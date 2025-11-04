@@ -122,6 +122,23 @@
 		}
 		/* === FIM: NOVOS ESTILOS (UX/TRANSIÇÕES) === */
 	</style>
+	/* ADICIONE ESTE CÓDIGO DENTRO DA TAG <style> NO <head> */
+
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+/* Removemos o CSS antigo do .login-modal que não é mais usado, 
+  pois o novo HTML tem seus próprios estilos Tailwind (bg-white/10, etc.) 
+*/
+.login-modal {
+    /* Não é mais necessário */
+}
 </head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
@@ -130,25 +147,88 @@
 		<i class="fas fa-spinner fa-spin mr-3"></i> Conectando...
 	</div>
 
-	<div id="auth-overlay">
-		<div class="w-full max-w-sm p-8 space-y-6 bg-transparent rounded-lg shadow-xl border border-indigo-800 login-modal">
-			<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logo" class="w-48 mx-auto">
-			<h2 class="text-2xl font-bold text-center">Bem-vindo ao Sistema</h2>
-			<div id="auth-error" class="hidden p-3 text-sm text-red-300 bg-red-800/50 border border-red-700 rounded-lg"></div>
-			<form id="login-form" class="space-y-4">
-				<div>
-					<label for="login-email" class="block text-sm font-medium text-gray-200">Email</label>
-					<input type="email" id="login-email" required class="mt-1 block w-full px-3 py-2 bg-transparent border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400">
-				</div>
-				<div>
-					<label for="login-password" class="block text-sm font-medium text-gray-200">Senha</label>
-					<input type="password" id="login-password" required class="mt-1 block w-full px-3 py-2 bg-transparent border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400">
-				</div>
-				<button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-8">Entrar</button>
-			</form>
-			<button id="theme-toggle" class="absolute top-4 right-4 text-white"><i class="fas fa-sun"></i></button>
-		</div>
-	</div>
+	<!-- COLE ESTE NOVO BLOCO NO LUGAR DO ANTIGO -->
+<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+    <!-- Background Effect -->
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+
+    <div class="relative z-10 w-full max-w-md">
+        <!-- Logo and Header -->
+        <div class="mb-8 text-center">
+            <img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+            <h1 class="text-3xl font-bold text-white mb-2">
+                Sistema Financeiro
+            </h1>
+            <p class="text-gray-300 text-sm">
+                Gestão profissional para advocacia
+            </p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+            <!-- Mantive o ID "login-form" para o JS funcionar -->
+            <form id="login-form" class="space-y-5">
+                <!-- Email Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-100 mb-2">
+                        Email
+                    </label>
+                    <div class="relative">
+                        <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+                        <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                        <input type="email"
+                               id="login-email"
+                               placeholder="seu@email.com"
+                               class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-100 mb-2">
+                        Senha
+                    </label>
+                    <div class="relative">
+                        <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+                        <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                        <input type="password"
+                               id="login-password"
+                               placeholder="••••••••"
+                               class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                               required />
+                    </div>
+                </div>
+
+                <!-- Error Message (Mantive o ID "auth-error" e apliquei seu novo estilo) -->
+                <div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+                    <!-- O JS vai preencher o erro aqui -->
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        id="login-submit-button"
+                        class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+                    <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+                    <i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+                    <span id="login-button-text">Entrar no Sistema</span>
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="mt-6 text-center text-gray-400 text-xs">
+                <p>Acesso restrito a usuários autorizados</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FIM DO NOVO BLOCO -->
 
 	<div id="app-container" class="container mx-auto p-4 md:p-8" aria-hidden="false">
 		<header class="mb-6 header-with-logo">
