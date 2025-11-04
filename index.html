@@ -120,23 +120,6 @@
 			transform: translateY(-1px);
 			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 		}
-		/* ADICIONE ESTE CÓDIGO DENTRO DA TAG <style> NO <head> */
-
-@keyframes blob {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-}
-.animate-blob {
-    animation: blob 7s infinite;
-}
-
-/* Removemos o CSS antigo do .login-modal que não é mais usado, 
-  pois o novo HTML tem seus próprios estilos Tailwind (bg-white/10, etc.) 
-*/
-.login-modal {
-    /* Não é mais necessário */
-}
 	</style>
 </head>
 <body class="text-gray-300">
