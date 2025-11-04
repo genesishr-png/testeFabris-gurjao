@@ -55,19 +55,18 @@
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
 		.filter-select { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
 		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
-		#loading-overlay, #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.2rem; transition: opacity 0.3s; }
-		#auth-overlay { z-index: 9999; }
+		#loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.2rem; transition: opacity 0.3s; }
+		/* #auth-overlay é estilizado diretamente pelo Tailwind no novo design */
+		#auth-overlay { display: none; } /* Deixamos o JS controlar a exibição */
 		#app-container { display: none; }
 		.admin-only { display: none; }
 		body.is-admin .admin-only { display: block; }
 		body.is-admin .flex.admin-only { display: flex; }
 		body:not(.is-admin) .non-admin-hidden { display: none; }
-		.login-modal { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: fadeIn 0.3s ease; }
-		.login-modal h2 { color: #ffffff; font-weight: 700; }
-		.login-modal input { background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; transition: border-color 0.2s; }
-		.login-modal input:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5); }
-		.login-modal button { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); transition: transform 0.2s, box-shadow 0.2s; }
-		.login-modal button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+		
+		/* CSS antigo do .login-modal não é mais necessário */
+		.login-modal { }
+
 		@keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 		.notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 11000; animation: slideIn 0.3s ease; }
 		@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -76,7 +75,7 @@
 		body.light-theme .login-modal { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
 		@media (max-width: 768px) { .kanban-column { min-width: 100%; } .header-user-block { margin-right: 0; } }
 
-		/* === INÍCIO: NOVOS ESTILOS DE PAGINAÇÃO === */
+		/* === INÍCIO: ESTILOS DE PAGINAÇÃO === */
 		.pagination-button {
 			background-color: #374151;
 			border: 1px solid #4b5563;
@@ -107,9 +106,9 @@
 			font-size: 14px;
 			color: #6b7280;
 		}
-		/* === FIM: NOVOS ESTILOS DE PAGINAÇÃO === */
+		/* === FIM: ESTILOS DE PAGINAÇÃO === */
 
-		/* === INÍCIO: NOVOS ESTILOS (UX/TRANSIÇÕES) === */
+		/* === INÍCIO: ESTILOS (UX/TRANSIÇÕES) === */
 		.modal input, .modal select, .modal textarea {
 			transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 		}
@@ -120,103 +119,113 @@
 			transform: translateY(-1px);
 			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 		}
-	</style>
-</head>
-<body class="text-gray-300">
+		/* === FIM: ESTILOS (UX/TRANSIÇÕES) === */
+		
+		/* === INÍCIO: ESTILOS (NOVO LOGIN) === */
+		@keyframes blob {
+			0%, 100% { transform: translate(0, 0) scale(1); }
+			33% { transform: translate(30px, -50px) scale(1.1); }
+			66% { transform: translate(-20px, 20px) scale(0.9); }
+		}
+		.animate-blob {
+			animation: blob 7s infinite;
+		}
+	<body class="text-gray-300">
 	<div id="notifications"></div>
 
 	<div id="loading-overlay">
-		<i class="fas fa-spinner fa-spin mr-3"></i> Conectando...
+		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
 	</div>
 
-	<!-- COLE ESTE NOVO BLOCO NO LUGAR DO ANTIGO -->
-<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
-    <!-- Background Effect -->
-    <div class="absolute inset-0 opacity-5">
-        <div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
-    </div>
+	<!-- [NOVO HTML DE LOGIN (Tradução do seu React)] -->
+	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+		<!-- Efeito de Fundo -->
+		<div class="absolute inset-0 opacity-5">
+			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
+		</div>
+	
+		<!-- Elementos Decorativos -->
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+	
+		<div class="relative z-10 w-full max-w-md">
+			<!-- Logótipo e Cabeçalho -->
+			<div class="mb-8 text-center">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+				<h1 class="text-3xl font-bold text-white mb-2">
+					Sistema Financeiro
+				</h1>
+				<p class="text-gray-300 text-sm">
+					Gestão profissional para advocacia
+				</p>
+			</div>
+	
+			<!-- Cartão de Login -->
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<!-- Mantive o ID "login-form" para o JS funcionar -->
+				<form id="login-form" class="space-y-5">
+					<!-- Input de Email -->
+					<div>
+						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
+							Email
+						</label>
+						<div class="relative">
+							<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email"
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+	
+					<!-- Input de Senha -->
+					<div>
+						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
+							Senha
+						</label>
+						<div class="relative">
+							<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password"
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+	
+					<!-- Mensagem de Erro (Mantive o ID "auth-error" e apliquei o seu novo estilo) -->
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+						<!-- O JS vai preencher o erro aqui -->
+					</div>
+	
+					<!-- Botão de Submeter -->
+					<button type="submit"
+							id="login-submit-button"
+							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
+						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+						<span id="login-button-text">Entrar no Sistema</span>
+					</button>
+				</form>
+	
+				<!-- Rodapé -->
+				<div class="mt-6 text-center text-gray-400 text-xs">
+					<p>Acesso restrito a utilizadores autorizados</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- [FIM DO NOVO HTML DE LOGIN] -->
 
-    <!-- Decorative Elements -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full max-w-md">
-        <!-- Logo and Header -->
-        <div class="mb-8 text-center">
-            <img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
-            <h1 class="text-3xl font-bold text-white mb-2">
-                Sistema Financeiro
-            </h1>
-            <p class="text-gray-300 text-sm">
-                Gestão profissional para advocacia
-            </p>
-        </div>
-
-        <!-- Login Card -->
-        <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
-            <!-- Mantive o ID "login-form" para o JS funcionar -->
-            <form id="login-form" class="space-y-5">
-                <!-- Email Input -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-100 mb-2">
-                        Email
-                    </label>
-                    <div class="relative">
-                        <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
-                        <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
-                        <input type="email"
-                               id="login-email"
-                               placeholder="seu@email.com"
-                               class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                               required />
-                    </div>
-                </div>
-
-                <!-- Password Input -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-100 mb-2">
-                        Senha
-                    </label>
-                    <div class="relative">
-                        <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
-                        <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
-                        <input type="password"
-                               id="login-password"
-                               placeholder="••••••••"
-                               class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-                               required />
-                    </div>
-                </div>
-
-                <!-- Error Message (Mantive o ID "auth-error" e apliquei seu novo estilo) -->
-                <div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                    <!-- O JS vai preencher o erro aqui -->
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit"
-                        id="login-submit-button"
-                        class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
-                    <!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
-                    <i id="login-button-icon" class="fas fa-sign-in-alt"></i>
-                    <span id="login-button-text">Entrar no Sistema</span>
-                </button>
-            </form>
-
-            <!-- Footer -->
-            <div class="mt-6 text-center text-gray-400 text-xs">
-                <p>Acesso restrito a usuários autorizados</p>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- FIM DO NOVO BLOCO -->
 
 	<div id="app-container" class="container mx-auto p-4 md:p-8" aria-hidden="false">
 		<header class="mb-6 header-with-logo">
 			<div>
 				<h1 class="text-3xl font-bold text-white">Painel de Gestão</h1>
-				<p class="text-gray-400">Controle Financeiro e de Produção do Escritório</p>
+				<p class="text-gray-400">Controlo Financeiro e de Produção do Escritório</p>
 			</div>
 			<div class="flex items-center header-user-block">
 				<span id="user-display-name" class="text-sm text-gray-300 font-medium mr-4"></span>
@@ -224,9 +233,8 @@
 					<i class="fas fa-sign-out-alt"></i> Sair
 				</button>
 			</div>
-			<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Fabris e Gurjão Logo" class="header-logo">
+			<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="header-logo">
 		</header>
-
 		<div class="border-b border-gray-700 mb-8">
 			<nav class="flex justify-between items-center -mb-px">
 				<div class="flex">
@@ -326,7 +334,7 @@
 
 		<div id="page-inadimplentes" class="hidden">
 			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-2xl font-semibold text-white">Controle de Inadimplentes (Meus Contratos)</h2>
+				<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
 				<div class="flex items-center gap-2">
 					<span class="text-sm text-gray-400">Ordenar por:</span>
 					<div id="inadimplentesSortButtons" class="flex gap-1"></div>
@@ -337,7 +345,7 @@
 
 		<div id="page-servicos" class="hidden">
 			<div class="flex justify-between items-center mb-4">
-				<h2 class="text-2xl font-semibold text-white">Controle de Produção de Serviços (Meus Contratos)</h2>
+				<h2 class="text-2xl font-semibold text-white">Controlo de Produção de Serviços (Meus Contratos)</h2>
 				<div class="flex items-center gap-4">
 					<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only"></select>
 					<div class="flex items-center gap-2">
@@ -354,29 +362,30 @@
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2>
 			</div>
-			<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Você pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
+			<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
 			<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 		</div>
 	</div>
-
+		<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalDisplayName" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
 		<div class="p-6">
 			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white mb-4">Bem-vindo(a)!</h2>
-			<p class="text-gray-400 mb-4">Percebemos que é seu primeiro acesso. Como você gostaria de ser chamado(a)?</p>
+			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
 			<form id="formDisplayName">
 				<div class="mb-4">
-					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400">Seu Nome de Exibição</label>
+					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400">O seu Nome de Exibição</label>
 					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" required>
 				</div>
-				<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Salvar e Entrar</button>
+				<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar e Entrar</button>
 			</form>
 		</div>
 	</div>
 
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalContrato" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
 		<div class="p-6">
 			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Cadastrar Novo Contrato</h2>
+				<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
 				<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
 			</div>
 			<form id="formContrato">
@@ -424,7 +433,7 @@
 							<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
 							<span class="ml-2 text-sm font-medium text-gray-300">Marcar valor fixo como já quitado (contrato antigo)</span>
 						</label>
-						<p class="text-xs text-gray-500 ml-6 mt-1">Isso criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
+						<p class="text-xs text-gray-500 ml-6 mt-1">Isto criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div class="mb-4">
@@ -448,16 +457,17 @@
 
 				<div class="flex justify-end mt-6">
 					<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2">Cancelar</button>
-					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Salvar</button>
+					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
 				</div>
 			</form>
 		</div>
 	</div>
 
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalPagamento" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
 		<div class="p-6">
 			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registrar Pagamento</h2>
+				<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
 				<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
 			</div>
 			<form id="formPagamento">
@@ -480,6 +490,7 @@
 		</div>
 	</div>
 
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalCliente" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
 		<div class="p-6">
 			<div class="flex justify-between items-center mb-4">
@@ -490,6 +501,7 @@
 		</div>
 	</div>
 
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalRelatorio" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
 		<div class="p-6">
 			<div class="flex justify-between items-center mb-6">
@@ -523,7 +535,7 @@
 
 			<div id="reportChartsContainer" class="hidden space-y-8">
 				<div class="dark-card p-6 rounded-lg shadow-lg">
-					<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturamento Real (Últimos 12 Meses)</h3>
+					<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real (Últimos 12 Meses)</h3>
 					<div class="relative" style="height: 350px;">
 						<canvas id="actualIncomeChartModal"></canvas>
 					</div>
@@ -539,10 +551,11 @@
 		</div>
 	</div>
 
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalExito" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
 		<div class="p-6">
 			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registrar Recebimento de Êxito</h2>
+				<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
 				<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
 			</div>
 			<form id="formExito">
@@ -555,27 +568,24 @@
 				<input type="hidden" id="exitoContractId">
 				<div class="flex justify-end mt-6">
 					<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2">Cancelar</button>
-					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Salvar Recebimento</button>
+					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Recebimento</button>
 				</div>
 			</form>
 		</div>
 	</div>
 
 	<div id="modal-backdrop" class="modal-backdrop"></div>
-		
-	<script type="module">
-		// Objeto global da aplicação
-		// window.App = window.App || {}; // Removido, será instanciado no final
 
+	<script type="module">
 		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+		
 		// Constantes Globais
 		const ADMIN_USERS = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Lilian"];
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
-
+		
 		// Objeto de Utilitários (Refatorado para ser independente)
 		const Utils = {
 			toastContainer: null,
@@ -629,15 +639,15 @@
 						modal = document.createElement('div');
 						modal.id = 'confirmModal';
 						modal.innerHTML = `
-<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:12000" role="alertdialog" aria-modal="true" aria-labelledby="confirmMessage">
-	<div class="dark-card" style="width:100%;max-width:420px;border-radius:12px;border:1px solid #374151;padding:16px;background:#111827">
+		<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:12000" role="alertdialog" aria-modal="true" aria-labelledby="confirmMessage">
+		<div class="dark-card" style="width:100%;max-width:420px;border-radius:12px;border:1px solid #374151;padding:16px;background:#111827">
 		<p id="confirmMessage" class="text-gray-200 mb-4"></p>
 		<div class="flex justify-end gap-2">
 			<button id="confirmCancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg">Cancelar</button>
 			<button id="confirmOk" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">Confirmar</button>
 		</div>
-	</div>
-</div>`;
+		</div>
+		</div>`;
 						document.body.appendChild(modal);
 					}
 					modal.querySelector('#confirmMessage').textContent = message;
@@ -656,7 +666,7 @@
 				return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 			}
 		};
-
+		
 		/**
 		 * @class CorrectionCalculator
 		 * @description Encapsula a lógica de cálculo de correção (IPCA + Juros)
@@ -664,8 +674,9 @@
 		class CorrectionCalculator {
 			constructor() {
 				this.ipcaWindowCache = new Map();
+				this.ipcaErrorToastShown = false; // [CORREÇÃO] Trava para o spam de toast de erro
 			}
-
+		
 			toUTCDate(y, m, d) { const dt = new Date(Date.UTC(y, m, d)); dt.setUTCHours(0,0,0,0); return dt; }
 			startOfMonthUTC(d) { return this.toUTCDate(d.getUTCFullYear(), d.getUTCMonth(), 1); }
 			endOfMonthUTC(d) { return this.toUTCDate(d.getUTCFullYear(), d.getUTCMonth() + 1, 0); }
@@ -677,14 +688,14 @@
 				if (d2 === 31 && d1 === 30) d2 = 30;
 				return Math.max(0, (y2 - y1) * 12 + (m2 - m1) + (d2 - d1) / 30);
 			}
-
+		
 			async fetchIPCAAccumulatedFactor(vencDate, refDate = new Date()) {
 				const start = this.startOfMonthUTC(vencDate);
 				const refMonth = this.startOfMonthUTC(refDate);
 				const endPrevMonth = this.endOfMonthUTC(this.toUTCDate(refMonth.getUTCFullYear(), refMonth.getUTCMonth(), 1 - 1));
 				
 				if (start.getTime() > endPrevMonth.getTime()) return 1;
-
+		
 				const toApiDate = (d) => {
 					const dd = String(d.getUTCDate()).padStart(2,'0');
 					const mm = String(d.getUTCMonth()+1).padStart(2,'0');
@@ -694,11 +705,11 @@
 				
 				const cacheKey = `${start.getUTCFullYear()}-${String(start.getUTCMonth()+1).padStart(2,'0')}..${endPrevMonth.getUTCFullYear()}-${String(endPrevMonth.getUTCMonth()+1).padStart(2,'0')}`;
 				if (this.ipcaWindowCache.has(cacheKey)) return this.ipcaWindowCache.get(cacheKey);
-
+		
 				const base = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados';
 				const url = `${base}?formato=json&dataInicial=${toApiDate(start)}&dataFinal=${toApiDate(endPrevMonth)}`;
 				const proxy = 'https://api.allorigins.win/get?url=';
-
+		
 				try {
 					const resp = await fetch(`${proxy}${encodeURIComponent(url)}`);
 					if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -715,7 +726,16 @@
 					return finalFactor;
 				} catch (e) {
 					console.error('Falha ao buscar IPCA:', e);
-					Utils.showToast('Falha ao buscar índice IPCA. Correção pode estar incompleta.', 'error');
+					
+					// [CORREÇÃO] Acalma o "spam" de alertas de erro do IPCA
+					if (!this.ipcaErrorToastShown) {
+						Utils.showToast('Falha ao buscar índice IPCA. A correção pode estar incompleta.', 'error');
+						this.ipcaErrorToastShown = true; // Ativa a trava
+						
+						// Reseta a trava depois de 1 minuto
+						setTimeout(() => { this.ipcaErrorToastShown = false; }, 60000); 
+					}
+					
 					return 1;
 				}
 			}
@@ -726,7 +746,7 @@
 				const venc = this.toUTCDate(vRaw.getUTCFullYear(), vRaw.getUTCMonth(), vRaw.getUTCDate());
 				
 				if (ref <= venc) return valorOriginal;
-
+		
 				// 1. Correção (IPCA)
 				const ipcaFactor = await this.fetchIPCAAccumulatedFactor(venc, ref);
 				
@@ -737,7 +757,7 @@
 				return valorOriginal * ipcaFactor * jurosSimplesFactor;
 			}
 		}
-
+		
 		/**
 		 * @class AuthService
 		 * @description Gerencia a autenticação com o Firebase
@@ -756,7 +776,7 @@
 					measurementId: "G-E99R5TFMQK"
 				};
 			}
-
+		
 			initialize() {
 				try {
 					const firebaseApp = initializeApp(this.firebaseConfig);
@@ -765,25 +785,37 @@
 					
 					const db = getFirestore(firebaseApp); // O DB é inicializado aqui
 					this.app.firebaseService.setDB(db); // E passado para o FirebaseService
-
+		
 					this.setupAuthListener();
 				} catch (error) {
 					console.error("Erro na inicialização do Firebase:", error);
 					document.getElementById('loading-overlay').textContent = "Erro ao conectar.";
 				}
 			}
-
+		
 			setupAuthListener() {
 				onAuthStateChanged(this.auth, (user) => {
 					this.app.handleAuthStateChange(user);
 				});
 			}
-
+		
 			async login(email, password) {
 				const authError = document.getElementById('auth-error');
 				authError.classList.add('hidden');
+				
+				// [NOVO] Lógica de loading do botão de login
+				const loginButton = document.getElementById('login-submit-button');
+				const buttonText = document.getElementById('login-button-text');
+				const buttonIcon = document.getElementById('login-button-icon');
+				
+				if (loginButton) loginButton.disabled = true;
+				if (buttonText) buttonText.textContent = "A entrar...";
+				if (buttonIcon) buttonIcon.className = "fas fa-spinner fa-spin";
+		
 				try {
 					await signInWithEmailAndPassword(this.auth, email, password);
+					// O onAuthStateChanged vai tratar do resto
+				
 				} catch (error) {
 					const showAuthError = (m) => { authError.textContent = m; authError.classList.remove('hidden'); };
 					if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(error.code)) {
@@ -792,9 +824,14 @@
 						showAuthError('Erro ao tentar fazer login.');
 						console.error("Erro de login:", error.code, error.message);
 					}
+				} finally {
+					// [NOVO] Reverte o estado do botão
+					if (loginButton) loginButton.disabled = false;
+					if (buttonText) buttonText.textContent = "Entrar no Sistema";
+					if (buttonIcon) buttonIcon.className = "fas fa-sign-in-alt";
 				}
 			}
-
+		
 			async logout() {
 				try {
 					await signOut(this.auth);
@@ -803,20 +840,20 @@
 					Utils.showToast('Erro ao tentar sair.', 'error');
 				}
 			}
-
+		
 			async updateUserProfile(displayName) {
 				if (!this.auth.currentUser) return false;
 				try {
 					await updateProfile(this.auth.currentUser, { displayName });
 					return true;
 				} catch (error) {
-					console.error("Erro ao salvar nome:", error);
-					Utils.showToast('Erro ao salvar seu nome.', 'error');
+					console.error("Erro ao guardar nome:", error);
+					Utils.showToast('Erro ao guardar o seu nome.', 'error');
 					return false;
 				}
 			}
 		}
-
+		
 		/**
 		 * @class FirebaseService
 		 * @description Centraliza todas as operações do Firestore (CRUD)
@@ -828,7 +865,7 @@
 				this.contractsCollection = null;
 				this.snapshotListenerUnsubscribe = null;
 			}
-
+		
 			setDB(dbInstance) {
 				this.db = dbInstance;
 			}
@@ -857,19 +894,19 @@
 					this.snapshotListenerUnsubscribe = null;
 				}
 			}
-
+		
 			async addContract(contractData) {
 				try {
 					await addDoc(this.contractsCollection, contractData);
-					Utils.showToast('Contrato salvo com sucesso.', 'success');
+					Utils.showToast('Contrato guardado com sucesso.', 'success');
 					return true;
 				} catch (error) {
 					console.error("Erro ao adicionar contrato:", error);
-					Utils.showToast('Erro ao salvar o contrato. Tente novamente.', 'error');
+					Utils.showToast('Erro ao guardar o contrato. Tente novamente.', 'error');
 					return false;
 				}
 			}
-
+		
 			async updateContract(contractId, contractData) {
 				try {
 					const contractRef = doc(this.contractsCollection, contractId);
@@ -882,7 +919,7 @@
 					return false;
 				}
 			}
-
+		
 			async updateContractField(contractId, fieldData) {
 				// Usado para operações simples como 'isDeleted' ou 'serviceTypes'
 				try {
@@ -895,7 +932,7 @@
 					return false;
 				}
 			}
-
+		
 			async deleteContract(contractId) {
 				try {
 					await deleteDoc(doc(this.contractsCollection, contractId));
@@ -908,6 +945,7 @@
 				}
 			}
 		}
+		
 		/**
 		 * @class AnalyticsHandler
 		 * @description Gerencia a criação e destruição dos gráficos (Chart.js)
@@ -918,23 +956,6 @@
 				this.projectedIncomeChartInstance = null;
 			}
 			
-			// Helper para criar um elemento de ícone com segurança
-			buildIcon(classes) {
-				const icon = document.createElement('i');
-				icon.className = classes;
-				return icon;
-			}
-			
-			// Helper para criar elementos DOM de forma mais limpa
-			buildElement(tag, { className = '', text = '', html = '', id = '' } = {}) {
-				const el = document.createElement(tag);
-				if (className) el.className = className;
-				if (text) el.textContent = text;
-				if (html) el.innerHTML = html; // Usar com cuidado, ex: para ícones
-				if (id) el.id = id;
-				return el;
-			}
-
 			getChartConfig(labels, data, label, backgroundColor, borderColor) {
 				return {
 					type: 'bar',
@@ -961,21 +982,21 @@
 					}
 				};
 			}
-
+		
 			renderActualIncomeChart(ctx, labels, data) {
 				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
 				this.actualIncomeChartInstance = new Chart(ctx, this.getChartConfig(
-					labels, data, 'Faturamento Real', 'rgba(74, 222, 128, 0.6)', 'rgba(74, 222, 128, 1)'
+					labels, data, 'Faturação Real', 'rgba(74, 222, 128, 0.6)', 'rgba(74, 222, 128, 1)'
 				));
 			}
-
+		
 			renderProjectedIncomeChart(ctx, labels, data) {
 				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
 				this.projectedIncomeChartInstance = new Chart(ctx, this.getChartConfig(
 					labels, data, 'Projeção (Parcelas)', 'rgba(139, 92, 246, 0.6)', 'rgba(139, 92, 246, 1)'
 				));
 			}
-
+		
 			destroyAllCharts() {
 				if (this.actualIncomeChartInstance) {
 					this.actualIncomeChartInstance.destroy();
@@ -987,7 +1008,7 @@
 				}
 			}
 		}
-
+		
 		/**
 		 * @class ReportHandler
 		 * @description Encapsula a lógica de geração de relatórios
@@ -996,10 +1017,10 @@
 			constructor(appInstance) {
 				this.app = appInstance;
 			}
-
+		
 			calculateMonthlyIncome(year, month, contractsToRender) {
 				if (!this.app.isUserAdmin) return { totalParcelas: 0, totalExito: 0, totalGeral: 0, detailedPayments: [] };
-
+		
 				let totalParcelas = 0, totalExito = 0, detailedPayments = [];
 				contractsToRender.filter(c => !c.isDeleted).forEach(contract => {
 					(contract.parcels || []).forEach(parcel => {
@@ -1026,12 +1047,12 @@
 				});
 				return { totalParcelas, totalExito, totalGeral: totalParcelas + totalExito, detailedPayments };
 			}
-
+		
 			getActualIncomeData(contractsToRender) {
 				const labels = [];
 				const data = [];
 				const hoje = new Date();
-
+		
 				for (let i = 11; i >= 0; i--) {
 					const date = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
 					labels.push(date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }));
@@ -1040,18 +1061,18 @@
 				}
 				return { labels, data };
 			}
-
+		
 			getProjectedIncomeData(contractsToRender) {
 				const labels = [];
 				const data = new Array(12).fill(0);
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 				const inicioMesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-
+		
 				for (let i = 0; i < 12; i++) {
 					const date = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
 					labels.push(date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }));
 				}
-
+		
 				const filteredContracts = contractsToRender.filter(c => !c.isDeleted);
 				for (const contract of filteredContracts) {
 					if (!contract.parcels) continue;
@@ -1067,7 +1088,7 @@
 				return { labels, data };
 			}
 		}
-
+		
 		/**
 		 * @class DOMBuilder
 		 * @description Encapsula toda a criação de elementos DOM
@@ -1076,7 +1097,7 @@
 			constructor(appInstance) {
 				this.app = appInstance; // Referência à instância principal do App
 			}
-
+		
 			// Helper para criar um elemento de ícone com segurança
 			buildIcon(classes) {
 				const icon = document.createElement('i');
@@ -1093,24 +1114,24 @@
 				if (id) el.id = id;
 				return el;
 			}
-
+		
 			// [REFATORADO] Usa createElement
 			createParcelCard(contract, parcel, index, type, remainingValue, valorCorrigido = null) {
 				const formattedDate = Utils.formatDate(parcel.dueDate);
 				const formattedValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const formattedRemaining = this.app.isUserAdmin ? Utils.formatCurrency(remainingValue) : '[Restrito]';
 				const formattedCorrigido = this.app.isUserAdmin && valorCorrigido ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
-
+		
 				let statusClass = '';
 				const card = this.buildElement('div', { className: 'dark-card p-4 rounded-lg shadow-md border-l-4' });
-
+		
 				const title = this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName });
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
 				const subtitle = this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: `${services} - Parcela ${parcel.number}/${contract.parcels.length || 1}` });
 				
 				const details = this.buildElement('div', { className: 'space-y-2 text-sm' });
 				let actionButton;
-
+		
 				if (type === 'vencida') {
 					statusClass = 'border-red-400';
 					if (this.app.isUserAdmin) {
@@ -1140,28 +1161,28 @@
 					});
 				}
 				card.classList.add(statusClass);
-
+		
 				// Data de Vencimento (comum a todos)
 				const vencimentoDiv = this.buildElement('div', { className: 'flex items-center text-gray-300' });
 				vencimentoDiv.append(this.buildIcon('fas fa-calendar-alt w-5 text-center mr-2 text-gray-500'));
 				vencimentoDiv.append(this.buildElement('strong', { text: 'Vencimento:' }));
 				vencimentoDiv.append(this.buildElement('span', { className: 'ml-auto font-medium', text: formattedDate }));
 				details.append(vencimentoDiv);
-
+		
 				card.append(title, subtitle, details);
-
+		
 				// Informações extras (Admin)
 				if (this.app.isUserAdmin) {
 					const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-400 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
 					extraInfo.innerHTML = `<span>Contrato: <strong>${Utils.formatCurrency(contract.totalValue || 0)}</strong></span> <span>Restante: <strong>${formattedRemaining}</strong></span>`;
 					card.append(extraInfo);
 				}
-
+		
 				// Botão de Ação
 				if (type !== 'paga') {
 					actionButton = this.buildElement('button', { 
 						className: 'mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
-						html: '<i class="fas fa-check"></i> Registrar Pagamento'
+						html: '<i class="fas fa-check"></i> Registar Pagamento'
 					});
 					actionButton.onclick = () => window.App.openPaymentModal(contract.id, index);
 				}
@@ -1187,14 +1208,14 @@
 				
 				const button = this.buildElement('button', {
 					className: 'w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
-					html: '<i class="fas fa-gavel"></i> Registrar Recebimento'
+					html: '<i class="fas fa-gavel"></i> Registar Recebimento'
 				});
 				button.onclick = () => window.App.openExitoModal(contract.id);
 				card.append(button);
-
+		
 				return card;
 			}
-
+		
 			// [REFATORADO] Usa createElement
 			createContractCard(contract, statusInfo) {
 				const { statusText, statusColor, borderColor } = statusInfo;
@@ -1207,25 +1228,25 @@
 				header.append(this.buildElement('h3', { className: 'font-bold text-xl text-white', text: contract.clientName }));
 				header.append(this.buildElement('span', { className: `px-2 py-1 rounded-full text-xs font-semibold ${statusColor}`, text: statusText }));
 				cardBody.append(header);
-
+		
 				// Advogado
 				const adv = this.buildElement('p', { className: 'text-xs text-indigo-300 mb-3' });
 				adv.append(this.buildIcon('fas fa-user-tie mr-1'));
 				adv.append(document.createTextNode(` ${contract.advogadoResponsavel}`));
 				cardBody.append(adv);
-
+		
 				// Tags de Serviço
 				const servicesContainer = this.buildElement('div', { className: 'mb-4' });
 				(contract.serviceTypes || []).forEach(s => {
 					servicesContainer.append(this.buildElement('span', { className: 'service-tag-small', text: s.name }));
 				});
 				cardBody.append(servicesContainer);
-
+		
 				// Detalhes Financeiros
 				const financialInfo = this.buildElement('div', { className: 'border-t border-gray-700 pt-4 space-y-3 text-sm' });
 				const valorFixoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(contract.totalValue) : '[Restrito]';
 				const exitoDisplay = this.app.isUserAdmin && contract.successFee ? contract.successFee : (contract.successFee ? '[Restrito]' : '');
-
+		
 				const fixedValueDiv = this.buildElement('div', { className: 'flex items-center text-gray-300' });
 				fixedValueDiv.append(this.buildIcon('fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500'));
 				fixedValueDiv.append(this.buildElement('strong', { text: 'Valor Fixo:' }));
@@ -1248,18 +1269,18 @@
 				historyBtn.title = "Ver Histórico do Cliente";
 				historyBtn.setAttribute('aria-label', `Ver Histórico do Cliente ${contract.clientName}`);
 				historyBtn.onclick = () => window.App.openClientHistoryModal(contract.clientName);
-
+		
 				const editBtn = this.buildElement('button', { className: 'text-sm flex items-center gap-2 text-gray-400 hover:text-green-400 hover:bg-green-900/20 py-1 px-3 rounded-md transition-colors', html: '<i class="fas fa-pencil-alt"></i> Editar' });
 				editBtn.title = "Editar Contrato";
 				editBtn.setAttribute('aria-label', `Editar Contrato de ${contract.clientName}`);
 				editBtn.onclick = () => window.App.openContractModal(contract.id);
-
+		
 				const deleteBtn = this.buildElement('button', { className: 'text-sm flex items-center gap-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 py-1 px-3 rounded-md transition-colors' });
 				deleteBtn.append(this.buildIcon('fas fa-trash-alt'));
 				deleteBtn.title = "Mover para Lixeira";
 				deleteBtn.setAttribute('aria-label', `Mover Contrato de ${contract.clientName} para lixeira`);
 				deleteBtn.onclick = () => window.App.moveToLixeira(contract.id);
-
+		
 				footer.append(historyBtn, editBtn, deleteBtn);
 				card.append(cardBody, footer);
 				return card;
@@ -1269,7 +1290,7 @@
 			createInadimplenteCard({ contract, parcel, index, diffDays, valorCorrigido }) {
 				const valorOriginalDisplay = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const valorCorrigidoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
-
+		
 				const card = this.buildElement('div', { className: 'dark-card p-5 rounded-lg shadow-lg border-l-4 border-red-500' });
 				card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 				
@@ -1301,10 +1322,10 @@
 				</div>`;
 				
 				card.append(details);
-
+		
 				const button = this.buildElement('button', {
 					className: 'mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
-					html: '<i class="fas fa-check"></i> Registrar Pagamento'
+					html: '<i class="fas fa-check"></i> Registar Pagamento'
 				});
 				button.onclick = () => window.App.openPaymentModal(contract.id, index);
 				card.append(button);
@@ -1320,7 +1341,7 @@
 				header.append(this.buildElement('h3', { className: 'font-bold text-xl text-indigo-300 mb-4', text: contract.clientName }));
 				header.append(this.buildElement('p', { className: 'text-sm text-gray-400', html: `<i class="fas fa-user-tie mr-1"></i> ${contract.advogadoResponsavel}` }));
 				card.append(header);
-
+		
 				const progressBars = this.buildElement('div', { className: 'space-y-4 mb-4' });
 				if (this.app.isUserAdmin) {
 					const financialProgressDiv = this.buildElement('div');
@@ -1340,7 +1361,7 @@
 				const serviceListContainer = this.buildElement('div', { className: 'border-t border-gray-700 pt-3' });
 				serviceListContainer.append(this.buildElement('h4', { className: 'font-semibold text-sm mb-2 text-gray-400', text: 'Serviços do Contrato:' }));
 				const serviceList = this.buildElement('ul', { className: 'space-y-1' });
-
+		
 				(contract.serviceTypes || []).forEach((service, index) => {
 					serviceList.append(this.createServiceListItem(contract, service, index));
 				});
@@ -1353,7 +1374,7 @@
 			// [REFATORADO] Helper para createServicoCard
 			createServiceListItem(contract, service, index) {
 				const li = this.buildElement('li', { className: 'flex items-center justify-between p-2 rounded-md' });
-
+		
 				const iconClass =
 					service.status === 'Concluído' ? 'fas fa-check-circle text-teal-500' :
 					service.status === '50% Concluído' ? 'fas fa-adjust text-purple-500' :
@@ -1427,12 +1448,12 @@
 				btn.onclick = onClick;
 				return btn;
 			}
-
+		
 			// [REFATORADO] Usa createElement
 			renderPaginationControls(container, totalItems, totalPages, currentPage) {
 				container.innerHTML = ''; // Limpa
 				if (totalPages <= 1) return;
-
+		
 				const createPageButton = (pageIndex, text = null, isDisabled = false, isActive = false) => {
 					const btn = this.buildElement('button', {
 						className: 'pagination-button',
@@ -1446,7 +1467,7 @@
 					}
 					return btn;
 				};
-
+		
 				// Botão "Anterior"
 				container.append(createPageButton(currentPage - 1, '« Ant', currentPage === 0));
 				
@@ -1456,7 +1477,7 @@
 				if (endPage - startPage + 1 < maxVisibleButtons) {
 					startPage = Math.max(0, endPage - maxVisibleButtons + 1);
 				}
-
+		
 				// Botão "Primeira Página" e "..."
 				if (startPage > 0) {
 					container.append(createPageButton(0));
@@ -1464,12 +1485,12 @@
 						container.append(this.buildElement('span', { text: '...' }));
 					}
 				}
-
+		
 				// Botões de números
 				for (let i = startPage; i <= endPage; i++) {
 					container.append(createPageButton(i, null, false, i === currentPage));
 				}
-
+		
 				// Botão "Última Página" e "..."
 				if (endPage < totalPages - 1) {
 					if (endPage < totalPages - 2) {
@@ -1477,14 +1498,16 @@
 					}
 					container.append(createPageButton(totalPages - 1));
 				}
-
+		
 				// Botão "Próximo"
 				container.append(createPageButton(currentPage + 1, 'Próx »', currentPage === totalPages - 1));
 			}
 		}
+		
+		
 		/**
 		 * @class App
-		 * @description Classe principal que gerencia o estado e a lógica do dashboard
+		 * @description Classe principal que gere o estado e a lógica do dashboard
 		 */
 		class App {
 			constructor() {
@@ -1508,7 +1531,7 @@
 				// Estado dos Modais (para acessibilidade)
 				this.openModalId = null;
 				this.lastFocusedElement = null;
-
+		
 				// Serviços Injetados
 				this.authService = new AuthService(this);
 				this.firebaseService = new FirebaseService(this);
@@ -1517,15 +1540,15 @@
 				this.analyticsHandler = new AnalyticsHandler(this);
 				this.correctionCalculator = new CorrectionCalculator(this);
 			}
-
+		
 			// --- 1. INICIALIZAÇÃO E EVENT LISTENERS ---
-
+		
 			initialize() {
 				this.authService.initialize();
 				this.setupEventListeners();
 				this._setupModalAccessibility();
 			}
-
+		
 			setupEventListeners() {
 				// Formulário de Login
 				document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -1534,30 +1557,30 @@
 					const password = document.getElementById('login-password').value;
 					this.authService.login(email, password);
 				});
-
+		
 				// Botão de Logout
 				document.getElementById('logout-button').addEventListener('click', () => {
 					this.authService.logout();
 				});
-
+		
 				// Formulário de Nome de Exibição
 				document.getElementById('formDisplayName').addEventListener('submit', this.handleDisplayNameSubmit.bind(this));
-
+		
 				// Formulários de Modais
 				document.getElementById('formContrato').addEventListener('submit', this.handleContractSubmit.bind(this));
 				document.getElementById('formPagamento').addEventListener('submit', this.handlePaymentSubmit.bind(this));
 				document.getElementById('formExito').addEventListener('submit', this.handleExitoSubmit.bind(this));
-
+		
 				// Botão de Adicionar Serviço (no modal de contrato)
 				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
-
+		
 				// Inputs de Busca (com debounce)
 				const debouncedContracts = Utils.debounce(() => this.resetAndRenderContractList(), 300);
 				document.getElementById('searchInput').addEventListener('input', debouncedContracts);
 				
 				const debouncedServicos = Utils.debounce(() => this.renderServicosPage(), 300);
 				document.getElementById('servicosSearchInput').addEventListener('input', debouncedServicos);
-
+		
 				// Backdrop dos modais
 				if (this.backdrop) {
 					this.backdrop.addEventListener('click', () => {
@@ -1567,23 +1590,23 @@
 					});
 				}
 			}
-
+		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS (Callbacks dos Serviços) ---
-
+		
 			handleAuthStateChange(user) {
 				if (user) {
 					this.currentUserDisplayName = user.displayName;
 					this.isUserAdmin = ADMIN_USERS.includes(this.currentUserDisplayName);
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
-
+		
 					if (!user.displayName) {
 						// Primeiro login, pedir nome
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'none';
+						this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
 						this.appContainer.style.display = 'none';
 						this.openModal('modalDisplayName');
 					} else {
-						// Usuário logado e com nome
+						// Utilizador logado e com nome
 						document.getElementById('user-display-name').textContent = user.displayName;
 						this.loadingOverlay.style.display = 'none';
 						this.authOverlay.style.display = 'none';
@@ -1592,34 +1615,34 @@
 						this.firebaseService.startSnapshotListener('contracts'); // Inicia o listener
 					}
 				} else {
-					// Usuário deslogado
+					// Utilizador deslogado
 					this.currentUserDisplayName = null;
 					this.isUserAdmin = false;
 					document.body.classList.remove('is-admin');
-					this.authOverlay.style.display = 'flex';
+					this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
 					this.appContainer.style.display = 'none';
 					this.loadingOverlay.style.display = 'none';
 					this.firebaseService.stopSnapshotListener(); // Para o listener
 				}
 			}
-
+		
 			handleSnapshotUpdate(contracts) {
 				this.database.contracts = contracts;
 				this.contractListPage = 0; // Reseta a paginação a cada nova atualização
 				this.render(); // Renderiza a aplicação com os novos dados
 			}
-
+		
 			// --- 3. LÓGICA DE RENDERIZAÇÃO PRINCIPAL ---
-
+		
 			async render() {
 				if (this.appContainer.style.display !== 'block') return;
-
+		
 				const currentPage = document.querySelector('div[id^="page-"]:not(.hidden)');
 				if (!currentPage) {
 					this.showPage('page-dashboard'); // Padrão se nenhuma página estiver visível
 					return;
 				}
-
+		
 				const pageId = currentPage.id;
 				
 				// As funções de renderização agora pegam os dados filtrados
@@ -1633,11 +1656,11 @@
 				} else if (pageId === 'page-lixeira') {
 					this.renderLixeiraPage();
 				}
-
+		
 				this.renderSortButtons();
 				this.renderAdvogadoFilters();
 			}
-
+		
 			/**
 			 * @description Renderiza o quadro Kanban
 			 */
@@ -1647,31 +1670,31 @@
 				const kanbanAVencer = document.getElementById('kanban-a-vencer');
 				const kanbanPagas = document.getElementById('kanban-pagas');
 				const kanbanExito = document.getElementById('kanban-exito');
-
+		
 				// Usar DocumentFragment para performance
 				const fragVencidas = document.createDocumentFragment();
 				const fragAVencer = document.createDocumentFragment();
 				const fragPagas = document.createDocumentFragment();
 				const fragExito = document.createDocumentFragment();
-
+		
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 				const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 				const trintaDiasFrente = new Date(); trintaDiasFrente.setDate(hoje.getDate() + 30);
-
+		
 				let totalAVencer30dias = 0;
 				let totalVencido = 0;
 				const vencidasPromises = [];
-
+		
 				for (const contract of contractsToRender) {
 					if (!contract.parcels) contract.parcels = [];
 					let remainingValue = this.isUserAdmin
 						? contract.parcels.reduce((sum, p) => p.status === 'Pendente' ? sum + p.value : sum, 0)
 						: 0;
-
+		
 					for (let i = 0; i < contract.parcels.length; i++) {
 						const parcel = contract.parcels[i];
 						const vencimento = new Date(parcel.dueDate);
-
+		
 						if (parcel.status === 'Paga') {
 							const dataPagamento = new Date(parcel.paymentDate);
 							if (dataPagamento >= primeiroDiaMes && dataPagamento <= hoje) {
@@ -1696,28 +1719,28 @@
 						fragExito.append(this.domBuilder.createExitoCard(contract));
 					}
 				}
-
+		
 				// Limpa containers
 				kanbanVencidas.innerHTML = '';
 				kanbanAVencer.innerHTML = '';
 				kanbanPagas.innerHTML = '';
 				kanbanExito.innerHTML = '';
-
+		
 				// Processa promessas vencidas
 				const vencidasCards = await Promise.all(vencidasPromises);
 				vencidasCards.forEach(card => fragVencidas.append(card));
-
+		
 				// Anexa fragmentos
 				kanbanVencidas.append(fragVencidas);
 				kanbanAVencer.append(fragAVencer);
 				kanbanPagas.append(fragPagas);
 				kanbanExito.append(fragExito);
-
+		
 				const allContracts = this.getFilteredContracts(true); // Inclui deletados para cálculo histórico
 				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
-
+		
 			/**
 			 * @description Atualiza os números do Dashboard
 			 */
@@ -1727,7 +1750,7 @@
 				document.getElementById('dash-recebido').textContent = Utils.formatCurrency(pago);
 				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
-
+		
 			/**
 			 * @description Renderiza a lista principal de contratos com paginação
 			 */
@@ -1738,47 +1761,47 @@
 				
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
-
+		
 				// 1. Filtra os contratos
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
 					return matchesAdvogado && matchesSearch;
 				});
-
+		
 				// 2. Ordena os contratos
 				if (this.currentContractSort === 'name-asc') {
 					filteredContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				} else if (this.currentContractSort === 'value-desc' && this.isUserAdmin) {
 					filteredContracts.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
 				}
-
+		
 				// 3. Calcula o total de itens e páginas
 				const totalItems = filteredContracts.length;
 				const totalPages = Math.ceil(totalItems / CONTRACTS_PER_PAGE);
-
+		
 				// 4. Garante que a página atual seja válida
 				if (this.contractListPage >= totalPages && totalPages > 0) this.contractListPage = totalPages - 1;
 				if (this.contractListPage < 0) this.contractListPage = 0;
-
+		
 				// 5. Pega apenas os itens da página atual
 				const startIndex = this.contractListPage * CONTRACTS_PER_PAGE;
 				const paginatedContracts = filteredContracts.slice(startIndex, startIndex + CONTRACTS_PER_PAGE);
-
+		
 				// 6. Limpa o container e renderiza
 				listContainer.innerHTML = '';
 				const paginationContainer = document.getElementById('paginationContainer');
-
+		
 				if (totalItems === 0) {
 					listContainer.innerHTML = '<div class="dark-card p-4 rounded-lg shadow-md text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>';
 					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0); // Limpa controles
 					return;
 				}
-
+		
 				// 7. Cria o grid e o fragmento
 				const gridContainer = this.domBuilder.buildElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' });
 				const fragment = document.createDocumentFragment();
-
+		
 				paginatedContracts.forEach(contract => {
 					const statusInfo = this.getContractStatus(contract);
 					fragment.append(this.domBuilder.createContractCard(contract, statusInfo));
@@ -1786,20 +1809,20 @@
 				
 				gridContainer.append(fragment);
 				listContainer.append(gridContainer);
-
+		
 				// 9. Renderiza os controles de paginação
 				this.domBuilder.renderPaginationControls(paginationContainer, totalItems, totalPages, this.contractListPage);
 			}
-
+		
 			/**
 			 * @description Renderiza a página de Inadimplentes
 			 */
 			async renderInadimplentesPage() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const container = document.getElementById('inadimplentesListContainer');
-				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">Calculando...</p></div>`;
+				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-
+		
 				// 1. Mapeia todas as parcelas vencidas e calcula a correção
 				const results = await Promise.all(contractsToRender.map(async (contract) => {
 					if (!contract.parcels) return [];
@@ -1816,7 +1839,7 @@
 					return contractInadimplencias;
 				}));
 				let inadimplentesList = results.flat();
-
+		
 				// 2. Ordena
 				if (this.currentInadimplentesSort === 'days-desc') {
 					inadimplentesList.sort((a, b) => b.diffDays - a.diffDays);
@@ -1825,7 +1848,7 @@
 				} else if (this.currentInadimplentesSort === 'name-asc') {
 					inadimplentesList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
 				}
-
+		
 				// 3. Renderiza
 				container.innerHTML = '';
 				if (inadimplentesList.length === 0) {
@@ -1839,7 +1862,7 @@
 				});
 				container.append(fragment);
 			}
-
+		
 			/**
 			 * @description Renderiza a página de Serviços/Produção
 			 */
@@ -1850,9 +1873,9 @@
 				const advogadoFilterEl = document.getElementById('servicosAdvogadoFilter');
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
-
+		
 				container.innerHTML = '';
-
+		
 				let activeContracts = contractsToRender.filter(c => {
 					const isNotConcluded = this.getContractStatus(c).statusText !== 'Concluído';
 					if (!isNotConcluded) return false;
@@ -1860,19 +1883,19 @@
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm)) || c.advogadoResponsavel.toLowerCase().includes(searchTerm);
 					return matchesAdvogado && matchesSearch;
 				});
-
+		
 				// Ordena
 				if (this.currentServicosSort === 'name-asc') {
 					activeContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				} else if (this.currentServicosSort === 'adv-asc') {
 					activeContracts.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
 				}
-
+		
 				if (activeContracts.length === 0) {
 					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card text-indigo-400 p-6 rounded-lg shadow-md"><i class="fas fa-coffee fa-3x mb-3"></i><p class="font-bold text-xl">Nenhum contrato ativo encontrado.</p><p class="text-sm text-gray-400">Nenhum resultado para a busca ou todos os trabalhos estão concluídos.</p></div></div>`;
 					return;
 				}
-
+		
 				// Renderiza
 				const fragment = document.createDocumentFragment();
 				activeContracts.forEach(contract => {
@@ -1884,7 +1907,7 @@
 						else if (service.status === 'Em Andamento') progressValue += 0.25;
 					});
 					const serviceProgress = totalServices > 0 ? (progressValue / totalServices) * 100 : 0;
-
+		
 					const totalPaid = (contract.parcels || []).reduce((sum, p) => sum + (p.valuePaid || 0), 0) + (contract.successFeeValueReceived || 0);
 					const financialProgress = (contract.totalValue || 0) > 0 ? (totalPaid / contract.totalValue) * 100 : (totalPaid > 0 ? 100 : 0);
 					
@@ -1901,12 +1924,12 @@
 				const container = document.getElementById('lixeiraListContainer');
 				container.innerHTML = '';
 				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true);
-
+		
 				if (deletedContracts.length === 0) {
 					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card text-gray-400 p-6 rounded-lg shadow-md"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
 					return;
 				}
-
+		
 				const fragment = document.createDocumentFragment();
 				deletedContracts.forEach(contract => {
 					const card = this.domBuilder.buildElement('div', { className: 'dark-card p-5 rounded-lg shadow-lg border-l-4 border-gray-600' });
@@ -1919,7 +1942,7 @@
 					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
 					restoreBtn.onclick = () => this.restoreContract(contract.id);
 					footer.append(restoreBtn);
-
+		
 					if (this.isUserAdmin) {
 						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
 						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
@@ -1931,9 +1954,9 @@
 				});
 				container.append(fragment);
 			}
-
+		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
-
+		
 			showPage(pageId) {
 				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira'].forEach(id => {
 					const el = document.getElementById(id);
@@ -1943,18 +1966,18 @@
 					const tab = document.getElementById(id);
 					if (tab) tab.classList.remove('active');
 				});
-
+		
 				const targetPage = document.getElementById(pageId);
 				if (targetPage) targetPage.classList.remove('hidden');
-
+		
 				const tabId = `tab-${pageId.split('-')[1]}`;
 				const targetTab = document.getElementById(tabId);
 				if (targetTab) targetTab.classList.add('active');
-
+		
 				// Chama o render, que agora é inteligente e renderiza a página ativa
 				this.render();
 			}
-
+		
 			setupUIAccess() {
 				const isAdmin = this.isUserAdmin;
 				const advogadoFilters = [
@@ -1967,13 +1990,13 @@
 						select.value = isAdmin ? 'Todos' : this.currentUserDisplayName;
 					}
 				});
-
+		
 				const financialFields = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito'];
 				financialFields.forEach(id => {
 					const field = document.getElementById(id);
 					if (field) field.disabled = !isAdmin;
 				});
-
+		
 				this.populateAdvogadoSelectModal();
 			}
 			
@@ -1982,14 +2005,14 @@
 				if (this.isUserAdmin) return includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
 				return allContracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted));
 			}
-
+		
 			getContractStatus(contract) {
 				const hasPendingParcels = (contract.parcels || []).some(p => p.status === 'Pendente');
 				if (hasPendingParcels) return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
 				if (contract.successFee && !contract.successFeePaymentDate) return { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' };
 				return { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' };
 			}
-
+		
 			renderSortButtons() {
 				const contractSortContainer = document.getElementById('contractSortButtons');
 				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
@@ -2006,25 +2029,25 @@
 					};
 					container.append(button);
 				};
-
+		
 				// Limpa
 				contractSortContainer.innerHTML = '';
 				inadimplentesSortContainer.innerHTML = '';
 				servicosSortContainer.innerHTML = '';
-
+		
 				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				if (this.isUserAdmin) {
 					createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				}
-
+		
 				// Botões de Inadimplentes
 				createButton(inadimplentesSortContainer, 'days-desc', 'Mais Antigas', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				createButton(inadimplentesSortContainer, 'name-asc', 'Nome (A-Z)', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				if (this.isUserAdmin) {
 					createButton(inadimplentesSortContainer, 'value-desc', 'Maior Valor', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				}
-
+		
 				// Botões de Serviços
 				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
@@ -2035,37 +2058,37 @@
 				const filterSelects = [document.getElementById('advogadoFilter'), document.getElementById('servicosAdvogadoFilter')];
 				const fixedNames = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Dr. Glaison", "Dr. Bruno D'Lucas", "Dra. Danielle Guimarães", "Dr. Joaquim Océlio", "Dra. Larissa Mendes"];
 				const allNames = new Set([...fixedNames, ...advogados]);
-
+		
 				filterSelects.forEach(select => {
 					if (!select) return;
 					const currentValue = select.value;
 					select.innerHTML = '<option value="Todos">Todos</option>';
 					select.add(new Option("Não Informado", "Não Informado"));
-
+		
 					[...allNames].filter(adv => adv && adv !== "Não Informado" && adv !== "Todos").sort().forEach(adv => {
 						select.add(new Option(adv, adv));
 					});
-
+		
 					select.value = this.isUserAdmin ? (currentValue || 'Todos') : this.currentUserDisplayName;
 					select.disabled = !this.isUserAdmin;
 				});
 			}
-
+		
 			populateAdvogadoSelectModal() {
 				const select = document.getElementById('advogadoResponsavel');
 				if (!select) return;
 				const currentValue = select.value;
 				select.innerHTML = '';
 				select.add(new Option("Não Informado", "Não Informado"));
-
+		
 				const advogados = [...new Set(this.database.contracts.map(c => c.advogadoResponsavel))].sort();
 				const fixedNames = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Dr. Glaison", "Dr. Bruno D'Lucas", "Dra. Danielle Guimarães", "Dr. Joaquim Océlio", "Dra. Larissa Mendes"];
 				const allNames = new Set([...fixedNames, ...advogados]);
-
+		
 				[...allNames].filter(adv => adv && adv !== "Não Informado").sort().forEach(adv => {
 					select.add(new Option(adv, adv));
 				});
-
+		
 				select.value = currentValue && currentValue !== 'Não Informado' ? currentValue : (this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName);
 				select.disabled = !this.isUserAdmin && !!this.currentUserDisplayName;
 			}
@@ -2080,7 +2103,7 @@
 				this.contractListPage = 0;
 				this.renderContractList();
 			}
-
+		
 			// --- 5. LÓGICA DE AÇÕES (CRUD) ---
 			
 			async handleDisplayNameSubmit(e) {
@@ -2097,7 +2120,7 @@
 					this.firebaseService.startSnapshotListener('contracts'); // Inicia listener após salvar nome
 				}
 			}
-
+		
 			async handleContractSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('contractId').value;
@@ -2108,7 +2131,7 @@
 					deadline: tag.dataset.deadline || null
 				}));
 				if (serviceTypes.length === 0) { Utils.showToast('Adicione pelo menos um serviço.', 'error'); return; }
-
+		
 				const contractData = {
 					clientName: Utils.sanitizeText(document.getElementById('clienteNome').value),
 					advogadoResponsavel: Utils.sanitizeText(document.getElementById('advogadoResponsavel').value),
@@ -2116,14 +2139,14 @@
 					paymentType: Utils.sanitizeText(document.getElementById('contratoTipoPagamento').value),
 					observations: Utils.sanitizeText(document.getElementById('contratoObservacoes').value),
 				};
-
+		
 				if (this.isUserAdmin) {
 					Object.assign(contractData, {
 						totalValue: Utils.parseNumber(document.getElementById('valorTotal').value),
 						successFee: Utils.sanitizeText(document.getElementById('taxaExito').value) || null,
 					});
 				}
-
+		
 				if (!contractId) {
 					// --- Lógica de NOVO Contrato ---
 					Object.assign(contractData, {
@@ -2132,13 +2155,13 @@
 						isDeleted: false,
 						parcels: []
 					});
-
+		
 					if (this.isUserAdmin) {
 						const jaQuitado = document.getElementById('contratoJaQuitado').checked;
 						const totalValue = contractData.totalValue;
 						const numParcels = parseInt(document.getElementById('numParcelas').value) || 1;
 						const firstDueDate = document.getElementById('vencimentoPrimeiraParcela').value;
-
+		
 						if (numParcels > 0 && totalValue > 0) {
 							if (!firstDueDate && !jaQuitado) {
 								Utils.showToast('Informe data da 1ª parcela.', 'error');
@@ -2159,7 +2182,9 @@
 							}
 						}
 					}
-					await this.firebaseService.addContract(contractData);
+					if (await this.firebaseService.addContract(contractData)) {
+						this.closeModal('modalContrato');
+					}
 				} else {
 					// --- Lógica de EDITAR Contrato ---
 					const existingContract = this.database.contracts.find(c => c.id === contractId);
@@ -2177,9 +2202,11 @@
 						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
 					}
 					contractData.isDeleted = existingContract?.isDeleted || false;
-					await this.firebaseService.updateContract(contractId, contractData);
+					
+					if (await this.firebaseService.updateContract(contractId, contractData)) {
+						this.closeModal('modalContrato');
+					}
 				}
-				this.closeModal('modalContrato');
 			}
 			
 			async handlePaymentSubmit(e) {
@@ -2191,7 +2218,7 @@
 					? Utils.parseNumber(document.getElementById('pagamentoValor').value)
 					: (contract?.parcels[parcelIndex]?.value || 0);
 				const paymentDate = document.getElementById('pagamentoData').value;
-
+		
 				if (contract && !isNaN(valuePaid)) {
 					const updatedParcels = [...(contract.parcels || [])];
 					updatedParcels[parcelIndex].status = 'Paga';
@@ -2201,19 +2228,19 @@
 					const success = await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels });
 					if (success) {
 						this.closeModal('modalPagamento');
-						Utils.showToast('Pagamento registrado.', 'success');
+						Utils.showToast('Pagamento registado.', 'success');
 					}
 				} else {
 					Utils.showToast('Valor de pagamento inválido.', 'error');
 				}
 			}
-
+		
 			async handleExitoSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('exitoContractId').value;
 				const valueReceived = this.isUserAdmin ? Utils.parseNumber(document.getElementById('exitoValorRecebido').value) : 0;
 				const contract = this.database.contracts.find(c => c.id === contractId);
-
+		
 				if (contract) {
 					if (this.isUserAdmin && (isNaN(valueReceived) || valueReceived <= 0)) {
 						Utils.showToast('Valor de êxito inválido.', 'error');
@@ -2225,17 +2252,17 @@
 					});
 					if (success) {
 						this.closeModal('modalExito');
-						Utils.showToast('Êxito registrado.', 'success');
+						Utils.showToast('Êxito registado.', 'success');
 					}
 				}
 			}
-
+		
 			handleAddServiceTag() {
 				const nameInput = document.getElementById('contratoServicoInput');
 				const deadlineInput = document.getElementById('contratoPrazoInput');
 				const serviceName = Utils.sanitizeText(nameInput.value);
 				const deadline = deadlineInput.value || null;
-
+		
 				if (serviceName) {
 					this.createServiceTag(serviceName, deadline, 'Pendente');
 					nameInput.value = '';
@@ -2254,38 +2281,38 @@
 					await this.firebaseService.updateContractField(contractId, { serviceTypes: updatedServiceTypes });
 				}
 			}
-
+		
 			async moveToLixeira(contractId) {
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract) return;
-				const ok = await Utils.confirm(`Tem certeza que deseja mover o contrato de "${contract.clientName}" para a lixeira?`);
+				const ok = await Utils.confirm(`Tem a certeza que deseja mover o contrato de "${contract.clientName}" para a lixeira?`);
 				if (!ok) return;
 				
 				const success = await this.firebaseService.updateContractField(contractId, { isDeleted: true });
 				if (success) Utils.showToast('Contrato movido para a lixeira.', 'success');
 			}
-
+		
 			async restoreContract(contractId) {
-				const ok = await Utils.confirm(`Tem certeza que deseja restaurar este contrato?`);
+				const ok = await Utils.confirm(`Tem a certeza que deseja restaurar este contrato?`);
 				if (!ok) return;
 				const success = await this.firebaseService.updateContractField(contractId, { isDeleted: false });
 				if (success) Utils.showToast('Contrato restaurado.', 'success');
 			}
-
+		
 			async deleteContractPermanently(contractId) {
 				if (!this.isUserAdmin) return;
-				const ok = await Utils.confirm(`EXCLUSÃO PERMANENTE: Tem certeza? Esta ação não pode ser desfeita.`);
+				const ok = await Utils.confirm(`EXCLUSÃO PERMANENTE: Tem a certeza? Esta ação não pode ser desfeita.`);
 				if (!ok) return;
 				await this.firebaseService.deleteContract(contractId);
 				// O Toast já é mostrado pelo firebaseService
 			}
-
+		
 			// --- 6. LÓGICA DE MODAIS (com Acessibilidade) ---
-
+		
 			openModal(modalId) {
-				// Salva o foco atual
+				// Guarda o foco atual
 				this.lastFocusedElement = document.activeElement;
-
+		
 				// Fecha outros modais
 				const modals = document.querySelectorAll('.modal');
 				modals.forEach(m => { if (m && m.style.display === 'block' && m.id !== modalId) m.style.display = 'none'; });
@@ -2297,18 +2324,18 @@
 				document.body.style.overflow = 'hidden';
 				this.appContainer.setAttribute('aria-hidden', 'true');
 				this.openModalId = modalId;
-
+		
 				// Foca no primeiro elemento interativo dentro do modal
 				const firstFocusableEl = modal.querySelector('button, [href], input, select, textarea');
 				if (firstFocusableEl) firstFocusableEl.focus();
 			}
-
+		
 			closeModal(modalId) {
 				const el = document.getElementById(modalId);
 				if (el) el.style.display = 'none';
 				
 				if (this.openModalId === modalId) this.openModalId = null;
-
+		
 				const anyOpen = Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'block');
 				
 				if (this.backdrop && !anyOpen) {
@@ -2325,7 +2352,7 @@
 					this.analyticsHandler.destroyAllCharts();
 				}
 			}
-
+		
 			openContractModal(contractId = null) {
 				try {
 					const form = document.getElementById('formContrato'); form.reset();
@@ -2334,7 +2361,7 @@
 					this.populateAdvogadoSelectModal();
 					const advogadoSelect = document.getElementById('advogadoResponsavel');
 					const jaQuitadoCheckbox = document.getElementById('contratoJaQuitado');
-
+		
 					if (contractId) {
 						// Modo de Edição
 						const contract = this.database.contracts.find(c => c.id === contractId);
@@ -2358,7 +2385,7 @@
 						}
 					} else {
 						// Modo de Criação
-						title.textContent = "Cadastrar Novo Contrato";
+						title.textContent = "Registar Novo Contrato";
 						document.getElementById('contractId').value = '';
 						advogadoSelect.value = this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName;
 						jaQuitadoCheckbox.checked = false;
@@ -2376,14 +2403,14 @@
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract || !contract.parcels || !contract.parcels[parcelIndex]) return;
 				const parcel = contract.parcels[parcelIndex];
-
+		
 				let valorCorrigido = parcel.value;
 				let infoCorrecao = '';
 				if (new Date(parcel.dueDate) < new Date()) {
 					valorCorrigido = await this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
 					if (this.isUserAdmin) infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> ${Utils.formatCurrency(valorCorrigido)}</p>`;
 				}
-
+		
 				document.getElementById('pagamentoContractId').value = contractId;
 				document.getElementById('pagamentoParcelIndex').value = parcelIndex;
 				const infoDiv = document.getElementById('pagamentoInfo');
@@ -2392,28 +2419,28 @@
 					<p><strong>Parcela:</strong> ${parcel.number}/${contract.parcels.length}</p>
 					${this.isUserAdmin ? `<p><strong>Valor Original:</strong> ${Utils.formatCurrency(parcel.value)}</p>` : ''}
 					${infoCorrecao}`;
-
+		
 				const valorInput = document.getElementById('pagamentoValor');
 				valorInput.value = (this.isUserAdmin ? valorCorrigido : parcel.value).toFixed(2);
 				valorInput.disabled = !this.isUserAdmin;
-
+		
 				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
 				this.openModal('modalPagamento');
 			}
-
+		
 			openClientHistoryModal(clientName) {
 				const clientContracts = (this.isUserAdmin ? this.database.contracts : this.getFilteredContracts(true))
 					.filter(c => c.clientName === clientName);
 				const title = document.getElementById('clienteModalTitle'); title.textContent = `Histórico de ${clientName}`;
 				const content = document.getElementById('clienteModalContent'); content.innerHTML = '';
-
+		
 				let totalContratado = 0, totalPago = 0;
 				const fragment = document.createDocumentFragment();
-
+		
 				clientContracts.forEach(contract => {
 					const contractValue = contract.totalValue || 0;
 					if (this.isUserAdmin) totalContratado += contractValue;
-
+		
 					let contractHtml = `<div class="bg-gray-700 p-4 rounded-lg ${contract.isDeleted ? 'opacity-60 border-l-4 border-gray-500' : ''}">`;
 					contractHtml += `<div class="flex justify-between items-start">
 						<h3 class="font-bold text-lg text-white">${(contract.serviceTypes || []).map(s => s.name).join(', ')} <span class="text-base font-normal text-gray-400">- ${contract.paymentType || ''}</span></h3>
@@ -2421,7 +2448,7 @@
 					</div>`;
 					contractHtml += `<p class="text-sm text-gray-400 mb-2">Adv: ${contract.advogadoResponsavel}</p>`;
 					if (contract.observations) contractHtml += `<blockquote class="text-sm mt-2 p-2 bg-gray-600/50 rounded-md text-gray-300 border-l-4 border-indigo-500 pl-4"><strong>Obs:</strong> ${Utils.sanitizeText(contract.observations)}</blockquote>`;
-
+		
 					if ((contract.parcels || []).length > 0) {
 						contractHtml += `<ul class="mt-2 text-sm space-y-1">`;
 						contract.parcels.forEach(p => {
@@ -2447,7 +2474,7 @@
 					el.innerHTML = contractHtml; // innerHTML usado aqui para conteúdo complexo, mas dados do BD (obs) são sanitizados
 					fragment.append(el);
 				});
-
+		
 				if (this.isUserAdmin) {
 					const summaryHtml = `
 					<div class="grid grid-cols-3 gap-4 text-center">
@@ -2475,7 +2502,7 @@
 					Utils.showToast('Não foi possível gerar o relatório.', 'error');
 				}
 			}
-
+		
 			_populateDateSelectors() {
 				const monthSelect = document.getElementById('reportMonth');
 				const yearSelect = document.getElementById('reportYear');
@@ -2492,11 +2519,11 @@
 				document.getElementById('reportChartsContainer').classList.add('hidden');
 				const resultDiv = document.getElementById('reportResult');
 				resultDiv.classList.remove('hidden');
-
+		
 				const month = parseInt(document.getElementById('reportMonth').value);
 				const year = parseInt(document.getElementById('reportYear').value);
 				const income = this.reportHandler.calculateMonthlyIncome(year, month, this.getFilteredContracts(true));
-
+		
 				let detailsHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Detalhes dos Recebimentos</h4>';
 				if (income.detailedPayments.length > 0) {
 					detailsHtml += '<ul class="space-y-2 mt-2 text-sm">';
@@ -2507,7 +2534,7 @@
 				} else {
 					detailsHtml += '<p class="text-sm text-gray-400 mt-2">Nenhum recebimento neste período.</p>';
 				}
-
+		
 				resultDiv.innerHTML = `
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div class="dark-card p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Parcelas)</p><p class="text-2xl font-bold text-white">${Utils.formatCurrency(income.totalParcelas)}</p></div>
@@ -2516,7 +2543,7 @@
 					<div class="bg-gray-900 p-4 rounded-lg border border-gray-700 text-center"><p class="text-white font-bold">TOTAL GERAL RECEBIDO</p><p class="text-3xl font-extrabold text-green-400">${Utils.formatCurrency(income.totalGeral)}</p></div>
 				` + detailsHtml;
 			}
-
+		
 			showAnalyticsInModal() {
 				if (!this.isUserAdmin) return;
 				document.getElementById('reportResult').classList.add('hidden');
@@ -2526,7 +2553,7 @@
 					const actualCtx = document.getElementById('actualIncomeChartModal')?.getContext('2d');
 					const projectedCtx = document.getElementById('projectedIncomeChartModal')?.getContext('2d');
 					if (!actualCtx || !projectedCtx) return;
-
+		
 					const allContracts = this.getFilteredContracts(true);
 					const actualData = this.reportHandler.getActualIncomeData(allContracts);
 					this.analyticsHandler.renderActualIncomeChart(actualCtx, actualData.labels, actualData.data);
@@ -2538,29 +2565,29 @@
 					Utils.showToast('Erro ao carregar gráficos.', 'error');
 				}
 			}
-
+		
 			openExitoModal(contractId) {
 				const contract = this.database.contracts.find(c => c.id === contractId); if (!contract) return;
 				document.getElementById('exitoContractId').value = contractId;
 				const exitoInfoEl = document.getElementById('exitoInfo');
 				const valorRecebidoInput = document.getElementById('exitoValorRecebido');
-
+		
 				exitoInfoEl.innerHTML = `<p><strong>Cliente:</strong> ${contract.clientName}</p><p><strong>Serviço:</strong> ${(contract.serviceTypes || []).map(s => s.name).join(', ')}</p>${this.isUserAdmin ? `<p><strong>Bonificação Prevista:</strong> <span class="font-bold text-indigo-400">${contract.successFee}</span></p>` : ''}`;
-
+		
 				valorRecebidoInput.value = '';
 				valorRecebidoInput.closest('.admin-only').style.display = this.isUserAdmin ? 'block' : 'none';
 				document.querySelector('#modalExito .non-admin-hidden').style.display = this.isUserAdmin ? 'none' : 'block';
-
+		
 				this.openModal('modalExito');
 			}
-
+		
 			createServiceTag(serviceName, deadline, status = 'Pendente') {
 				const container = document.getElementById('servicosContainer');
 				const tag = this.domBuilder.buildElement('div', { className: 'service-tag' });
 				tag.dataset.name = serviceName;
 				tag.dataset.deadline = deadline || '';
 				tag.dataset.status = status;
-
+		
 				let deadlineHtml = '';
 				if (deadline) {
 					const prazo = new Date(deadline + "T12:00:00Z");
@@ -2569,9 +2596,9 @@
 				tag.innerHTML = `<span>${serviceName}${deadlineHtml}</span><span class="remove-tag" onclick="this.parentElement.remove()">&times;</span>`;
 				container.appendChild(tag);
 			}
-
+		
 			// --- 7. EXPORTAÇÃO E FUNÇÕES AUXILIARES ---
-
+		
 			_formatCSVCell(data) {
 				if (data == null) return '';
 				let s = String(data);
@@ -2593,7 +2620,7 @@
 				l.click();
 				document.body.removeChild(l);
 			}
-
+		
 			exportContractsCSV() {
 				const headers = ["ID", "Cliente", "Advogado", "Tipo Pagamento", "Valor Total", "Taxa Êxito", "Status", "Serviços", "Observações"];
 				let csvRows = [headers.join(',')];
@@ -2609,7 +2636,7 @@
 				});
 				this._downloadCSV(csvRows.join('\n'), 'contratos_export.csv');
 			}
-
+		
 			exportReportCSV() {
 				if (!this.isUserAdmin) return;
 				const month = parseInt(document.getElementById('reportMonth').value);
@@ -2631,7 +2658,7 @@
 			// (Função de Recálculo - mantida se necessária para admin)
 			async recalculateAllDebts(referenceDate = new Date()) {
 				if (!this.isUserAdmin) { Utils.showToast('Ação não permitida.', 'error'); return; }
-				Utils.showToast('Iniciando recálculo... Isso pode levar um momento.', 'info');
+				Utils.showToast('A iniciar recálculo... Isto pode demorar um momento.', 'info');
 				const contracts = this.database.contracts.filter(c => !c.isDeleted);
 				for (const contract of contracts) {
 					if (!contract.parcels) continue;
@@ -2642,18 +2669,18 @@
 						}
 						return p;
 					}));
+					// Esta operação é pesada e pode ser otimizada, mas segue a lógica original
 					await this.firebaseService.updateContractField(contract.id, { parcels: updatedParcels });
 				}
-				Utils.showToast('Recalculo concluído.', 'success');
+				Utils.showToast('Recálculo concluído.', 'success');
 			}
-
+		
 			// --- 8. [NOVO] HELPERS DE ACESSIBILIDADE ---
 			
 			_setupModalAccessibility() {
 				document.addEventListener('keydown', this._handleKeyDown.bind(this));
-				document.addEventListener('focusin', this._trapFocus.bind(this));
 			}
-
+		
 			_handleKeyDown(event) {
 				// Fecha modal com 'Esc'
 				if (event.key === 'Escape' && this.openModalId) {
@@ -2661,23 +2688,44 @@
 						this.closeModal(this.openModalId);
 					}
 				}
+		
+				// Trava de Foco com 'Tab'
+				if (event.key === 'Tab' && this.openModalId) {
+					this._trapFocus(event);
+				}
 			}
-
+		
 			_trapFocus(event) {
-				if (!this.openModalId) return; // Nenhum modal aberto
-
 				const modal = document.getElementById(this.openModalId);
 				if (!modal) return;
-
-				// Se o foco tentar sair do modal, impeça
-				if (!modal.contains(event.target)) {
-					event.stopPropagation();
-					const firstFocusableEl = modal.querySelector('button, [href], input, select, textarea');
-					if (firstFocusableEl) firstFocusableEl.focus();
+				
+				const focusableElements = modal.querySelectorAll(
+					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+				);
+				if (focusableElements.length === 0) return; // Se não há nada focável, não faz nada
+				
+				const firstElement = focusableElements[0];
+				const lastElement = focusableElements[focusableElements.length - 1];
+		
+				if (event.shiftKey) { // Shift + Tab
+					if (document.activeElement === firstElement) {
+						lastElement.focus();
+						event.preventDefault();
+					}
+				} else { // Tab
+					if (document.activeElement === lastElement) {
+						firstElement.focus();
+						event.preventDefault();
+					}
+				}
+				
+				// Cobre o caso do foco tentar sair do modal
+				if (!modal.contains(document.activeElement)) {
+					firstElement.focus();
 				}
 			}
 		}
-
+		
 		// --- INICIALIZAÇÃO DA APLICAÇÃO ---
 		document.addEventListener('DOMContentLoaded', () => {
 			// Expõe a instância da classe no objeto window para que
@@ -2685,7 +2733,7 @@
 			window.App = new App();
 			window.App.initialize();
 		});
-
+		
 	</script>
 </body>
 </html>
