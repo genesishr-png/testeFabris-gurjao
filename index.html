@@ -216,6 +216,8 @@
 			animation: blob 7s infinite;
 		}
 	</style>
+
+	
 </head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
@@ -374,7 +376,7 @@
 							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
 						</div>
 					</div>
-					<div class="mb-4 border-b border-gray-700">
+	<div class="mb-4 border-b border-gray-700">
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
 
@@ -1997,9 +1999,6 @@
 				container.innerHTML = '';
 		
 				let activeContracts = contractsToRender.filter(c => {
-					// [MUDANÇA v3] Não filtra mais os concluídos, pois a lógica de status já trata disso
-					// const isNotConcluded = this.getContractStatus(c).statusText !== 'Concluído';
-					// if (!isNotConcluded) return false; 
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm)) || c.advogadoResponsavel.toLowerCase().includes(searchTerm);
 					return matchesAdvogado && matchesSearch;
@@ -2033,12 +2032,13 @@
 					const totalPaid = (contract.parcels || []).reduce((sum, p) => sum + (p.valuePaid || 0), 0) + (contract.successFeeValueReceived || 0);
 					const financialProgress = (contract.totalValue || 0) > 0 ? (totalPaid / contract.totalValue) * 100 : (totalPaid > 0 ? 100 : 0);
 					
-					// Só mostra se o serviço não estiver 100%
+					// [MUDANÇA v3] Só mostra se o serviço não estiver 100%
 					if(serviceProgress < 100) {
 						fragment.append(this.domBuilder.createServicoCard(contract, serviceProgress, financialProgress));
 					}
 				});
 
+				// [MUDANÇA v3] Mensagem se todos os serviços estiverem concluídos
 				if(fragment.children.length === 0) {
 					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços estão concluídos.</p><p class="text-sm text-gray-400">Nenhum serviço pendente para os filtros selecionados.</p></div></div>`;
 					return;
@@ -2154,12 +2154,15 @@
 			// [MUDANÇA v3] Lógica de "Concluído" atualizada
 			getContractStatus(contract) {
 				const allParcelsPaid = (contract.parcels || []).every(p => p.status === 'Paga');
-				const allServicesDone = (contract.serviceTypes || []).every(s => s.status === 'Concluído');
+				// Verifica se todos os serviços definidos estão concluídos
+				const allServicesDone = (contract.serviceTypes || []).length > 0 && (contract.serviceTypes || []).every(s => s.status === 'Concluído');
 				
 				if (allParcelsPaid && allServicesDone) {
+					// Se tem taxa de êxito pendente, fica "Aguardando Êxito"
 					if (contract.successFee && !contract.successFeePaymentDate) {
 						return { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' };
 					}
+					// Se não, está "Concluído"
 					return { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' };
 				}
 				
@@ -2177,7 +2180,7 @@
 				const contractSortContainer = document.getElementById('contractSortButtons');
 				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
 				const servicosSortContainer = document.getElementById('servicosSortButtons');
-				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons');
+				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons'); // Novo container
 				if (!contractSortContainer || !inadimplentesSortContainer || !servicosSortContainer || !contractStatusFilterContainer) return;
 				
 				const createButton = (container, sortKey, sortLabel, currentSort, callback) => {
@@ -2889,4 +2892,3 @@
 	</script>
 </body>
 </html>
-	
