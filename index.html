@@ -243,6 +243,15 @@
 			font-size: 14px;
 			color: #9ca3af; /* text-gray-400 */
 		}
+
+		/* [CORREÇÃO v5.2] Estilo para tooltips de gráfico (para garantir a remoção) */
+		.chartjs-tooltip {
+			opacity: 0;
+			pointer-events: none;
+			position: absolute;
+			transition: all .1s ease;
+			/* ... (outros estilos padrões do chart.js) ... */
+		}
 	</style>
 </head>
 <body class="text-gray-300">
@@ -922,8 +931,7 @@
 				if (interval > 1) return `há ${Math.floor(interval)} min(s)`;
 				return `há ${Math.floor(seconds)} seg(s)`;
 			}
-		};
-		/**
+		};/**
 		 * @class CorrectionCalculator
 		 */
 		class CorrectionCalculator {
@@ -1311,18 +1319,34 @@
 			}
 			// Fim Mudança v5
 		
-			destroyAllCharts() {
-				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
-				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
+			// [CORREÇÃO v5.2] Força a remoção de tooltips "fantasmas"
+			_forceRemoveTooltips() {
+				const tooltips = document.querySelectorAll('div.chartjs-tooltip');
+				tooltips.forEach(tip => tip.remove());
+			}
+
+			// [CORREÇÃO v5.2] Destruição separada para Gráficos da PÁGINA
+			destroyPageCharts() {
 				if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
 				if (this.advReportByAdvogadoChart) this.advReportByAdvogadoChart.destroy();
 				if (this.advReportNewContractsChart) this.advReportNewContractsChart.destroy();
 				
-				this.actualIncomeChartInstance = null;
-				this.projectedIncomeChartInstance = null;
 				this.advReportTimelineChart = null;
 				this.advReportByAdvogadoChart = null;
 				this.advReportNewContractsChart = null;
+				
+				this._forceRemoveTooltips();
+			}
+
+			// [CORREÇÃO v5.2] Destruição separada para Gráficos do MODAL
+			destroyModalCharts() {
+				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
+				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
+
+				this.actualIncomeChartInstance = null;
+				this.projectedIncomeChartInstance = null;
+
+				this._forceRemoveTooltips();
 			}
 		}
 		
@@ -2419,7 +2443,9 @@
 				document.getElementById('exportPdfButton').disabled = true;
 				document.getElementById('advancedReportContainer').classList.add('hidden');
 				document.getElementById('advancedReportEmpty').classList.remove('hidden');
-				this.analyticsHandler.destroyAllCharts();
+				
+				// [CORREÇÃO v5.2] Chama o destrutor específico da página
+				this.analyticsHandler.destroyPageCharts();
 			}
 		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
@@ -2433,9 +2459,9 @@
 					'page-lixeira': 'Lixeira'
 				};
 				
-				// [CORREÇÃO v5.1] Destrói os gráficos se ESTIVERMOS a SAIR da página de relatórios
+				// [CORREÇÃO v5.2] Destrói os gráficos se ESTIVERMOS a SAIR da página de relatórios
 				if (this.currentPageId === 'page-relatorios' && pageId !== 'page-relatorios') {
-					this.analyticsHandler.destroyAllCharts();
+					this.analyticsHandler.destroyPageCharts();
 				}
 
 				this.currentPageId = pageId; // Define a página atual
@@ -2770,7 +2796,7 @@
 						successFeePaymentDate: new Date().toISOString()
 					});
 					if (success) {
-						this.closeModal('exitoModal');
+						this.closeModal('modalExito');
 						Utils.showToast('Êxito registado.', 'success');
 					}
 				}
@@ -2883,8 +2909,9 @@
 					if (this.lastFocusedElement) this.lastFocusedElement.focus();
 				}
 				
+				// [CORREÇÃO v5.2] Chama o destrutor específico do MODAL
 				if (modalId === 'modalRelatorio') {
-					this.analyticsHandler.destroyAllCharts();
+					this.analyticsHandler.destroyModalCharts();
 				}
 			}
 		
@@ -3174,7 +3201,9 @@
 
 			// [MUDANÇA v5] Lógica dos Relatórios Avançados
 			generateAdvancedReport() {
-				this.analyticsHandler.destroyAllCharts();
+				// [CORREÇÃO v5.2] Destrói gráficos antigos ANTES de criar novos
+				this.analyticsHandler.destroyPageCharts();
+
 				const startDate = new Date(document.getElementById('reportStartDate').value + 'T00:00:00-04:00'); // Fuso de RO
 				const endDate = new Date(document.getElementById('reportEndDate').value + 'T23:59:59-04:00'); // Fuso de RO
 				
