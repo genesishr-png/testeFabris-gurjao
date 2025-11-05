@@ -17,7 +17,7 @@
 			background-color: #0f172a;
 			color: #d1d5db;
 			/* [REVOLUÇÃO] Trava o scroll do body, o main content que vai rolar */
-			overflow-y: hidden; 
+			overflow-y: hidden; 
 		}
 		body::after {
 			content: '';
@@ -32,13 +32,13 @@
 		}
 		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
 		
-		.modal { 
-			display: none; 
-			position: fixed; 
-			top: 50%; left: 50%; 
-			transform: translate(-50%, -50%); 
-			z-index: 9001; 
-			max-height: 90vh; 
+		.modal { 
+			display: none; 
+			position: fixed; 
+			top: 50%; left: 50%; 
+			transform: translate(-50%, -50%); 
+			z-index: 9001; 
+			max-height: 90vh; 
 			border: 1px solid #374151;
 			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
 		}
@@ -104,7 +104,7 @@
 		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
 		
-		.dark-card { 
+		.dark-card { 
 			background-color: #1f2937;
 		}
 		
@@ -117,12 +117,12 @@
 		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
 		
-		.filter-select { 
+		.filter-select { 
 			background-color: #1f2937;
-			border: 1px solid #4b5563; 
-			color: #9ca3af; 
-			padding: 8px 12px; 
-			border-radius: 6px; 
+			border: 1px solid #4b5563; 
+			color: #9ca3af; 
+			padding: 8px 12px; 
+			border-radius: 6px; 
 			font-size: 14px;
 			transition: all 0.2s ease-in-out;
 		}
@@ -133,18 +133,18 @@
 		}
 		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
 		
-		#loading-overlay { 
-			position: fixed; 
-			top: 0; left: 0; 
-			width: 100%; height: 100%; 
-			background-color: rgba(17, 24, 39, 0.9); 
-			display: flex; 
-			justify-content: center; 
-			align-items: center; 
-			z-index: 10000; 
-			color: white; 
-			font-size: 1.2rem; 
-			transition: opacity 0.3s; 
+		#loading-overlay { 
+			position: fixed; 
+			top: 0; left: 0; 
+			width: 100%; height: 100%; 
+			background-color: rgba(17, 24, 39, 0.9); 
+			display: flex; 
+			justify-content: center; 
+			align-items: center; 
+			z-index: 10000; 
+			color: white; 
+			font-size: 1.2rem; 
+			transition: opacity 0.3s; 
 		}
 		#app-container { display: none; }
 		
@@ -216,8 +216,6 @@
 			animation: blob 7s infinite;
 		}
 	</style>
-
-	
 </head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
@@ -252,10 +250,10 @@
 						<div class="relative">
 							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="email"
-								   id="login-email"
-								   placeholder="seu@email.com"
-								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-								   required />
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
 					<div>
@@ -265,10 +263,10 @@
 						<div class="relative">
 							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="password"
-								   id="login-password"
-								   placeholder="••••••••"
-								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-								   required />
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
 					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
@@ -376,7 +374,7 @@
 							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
 						</div>
 					</div>
-	<div class="mb-4 border-b border-gray-700">
+					<div class="mb-4 border-b border-gray-700">
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
 
@@ -888,7 +886,7 @@
 					if (!this.ipcaErrorToastShown) {
 						Utils.showToast('Falha ao buscar índice IPCA. A correção pode estar incompleta.', 'error');
 						this.ipcaErrorToastShown = true;
-						setTimeout(() => { this.ipcaErrorToastShown = false; }, 60000); 
+						setTimeout(() => { this.ipcaErrorToastShown = false; }, 60000); 
 					}
 					return 1;
 				}
@@ -1285,7 +1283,7 @@
 					if (this.app.isUserAdmin) {
 						details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
 					}
-					actionButton = this.buildElement('div', { 
+					actionButton = this.buildElement('div', { 
 						className: 'mt-4 text-center text-sm bg-green-900/50 text-green-300 p-2 rounded-md font-medium',
 						text: `Pago ${this.app.isUserAdmin ? formattedPaidValue : ''} em ${paymentDate}`
 					});
@@ -1307,7 +1305,7 @@
 				}
 		
 				if (type !== 'paga') {
-					actionButton = this.buildElement('button', { 
+					actionButton = this.buildElement('button', { 
 						className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg text-sm shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
 						html: '<i class="fas fa-check"></i> Registar Pagamento'
 					});
@@ -1999,6 +1997,9 @@
 				container.innerHTML = '';
 		
 				let activeContracts = contractsToRender.filter(c => {
+					// [MUDANÇA v3] Não filtra mais os concluídos, pois a lógica de status já trata disso
+					// const isNotConcluded = this.getContractStatus(c).statusText !== 'Concluído';
+					// if (!isNotConcluded) return false; 
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm)) || c.advogadoResponsavel.toLowerCase().includes(searchTerm);
 					return matchesAdvogado && matchesSearch;
@@ -2032,13 +2033,12 @@
 					const totalPaid = (contract.parcels || []).reduce((sum, p) => sum + (p.valuePaid || 0), 0) + (contract.successFeeValueReceived || 0);
 					const financialProgress = (contract.totalValue || 0) > 0 ? (totalPaid / contract.totalValue) * 100 : (totalPaid > 0 ? 100 : 0);
 					
-					// [MUDANÇA v3] Só mostra se o serviço não estiver 100%
+					// Só mostra se o serviço não estiver 100%
 					if(serviceProgress < 100) {
 						fragment.append(this.domBuilder.createServicoCard(contract, serviceProgress, financialProgress));
 					}
 				});
 
-				// [MUDANÇA v3] Mensagem se todos os serviços estiverem concluídos
 				if(fragment.children.length === 0) {
 					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços estão concluídos.</p><p class="text-sm text-gray-400">Nenhum serviço pendente para os filtros selecionados.</p></div></div>`;
 					return;
@@ -2154,15 +2154,12 @@
 			// [MUDANÇA v3] Lógica de "Concluído" atualizada
 			getContractStatus(contract) {
 				const allParcelsPaid = (contract.parcels || []).every(p => p.status === 'Paga');
-				// Verifica se todos os serviços definidos estão concluídos
-				const allServicesDone = (contract.serviceTypes || []).length > 0 && (contract.serviceTypes || []).every(s => s.status === 'Concluído');
+				const allServicesDone = (contract.serviceTypes || []).every(s => s.status === 'Concluído');
 				
 				if (allParcelsPaid && allServicesDone) {
-					// Se tem taxa de êxito pendente, fica "Aguardando Êxito"
 					if (contract.successFee && !contract.successFeePaymentDate) {
 						return { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' };
 					}
-					// Se não, está "Concluído"
 					return { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' };
 				}
 				
@@ -2180,7 +2177,7 @@
 				const contractSortContainer = document.getElementById('contractSortButtons');
 				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
 				const servicosSortContainer = document.getElementById('servicosSortButtons');
-				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons'); // Novo container
+				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons');
 				if (!contractSortContainer || !inadimplentesSortContainer || !servicosSortContainer || !contractStatusFilterContainer) return;
 				
 				const createButton = (container, sortKey, sortLabel, currentSort, callback) => {
@@ -2892,3 +2889,4 @@
 	</script>
 </body>
 </html>
+	
