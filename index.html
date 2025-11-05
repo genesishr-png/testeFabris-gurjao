@@ -96,7 +96,6 @@
 			color: #6366f1; /* text-indigo-500 */
 			background-color: rgba(79, 70, 229, 0.1); /* indigo-600/10 */
 		}
-
 		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
 		
@@ -143,8 +142,15 @@
 		
 		.admin-only { display: none; }
 		body.is-admin .admin-only { display: block; }
+		
 		/* [MUDANÇA v5] Flex admin-only */
-		body.is-admin .flex.admin-only, body.is-admin .grid.admin-only { display: flex; display: grid; }
+		/* [CORREÇÃO v5.3] Esta regra garante que menus mobile admin (flex) sejam mostrados */
+		body.is-admin .admin-only.mobile-nav-item {
+			display: flex;
+		}
+		body.is-admin .flex.admin-only, body.is-admin .grid.admin-only { 
+			display: flex; display: grid; 
+		}
 		
 		body:not(.is-admin) .non-admin-hidden { display: none; }
 		
@@ -320,6 +326,7 @@
 			</div>
 		</div>
 	</div>
+	
 	<div id="app-container" class="flex h-screen">
 		
 		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
@@ -397,6 +404,7 @@
 			</header>
 
 			<div class="p-4 md:p-8 flex-1">
+				
 				<div id="page-dashboard">
 					<div class="flex flex-wrap gap-4 mb-8">
 						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
@@ -482,9 +490,7 @@
 						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
 						</div>
 					</div>
-				</div>
-
-				<div id="page-inadimplentes" class="hidden">
+				</div> <div id="page-inadimplentes" class="hidden">
 					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
 						<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
 						<div class="flex items-center gap-2">
@@ -575,7 +581,9 @@
 					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
 					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
-			</div> </main> <nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
+			</div> 
+		</main>
+		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
 			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
 				<i class="fas fa-tachometer-alt text-xl"></i>
 				<span class="text-xs mt-1">Painel</span>
@@ -588,7 +596,8 @@
 				<i class="fas fa-tasks text-xl"></i>
 				<span class="text-xs mt-1">Serviços</span>
 			</a>
-			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only" style="display: none;"> <i class="fas fa-chart-pie text-xl"></i>
+			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only">
+				<i class="fas fa-chart-pie text-xl"></i>
 				<span class="text-xs mt-1">Relatórios</span>
 			</a>
 			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
@@ -597,8 +606,7 @@
 			</a>
 		</nav>
 
-	</div> ```
-	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
+	</div> <div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
 		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
 		</div>
@@ -732,7 +740,6 @@
 		</div>
 		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
 	</div>
-
 	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal</h2>
@@ -931,7 +938,9 @@
 				if (interval > 1) return `há ${Math.floor(interval)} min(s)`;
 				return `há ${Math.floor(seconds)} seg(s)`;
 			}
-		};/**
+		};
+
+		/**
 		 * @class CorrectionCalculator
 		 */
 		class CorrectionCalculator {
@@ -1018,14 +1027,15 @@
 			constructor(appInstance) {
 				this.app = appInstance;
 				this.auth = null;
+				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-					authDomain: "fabrisgurjao.firebaseapp.com",
-					projectId: "fabrisgurjao",
-					storageBucket: "fabrisgurjao.firebasestorage.app",
-					messagingSenderId: "466702265991",
-					appId: "1:466702265991:web:78c4d98b47cab537921222",
-					measurementId: "G-E99R5TFMQK"
+					apiKey: "SUA_API_KEY",
+					authDomain: "SEU_AUTH_DOMAIN",
+					projectId: "SEU_PROJECT_ID",
+					storageBucket: "SEU_STORAGE_BUCKET",
+					messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+					appId: "SEU_APP_ID",
+					measurementId: "SEU_MEASUREMENT_ID"
 				};
 			}
 		
@@ -1033,7 +1043,7 @@
 				try {
 					const firebaseApp = initializeApp(this.firebaseConfig);
 					this.auth = getAuth(firebaseApp);
-					setLogLevel('debug');
+					setLogLevel('debug'); // 'error' em produção
 					const db = getFirestore(firebaseApp);
 					this.app.firebaseService.setDB(db);
 					this.setupAuthListener();
@@ -1065,7 +1075,8 @@
 					await signInWithEmailAndPassword(this.auth, email, password);
 				} catch (error) {
 					const showAuthError = (m) => { authError.textContent = m; authError.classList.remove('hidden'); };
-					if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(error.code)) {
+					// [POLIMENTO] 'auth/invalid-credential' é o erro moderno que cobre (user-not-found, wrong-password, etc)
+					if (error.code === 'auth/invalid-credential') {
 						showAuthError('Email ou senha inválidos.');
 					} else {
 						showAuthError('Erro ao tentar fazer login.');
@@ -1468,6 +1479,7 @@
 			}
 		}
 		
+		// [O script continua na Parte 7...]
 		/**
 		 * @class DOMBuilder
 		 */
