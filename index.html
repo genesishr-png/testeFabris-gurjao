@@ -394,7 +394,7 @@
 							<i class="fas fa-plus-circle"></i> Novo Contrato
 						</button>
 						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-							<i class="fas fa-chart-line"></i> Relatório Mensal (Legado)
+							<i class="fas fa-chart-line"></i> Relatório Mensal
 						</button>
 					</div>
 
@@ -726,7 +726,7 @@
 
 	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal (Legado)</h2>
+			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal</h2>
 			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
@@ -1873,6 +1873,7 @@
 				this.currentSafeName = null; // [MUDANÇA v5]
 				this.isUserAdmin = false;
 				this.currentAdvancedReportData = null; // [MUDANÇA v5]
+				this.currentPageId = null; // [CORREÇÃO v5.1]
 				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
@@ -2078,13 +2079,12 @@
 			async render() {
 				if (this.appContainer.style.display !== 'flex') return;
 		
-				const currentPage = document.querySelector('div[id^="page-"]:not(.hidden)');
-				if (!currentPage) {
-					this.showPage('page-dashboard');
+				// [CORREÇÃO v5.1] Usa o this.currentPageId
+				const pageId = this.currentPageId;
+				if (!pageId) {
+					this.showPage('page-dashboard'); // Define o ID da página pela primeira vez
 					return;
 				}
-		
-				const pageId = currentPage.id;
 				
 				if (pageId === 'page-dashboard') {
 					await this.renderKanban();
@@ -2381,18 +2381,18 @@
 				const fragment = document.createDocumentFragment();
 				deletedContracts.forEach(contract => {
 					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
-					card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
+					card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
 					card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
 					
-					const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
+					const footer = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
 					
-					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
+					const restoreBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
 					restoreBtn.onclick = () => this.restoreContract(contract.id);
 					footer.append(restoreBtn);
 		
 					if (this.isUserAdmin) {
-						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+						const deleteBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
 						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
 						footer.append(deleteBtn);
 					}
@@ -2432,6 +2432,13 @@
 					'page-relatorios': 'Relatórios Avançados', // [MUDANÇA v5]
 					'page-lixeira': 'Lixeira'
 				};
+				
+				// [CORREÇÃO v5.1] Destrói os gráficos se ESTIVERMOS a SAIR da página de relatórios
+				if (this.currentPageId === 'page-relatorios' && pageId !== 'page-relatorios') {
+					this.analyticsHandler.destroyAllCharts();
+				}
+
+				this.currentPageId = pageId; // Define a página atual
 				
 				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
 		
@@ -2763,7 +2770,7 @@
 						successFeePaymentDate: new Date().toISOString()
 					});
 					if (success) {
-						this.closeModal('modalExito');
+						this.closeModal('exitoModal');
 						Utils.showToast('Êxito registado.', 'success');
 					}
 				}
@@ -3017,7 +3024,7 @@
 				this.openModal('modalCliente');
 			}
 			
-			// Modal Legado
+			// Modal de Relatório Antigo
 			openReportModal() {
 				if (!this.isUserAdmin) { Utils.showToast('Apenas admins podem abrir o relatório.', 'error'); return; }
 				this.openModal('modalRelatorio');
