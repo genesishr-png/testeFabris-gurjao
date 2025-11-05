@@ -141,15 +141,24 @@
 		#app-container { display: none; }
 		
 		.admin-only { display: none; }
-		body.is-admin .admin-only { display: block; }
+
+		/* [CORREÇÃO DO BUG DAS ABAS] 
+		  Usamos :not(.hidden) para garantir que a classe 'hidden' (controlada pelo JavaScript) 
+		  tenha prioridade sobre as regras de 'admin-only'.
+		*/
+		body.is-admin .admin-only:not(.hidden) { 
+			display: block; 
+		}
+		body.is-admin .flex.admin-only:not(.hidden) { 
+			display: flex; 
+		}
+		body.is-admin .grid.admin-only:not(.hidden) { 
+			display: grid; 
+		}
 		
-		/* [MUDANÇA v5] Flex admin-only */
-		/* [CORREÇÃO v5.3] Esta regra garante que menus mobile admin (flex) sejam mostrados */
+		/* Esta regra para o menu mobile (que eu já tinha corrigido) está correta e não precisa do :not(.hidden) */
 		body.is-admin .admin-only.mobile-nav-item {
 			display: flex;
-		}
-		body.is-admin .flex.admin-only, body.is-admin .grid.admin-only { 
-			display: flex; display: grid; 
 		}
 		
 		body:not(.is-admin) .non-admin-hidden { display: none; }
