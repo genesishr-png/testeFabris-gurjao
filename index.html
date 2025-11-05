@@ -2208,13 +2208,21 @@ this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 							}
 						} else {
 							if (vencimento < hoje) {
-								vencidasPromises.push(
-									this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate)
-										.then(valorCorrigido => {
-											if (this.isUserAdmin) totalVencido += valorCorrigido;
-											return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido);
-										})
-								);
+								// [Substitua pelo bloco abaixo]
+vencidasPromises.push(
+    this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate)
+        .then(valorCorrigido => {
+            if (this.isUserAdmin) totalVencido += valorCorrigido;
+            return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido);
+        })
+        .catch(err => {
+            // [NOVA CORREÇÃO] Se o IPCA falhar (erro 429), não trava o app.
+            console.error("Falha ao calcular IPCA para o card. Usando valor original.", err);
+            // Usa o valor original (sem correção) como fallback
+            if (this.isUserAdmin) totalVencido += parcel.value; 
+            return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, parcel.value); 
+        })
+);
 							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) {
 								fragAVencer.append(this.domBuilder.createParcelCard(contract, parcel, i, 'a-vencer', remainingValue));
 								if (this.isUserAdmin) totalAVencer30dias += parcel.value;
