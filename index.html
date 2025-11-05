@@ -831,7 +831,7 @@
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
-		const ADMIN_USERS = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Lilian"];
+		const ADMIN_USERS = ["dra. renata fabris", "dr. felipe gurjão", "lilian"];
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
 		
 		// Objeto de Utilitários
@@ -2072,8 +2072,11 @@
 			handleAuthStateChange(user) {
 				if (user) {
 					this.currentUserDisplayName = user.displayName;
-					this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); // [MUDANÇA v5]
-					this.isUserAdmin = ADMIN_USERS.includes(this.currentUserDisplayName);
+this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); // [MUDANÇA v5]
+
+// [CORREÇÃO LIXEIRA] Compara em minúsculas para evitar erros (ex: "Lilian" vs "lilian")
+const displayNameLower = this.currentUserDisplayName ? this.currentUserDisplayName.toLowerCase() : '';
+this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 		
 					if (!user.displayName) {
