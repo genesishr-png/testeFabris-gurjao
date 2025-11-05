@@ -42,7 +42,6 @@
 			border: 1px solid #374151;
 			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
 		}
-		/* [REVOLUÇÃO] O conteúdo do modal rola, não o modal inteiro */
 		.modal-body {
 			overflow-y: auto;
 			max-height: 70vh;
@@ -57,11 +56,9 @@
 		.service-tag-small { display: inline-block; background-color: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
 		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
 		
-		/* [REVOLUÇÃO] Abas antigas removidas */
 		.nav-tab { }
 		.nav-tab-icon { }
 		
-		/* [REVOLUÇÃO] Novos estilos da Sidebar */
 		.sidebar-nav-item {
 			display: flex;
 			align-items: center;
@@ -82,7 +79,6 @@
 			box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.5); /* Sombra/brilho índigo */
 		}
 		
-		/* [REVOLUÇÃO] Novos estilos da Navbar Mobile */
 		.mobile-nav-item {
 			display: flex;
 			flex-direction: column;
@@ -108,7 +104,6 @@
 			background-color: #1f2937;
 		}
 		
-		/* [REVOLUÇÃO] Estilos do header antigo removidos */
 		.header-with-logo { }
 		.header-user-block { }
 		.header-logo { }
@@ -159,10 +154,8 @@
 		.notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 11000; animation: slideIn 0.3s ease; }
 		@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 		
-		/* [REVOLUÇÃO] Media query para o layout da sidebar */
 		@media (max-width: 768px) {
 			.kanban-column { min-width: 100%; }
-			/* O JS vai tratar de esconder/mostrar a sidebar e ajustar a margem */
 		}
 
 		/* === ESTILOS DE PAGINAÇÃO === */
@@ -217,6 +210,7 @@
 		}
 	</style>
 </head>
+
 <body class="text-gray-300">
 	<div id="notifications"></div>
 
@@ -313,6 +307,12 @@
 					<i class="fas fa-trash-alt w-5 text-center"></i>
 					<span>Lixeira</span>
 				</a>
+				<!-- [MUDANÇA v4] Botão de Notificações (Visual) -->
+				<a onclick="window.App.showPage('page-notifications')" id="tab-notifications" class="sidebar-nav-item relative">
+					<i class="fas fa-bell w-5 text-center"></i>
+					<span>Notificações</span>
+					<span id="notification-dot" class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+				</a>
 			</nav>
 
 			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
@@ -374,6 +374,170 @@
 							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
 						</div>
 					</div>
+<body class="text-gray-300">
+	<div id="notifications"></div>
+
+	<div id="loading-overlay">
+		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
+	</div>
+
+	<!-- [TELA DE LOGIN - SEM ALTERAÇÕES CONFORME O PEDIDO] -->
+	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+		<div class="absolute inset-0 opacity-5">
+			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
+		</div>
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+		<div class="relative z-10 w-full max-w-md">
+			<div class="mb-8 text-center">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+				<h1 class="text-3xl font-bold text-white mb-2">
+					Sistema Financeiro
+				</h1>
+				<p class="text-gray-300 text-sm">
+					Gestão profissional para advocacia
+				</p>
+			</div>
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<form id="login-form" class="space-y-5">
+					<div>
+						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
+							Email
+						</label>
+						<div class="relative">
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email"
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div>
+						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
+							Senha
+						</label>
+						<div class="relative">
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password"
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+						<!-- O JS vai preencher o erro aqui -->
+					</div>
+					<button type="submit"
+							id="login-submit-button"
+							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+						<span id="login-button-text">Entrar no Sistema</span>
+					</button>
+				</form>
+				<div class="mt-6 text-center text-gray-400 text-xs">
+					<p>Acesso restrito a utilizadores autorizados</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- [FIM DA TELA DE LOGIN] -->
+
+	<!-- [REVOLUÇÃO] Novo layout principal com Sidebar -->
+	<div id="app-container" class="flex h-screen">
+		
+		<!-- [REVOLUÇÃO] Sidebar (Desktop) -->
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
+			<div class="flex-shrink-0 mb-8">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
+			</div>
+			
+			<nav class="flex-1 space-y-3">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active">
+					<i class="fas fa-tachometer-alt w-5 text-center"></i>
+					<span>Painel Principal</span>
+				</a>
+				<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="sidebar-nav-item">
+					<i class="fas fa-exclamation-triangle w-5 text-center"></i>
+					<span>Inadimplentes</span>
+				</a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
+					<i class="fas fa-tasks w-5 text-center"></i>
+					<span>Serviços</span>
+				</a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
+					<i class="fas fa-trash-alt w-5 text-center"></i>
+					<span>Lixeira</span>
+				</a>
+				<!-- [MUDANÇA v4] Botão de Notificações (Visual) -->
+				<a onclick="window.App.showPage('page-notifications')" id="tab-notifications" class="sidebar-nav-item relative">
+					<i class="fas fa-bell w-5 text-center"></i>
+					<span>Notificações</span>
+					<span id="notification-dot" class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+				</a>
+			</nav>
+
+			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
+				<div class="flex items-center gap-3 p-2 rounded-lg">
+					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
+						<i class="fas fa-user"></i>
+					</div>
+					<div>
+						<span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span>
+						<button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<!-- [REVOLUÇÃO] Conteúdo Principal (com scroll próprio) -->
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
+			
+			<!-- [REVOLUÇÃO] Cabeçalho do Conteúdo (Limpo) -->
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
+				<div class="flex justify-between items-center">
+					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+				</div>
+			</header>
+
+			<!-- O wrapper para as páginas -->
+			<div class="p-4 md:p-8 flex-1">
+				<div id="page-dashboard">
+					<div class="flex flex-wrap gap-4 mb-8">
+						<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
+						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-plus-circle"></i> Novo Contrato
+						</button>
+						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-chart-line"></i> Relatório Mensal
+						</button>
+					</div>
+
+					<!-- [MUDANÇA v3] Stats do Painel de volta para 4 colunas -->
+					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
+							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
+							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
+						</div>
+						<!-- [MUDANÇA v3] Cartão de "Contratos Ativos" de volta -->
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
+							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+						</div>
+					</div>
+					
 					<div class="mb-4 border-b border-gray-700">
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
@@ -401,8 +565,7 @@
 						</div>
 						<!-- Esta secção tem scroll horizontal se houver muitos cartões -->
 						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4">
-							<!-- O JS vai preencher o #kanban-exito aqui -->
-							<!-- [MUDANÇA v3] O 'kanban-column' foi removido dos cartões de êxito no JS -->
+							<!-- [MUDANÇA v4] Correção: O 'kanban-exito' é o wrapper flex, os cartões são adicionados diretamente aqui -->
 							<div id="kanban-exito" class="flex space-x-6"></div>
 						</div>
 					</div>
@@ -473,8 +636,294 @@
 					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
 					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
+				
+				<!-- [MUDANÇA v4] Nova página de Notificações -->
+				<div id="page-notifications" class="hidden">
+					<h2 class="text-2xl font-semibold text-white mb-6">Notificações</h2>
+					<div id="notificationsListContainer" class="space-y-4 max-w-2xl mx-auto">
+						<!-- JS vai preencher aqui -->
+						<p class="text-gray-400 text-center">Ainda não há notificações.</p>
+					</div>
+				</div>
+
 			</div> <!-- Fim do wrapper da página -->
-</main> <!-- Fim do <main id="main-content"> -->
+
+		</main> <!-- Fim do <main id="main-content"> -->
+<body class="text-gray-300">
+	<div id="notifications"></div>
+
+	<div id="loading-overlay">
+		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
+	</div>
+
+	<!-- [TELA DE LOGIN - SEM ALTERAÇÕES CONFORME O PEDIDO] -->
+	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+		<div class="absolute inset-0 opacity-5">
+			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
+		</div>
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+		<div class="relative z-10 w-full max-w-md">
+			<div class="mb-8 text-center">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+				<h1 class="text-3xl font-bold text-white mb-2">
+					Sistema Financeiro
+				</h1>
+				<p class="text-gray-300 text-sm">
+					Gestão profissional para advocacia
+				</p>
+			</div>
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<form id="login-form" class="space-y-5">
+					<div>
+						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
+							Email
+						</label>
+						<div class="relative">
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email"
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div>
+						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
+							Senha
+						</label>
+						<div class="relative">
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password"
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+						<!-- O JS vai preencher o erro aqui -->
+					</div>
+					<button type="submit"
+							id="login-submit-button"
+							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+						<span id="login-button-text">Entrar no Sistema</span>
+					</button>
+				</form>
+				<div class="mt-6 text-center text-gray-400 text-xs">
+					<p>Acesso restrito a utilizadores autorizados</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- [FIM DA TELA DE LOGIN] -->
+
+	<!-- [REVOLUÇÃO] Novo layout principal com Sidebar -->
+	<div id="app-container" class="flex h-screen">
+		
+		<!-- [REVOLUÇÃO] Sidebar (Desktop) -->
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
+			<div class="flex-shrink-0 mb-8">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
+			</div>
+			
+			<nav class="flex-1 space-y-3">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active">
+					<i class="fas fa-tachometer-alt w-5 text-center"></i>
+					<span>Painel Principal</span>
+				</a>
+				<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="sidebar-nav-item">
+					<i class="fas fa-exclamation-triangle w-5 text-center"></i>
+					<span>Inadimplentes</span>
+				</a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
+					<i class="fas fa-tasks w-5 text-center"></i>
+					<span>Serviços</span>
+				</a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
+					<i class="fas fa-trash-alt w-5 text-center"></i>
+					<span>Lixeira</span>
+				</a>
+				<!-- [MUDANÇA v4] Botão de Notificações (Visual) -->
+				<a onclick="window.App.showPage('page-notifications')" id="tab-notifications" class="sidebar-nav-item relative">
+					<i class="fas fa-bell w-5 text-center"></i>
+					<span>Notificações</span>
+					<span id="notification-dot" class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+				</a>
+			</nav>
+
+			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
+				<div class="flex items-center gap-3 p-2 rounded-lg">
+					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
+						<i class="fas fa-user"></i>
+					</div>
+					<div>
+						<span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span>
+						<button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<!-- [REVOLUÇÃO] Conteúdo Principal (com scroll próprio) -->
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
+			
+			<!-- [REVOLUÇÃO] Cabeçalho do Conteúdo (Limpo) -->
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
+				<div class="flex justify-between items-center">
+					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+				</div>
+			</header>
+
+			<!-- O wrapper para as páginas -->
+			<div class="p-4 md:p-8 flex-1">
+				<div id="page-dashboard">
+					<div class="flex flex-wrap gap-4 mb-8">
+						<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
+						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-plus-circle"></i> Novo Contrato
+						</button>
+						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-chart-line"></i> Relatório Mensal
+						</button>
+					</div>
+
+					<!-- [MUDANÇA v3] Stats do Painel de volta para 4 colunas -->
+					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
+							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
+							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
+						</div>
+						<!-- [MUDANÇA v3] Cartão de "Contratos Ativos" de volta -->
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
+							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+						</div>
+					</div>
+					
+					<div class="mb-4 border-b border-gray-700">
+						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
+					</div>
+
+					<!-- [MUDANÇA v3] Kanban agora com 3 colunas, sem scroll (em grid) -->
+					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
+							<div id="kanban-vencidas" class="kanban-content space-y-3"></div>
+						</div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-yellow-400 flex items-center gap-2"><i class="far fa-clock"></i>A Vencer (Próx. 30 dias)</h3>
+							<div id="kanban-a-vencer" class="kanban-content space-y-3"></div>
+						</div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-gray-400 flex items-center gap-2"><i class="fas fa-check-circle"></i>Pagas (Este Mês)</h3>
+							<div id="kanban-pagas" class="kanban-content space-y-3"></div>
+						</div>
+					</div>
+
+					<!-- [MUDANÇA v3] Nova secção dedicada para Êxito -->
+					<div id="exito-section" class="mt-12">
+						<div class="mb-4 border-b border-gray-700">
+							<h2 class="text-2xl font-semibold mb-4 text-white">Bonificações de Êxito Pendentes</h2>
+						</div>
+						<!-- Esta secção tem scroll horizontal se houver muitos cartões -->
+						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4">
+							<!-- [MUDANÇA v4] Correção: O 'kanban-exito' é o wrapper flex, os cartões são adicionados diretamente aqui -->
+							<div id="kanban-exito" class="flex space-x-6"></div>
+						</div>
+					</div>
+
+					<div class="mt-12">
+						<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-4 gap-4">
+							<h2 class="text-2xl font-semibold text-white">Meus Contratos</h2>
+							<div class="flex flex-wrap items-center gap-4">
+								<button onclick="window.App.exportContractsCSV()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-3 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+									<i class="fas fa-file-csv"></i> Exportar (CSV)
+								</button>
+								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
+								
+								<!-- [MUDANÇA v3] Novo Filtro Ativos/Concluídos -->
+								<div class="flex items-center gap-2">
+									<span class="text-sm text-gray-400">Mostrar:</span>
+									<div id="contractStatusFilterButtons" class="flex gap-1">
+										<!-- Botões serão gerados pelo JS -->
+									</div>
+								</div>
+
+								<div class="flex items-center gap-2">
+									<span class="text-sm text-gray-400">Ordenar por:</span>
+									<div id="contractSortButtons" class="flex gap-1"></div>
+								</div>
+							</div>
+						</div>
+						<div class="mb-4">
+							<input type="text" id="searchInput" placeholder="🔎 Pesquisar por cliente ou tipo de serviço..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+						</div>
+						<div id="contractListContainer"></div>
+						
+						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
+						</div>
+					</div>
+				</div>
+
+				<div id="page-inadimplentes" class="hidden">
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+						<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
+						<div class="flex items-center gap-2">
+							<span class="text-sm text-gray-400">Ordenar por:</span>
+							<div id="inadimplentesSortButtons" class="flex gap-1"></div>
+						</div>
+					</div>
+					<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+				</div>
+
+				<div id="page-servicos" class="hidden">
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+						<h2 class="text-2xl font-semibold text-white">Controlo de Produção de Serviços (Meus Contratos)</h2>
+						<div class="flex flex-wrap items-center gap-4">
+							<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
+							<div class="flex items-center gap-2">
+								<span class="text-sm text-gray-400">Ordenar por:</span>
+								<div id="servicosSortButtons" class="flex gap-1"></div>
+							</div>
+							<input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+						</div>
+					</div>
+					<div id="servicosListContainer" class="space-y-8"></div>
+				</div>
+
+				<div id="page-lixeira" class="hidden">
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2>
+					</div>
+					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
+					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+				</div>
+				
+				<!-- [MUDANÇA v4] Nova página de Notificações -->
+				<div id="page-notifications" class="hidden">
+					<h2 class="text-2xl font-semibold text-white mb-6">Notificações</h2>
+					<div id="notificationsListContainer" class="space-y-4 max-w-2xl mx-auto">
+						<!-- JS vai preencher aqui -->
+						<p class="text-gray-400 text-center">Ainda não há notificações.</p>
+					</div>
+				</div>
+
+			</div> <!-- Fim do wrapper da página -->
+
+		</main> <!-- Fim do <main id="main-content"> -->
 
 		<!-- [REVOLUÇÃO] Navbar Mobile (Fica no fundo em ecrãs pequenos) -->
 		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
@@ -489,6 +938,12 @@
 			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item">
 				<i class="fas fa-tasks text-xl"></i>
 				<span class="text-xs mt-1">Serviços</span>
+			</a>
+			<!-- [MUDANÇA v4] Botão de Notificações Mobile -->
+			<a onclick="window.App.showPage('page-notifications')" id="mobile-tab-notifications" class="mobile-nav-item relative">
+				<i class="fas fa-bell text-xl"></i>
+				<span class="text-xs mt-1">Avisos</span>
+				<span id="mobile-notification-dot" class="absolute top-2 right-1/4 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
 			</a>
 			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
 				<i class="fas fa-trash-alt text-xl"></i>
@@ -529,13 +984,560 @@
 		</div>
 		
 		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
+			<!-- [MUDANÇA v4] Datalist para Autocomplete -->
+			<datalist id="client-names-list"></datalist>
+			
 			<!-- Corpo do Modal (com scroll) -->
 			<div class="p-6 space-y-4 overflow-y-auto modal-body">
 				<input type="hidden" id="contractId">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
-						<input type="text" id="clienteNome" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
+						<!-- [MUDANÇA v4] Adicionado list="client-names-list" -->
+						<input type="text" id="clienteNome" list="client-names-list" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
+					</div>
+					<div>
+						<label for="advogadoResponsavel" class="block text-sm font-medium text-gray-400 mb-1">Advogado Responsável</label>
+						<select id="advogadoResponsavel" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required></select>
+					</div>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-400 mb-1">Adicionar Serviços</label>
+					<div id="servicosContainerWrapper" class="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm">
+						<div id="servicosContainer" class="flex flex-wrap items-center gap-1 w-full mb-2">
+							<!-- Tags de serviço entram aqui -->
+						</div>
+						<div class="flex gap-2">
+							<input type="text" id="contratoServicoInput" class="flex-grow outline-none bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white" placeholder="Nome do Serviço...">
+							<input type="date" id="contratoPrazoInput" class="bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-400 px-3 py-2" style="color-scheme: dark;">
+							<button type="button" id="addServiceButton" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-3 rounded-lg">Adicionar</button>
+						</div>
+					</div>
+				</div>
+				<div>
+					<label for="contratoTipoPagamento" class="block text-sm font-medium text-gray-400 mb-1">Modalidade de Pagamento</label>
+					<select id="contratoTipoPagamento" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+						<option>Parcelado</option>
+						<option>Pró-labore</option>
+						<option>Entrada única</option>
+					</select>
+				</div>
+				<div>
+					<label for="contratoObservacoes" class="block text-sm font-medium text-gray-400 mb-1">Observações</label>
+					<textarea id="contratoObservacoes" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" placeholder="Detalhes da negociação, informações do caso, etc..."></textarea>
+				</div>
+				
+				<div class="admin-only space-y-4">
+					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros</h3>
+					
+					<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+						<label for="contratoJaQuitado" class="flex items-center">
+							<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
+							<span class="ml-2 text-sm font-medium text-gray-300">Marcar valor fixo como já quitado (contrato antigo)</span>
+						</label>
+						<p class="text-xs text-gray-500 ml-6 mt-1">Isto criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label for="valorTotal" class="block text-sm font-medium text-gray-400 mb-1">Valor Fixo Total (R$)</label>
+							<input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
+						</div>
+						<div>
+							<label for="numParcelas" class="block text-sm font-medium text-gray-400 mb-1">N° de Parcelas</label>
+							<input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" value="1">
+						</div>
+					</div>
+					<div>
+						<label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400 mb-1">Vencimento da 1ª Parcela</label>
+						<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;">
+					</div>
+					<div>
+						<label for="taxaExito" class="block text-sm font-medium text-gray-400 mb-1">Taxa de Êxito (Bonificação)</label>
+						<input type="text" id="taxaExito" placeholder="Ex: 20%, 10000, 5 SALARIOS" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
+					</div>
+				</div>
+			</div>
+
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
+			<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formPagamento">
+			<!-- Corpo do Modal -->
+			<div class="p-6 space-y-4 modal-body">
+				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded-md text-white"></div>
+				<div>
+					<label for="pagamentoValor" class="block text-sm font-medium text-gray-400 mb-1">Valor Pago (R$)</label>
+					<input type="number" step="0.01" id="pagamentoValor" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required>
+				</div>
+				<div>
+					<label for="pagamentoData" class="block text-sm font-medium text-gray-400 mb-1">Data do Pagamento</label>
+					<input type="date" id="pagamentoData" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required style="color-scheme: dark;">
+				</div>
+				<input type="hidden" id="pagamentoContractId">
+				<input type="hidden" id="pagamentoParcelIndex">
+			</div>
+			
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Confirmar Pagamento</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
+			<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		<!-- Corpo do Modal (com scroll) -->
+		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
+	</div>
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório e Análise</h2>
+			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<!-- Corpo do Modal (com scroll) -->
+		<div class="p-6 overflow-y-auto modal-body">
+			<div class="flex gap-4 mb-4">
+				<div class="flex-1">
+					<label for="reportMonth" class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+					<select id="reportMonth" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select>
+				</div>
+				<div class="flex-1">
+					<label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
+					<select id="reportYear" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select>
+				</div>
+			</div>
+			<div class="flex gap-4 mb-6">
+				<button onclick="window.App.generateAndShowReport()" class="flex-1 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+					<i class="fas fa-file-invoice-dollar mr-2"></i> Relatório
+				</button>
+				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+					<i class="fas fa-chart-bar mr-2"></i> Gráficos
+				</button>
+				<button onclick="window.App.exportReportCSV()" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+					<i class="fas fa-file-csv mr-2"></i> Exportar (CSV)
+				</button>
+			</div>
+
+			<div id="reportResult" class="space-y-4">
+				<!-- O JS preenche aqui -->
+			</div>
+
+			<div id="reportChartsContainer" class="hidden space-y-8">
+				<div class="dark-card shadow-lg p-6 rounded-lg">
+					<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real (Últimos 12 Meses)</h3>
+					<div class="relative" style="height: 350px;">
+						<canvas id="actualIncomeChartModal"></canvas>
+					</div>
+				</div>
+				<div class="dark-card shadow-lg p-6 rounded-lg">
+					<h3 class="text-lg font-semibold text-gray-300 mb-4">Projeção de Ganhos (Próximos 12 Meses)</h3>
+					<p class="text-sm text-gray-400 mb-4 -mt-3">(Baseado em parcelas pendentes)</p>
+					<div class="relative" style="height: 350px;">
+						<canvas id="projectedIncomeChartModal"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
+			<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formExito">
+			<!-- Corpo do Modal -->
+			<div class="p-6 space-y-4 modal-body">
+				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded-md"></div>
+				<div class="admin-only">
+					<label for="exitoValorRecebido" class="block text-sm font-medium text-gray-400 mb-1">Valor Líquido Recebido (R$)</label>
+					<input type="number" step="0.01" id="exitoValorRecebido" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" placeholder="Ex: 9500.00" required>
+				</div>
+				<p class="mb-4 text-gray-400 non-admin-hidden">Confirme o recebimento do valor de êxito.</p>
+				<input type="hidden" id="exitoContractId">
+			</div>
+
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar Recebimento</button>
+			</div>
+		</form>
+	</div>
+
+	<div id="modal-backdrop" class="modal-backdrop"></div>
+<body class="text-gray-300">
+	<div id="notifications"></div>
+
+	<div id="loading-overlay">
+		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
+	</div>
+
+	<!-- [TELA DE LOGIN - SEM ALTERAÇÕES CONFORME O PEDIDO] -->
+	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+		<div class="absolute inset-0 opacity-5">
+			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
+		</div>
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+		<div class="relative z-10 w-full max-w-md">
+			<div class="mb-8 text-center">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+				<h1 class="text-3xl font-bold text-white mb-2">
+					Sistema Financeiro
+				</h1>
+				<p class="text-gray-300 text-sm">
+					Gestão profissional para advocacia
+				</p>
+			</div>
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<form id="login-form" class="space-y-5">
+					<div>
+						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
+							Email
+						</label>
+						<div class="relative">
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email"
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div>
+						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
+							Senha
+						</label>
+						<div class="relative">
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password"
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
+						</div>
+					</div>
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+						<!-- O JS vai preencher o erro aqui -->
+					</div>
+					<button type="submit"
+							id="login-submit-button"
+							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+						<span id="login-button-text">Entrar no Sistema</span>
+					</button>
+				</form>
+				<div class="mt-6 text-center text-gray-400 text-xs">
+					<p>Acesso restrito a utilizadores autorizados</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- [FIM DA TELA DE LOGIN] -->
+
+	<!-- [REVOLUÇÃO] Novo layout principal com Sidebar -->
+	<div id="app-container" class="flex h-screen">
+		
+		<!-- [REVOLUÇÃO] Sidebar (Desktop) -->
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
+			<div class="flex-shrink-0 mb-8">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
+			</div>
+			
+			<nav class="flex-1 space-y-3">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active">
+					<i class="fas fa-tachometer-alt w-5 text-center"></i>
+					<span>Painel Principal</span>
+				</a>
+				<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="sidebar-nav-item">
+					<i class="fas fa-exclamation-triangle w-5 text-center"></i>
+					<span>Inadimplentes</span>
+				</a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
+					<i class="fas fa-tasks w-5 text-center"></i>
+					<span>Serviços</span>
+				</a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
+					<i class="fas fa-trash-alt w-5 text-center"></i>
+					<span>Lixeira</span>
+				</a>
+				<!-- [MUDANÇA v4] Botão de Notificações (Visual) -->
+				<a onclick="window.App.showPage('page-notifications')" id="tab-notifications" class="sidebar-nav-item relative">
+					<i class="fas fa-bell w-5 text-center"></i>
+					<span>Notificações</span>
+					<span id="notification-dot" class="absolute top-3 right-3 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+				</a>
+			</nav>
+
+			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
+				<div class="flex items-center gap-3 p-2 rounded-lg">
+					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
+						<i class="fas fa-user"></i>
+					</div>
+					<div>
+						<span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span>
+						<button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<!-- [REVOLUÇÃO] Conteúdo Principal (com scroll próprio) -->
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
+			
+			<!-- [REVOLUÇÃO] Cabeçalho do Conteúdo (Limpo) -->
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
+				<div class="flex justify-between items-center">
+					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+				</div>
+			</header>
+
+			<!-- O wrapper para as páginas -->
+			<div class="p-4 md:p-8 flex-1">
+				<div id="page-dashboard">
+					<div class="flex flex-wrap gap-4 mb-8">
+						<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
+						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-plus-circle"></i> Novo Contrato
+						</button>
+						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-chart-line"></i> Relatório Mensal
+						</button>
+					</div>
+
+					<!-- [MUDANÇA v3] Stats do Painel de volta para 4 colunas -->
+					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
+							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
+							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
+						</div>
+						<!-- [MUDANÇA v3] Cartão de "Contratos Ativos" de volta -->
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
+							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+						</div>
+					</div>
+					
+					<div class="mb-4 border-b border-gray-700">
+						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
+					</div>
+
+					<!-- [MUDANÇA v3] Kanban agora com 3 colunas, sem scroll (em grid) -->
+					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
+							<div id="kanban-vencidas" class="kanban-content space-y-3"></div>
+						</div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-yellow-400 flex items-center gap-2"><i class="far fa-clock"></i>A Vencer (Próx. 30 dias)</h3>
+							<div id="kanban-a-vencer" class="kanban-content space-y-3"></div>
+						</div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
+							<h3 class="font-bold text-lg mb-4 text-gray-400 flex items-center gap-2"><i class="fas fa-check-circle"></i>Pagas (Este Mês)</h3>
+							<div id="kanban-pagas" class="kanban-content space-y-3"></div>
+						</div>
+					</div>
+
+					<!-- [MUDANÇA v3] Nova secção dedicada para Êxito -->
+					<div id="exito-section" class="mt-12">
+						<div class="mb-4 border-b border-gray-700">
+							<h2 class="text-2xl font-semibold mb-4 text-white">Bonificações de Êxito Pendentes</h2>
+						</div>
+						<!-- Esta secção tem scroll horizontal se houver muitos cartões -->
+						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4">
+							<!-- [MUDANÇA v4] Correção: O 'kanban-exito' é o wrapper flex, os cartões são adicionados diretamente aqui -->
+							<div id="kanban-exito" class="flex space-x-6"></div>
+						</div>
+					</div>
+
+					<div class="mt-12">
+						<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-4 gap-4">
+							<h2 class="text-2xl font-semibold text-white">Meus Contratos</h2>
+							<div class="flex flex-wrap items-center gap-4">
+								<button onclick="window.App.exportContractsCSV()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-3 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+									<i class="fas fa-file-csv"></i> Exportar (CSV)
+								</button>
+								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
+								
+								<!-- [MUDANÇA v3] Novo Filtro Ativos/Concluídos -->
+								<div class="flex items-center gap-2">
+									<span class="text-sm text-gray-400">Mostrar:</span>
+									<div id="contractStatusFilterButtons" class="flex gap-1">
+										<!-- Botões serão gerados pelo JS -->
+									</div>
+								</div>
+
+								<div class="flex items-center gap-2">
+									<span class="text-sm text-gray-400">Ordenar por:</span>
+									<div id="contractSortButtons" class="flex gap-1"></div>
+								</div>
+							</div>
+						</div>
+						<div class="mb-4">
+							<input type="text" id="searchInput" placeholder="🔎 Pesquisar por cliente ou tipo de serviço..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+						</div>
+						<div id="contractListContainer"></div>
+						
+						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
+						</div>
+					</div>
+				</div>
+
+				<div id="page-inadimplentes" class="hidden">
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+						<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
+						<div class="flex items-center gap-2">
+							<span class="text-sm text-gray-400">Ordenar por:</span>
+							<div id="inadimplentesSortButtons" class="flex gap-1"></div>
+						</div>
+					</div>
+					<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+				</div>
+
+				<div id="page-servicos" class="hidden">
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+						<h2 class="text-2xl font-semibold text-white">Controlo de Produção de Serviços (Meus Contratos)</h2>
+						<div class="flex flex-wrap items-center gap-4">
+							<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
+							<div class="flex items-center gap-2">
+								<span class="text-sm text-gray-400">Ordenar por:</span>
+								<div id="servicosSortButtons" class="flex gap-1"></div>
+							</div>
+							<input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+						</div>
+					</div>
+					<div id="servicosListContainer" class="space-y-8"></div>
+				</div>
+
+				<div id="page-lixeira" class="hidden">
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2>
+					</div>
+					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
+					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+				</div>
+				
+				<!-- [MUDANÇA v4] Nova página de Notificações -->
+				<div id="page-notifications" class="hidden">
+					<h2 class="text-2xl font-semibold text-white mb-6">Notificações</h2>
+					<div id="notificationsListContainer" class="space-y-4 max-w-2xl mx-auto">
+						<!-- JS vai preencher aqui -->
+						<p class="text-gray-400 text-center">Ainda não há notificações.</p>
+					</div>
+				</div>
+
+			</div> <!-- Fim do wrapper da página -->
+
+		</main> <!-- Fim do <main id="main-content"> -->
+
+		<!-- [REVOLUÇÃO] Navbar Mobile (Fica no fundo em ecrãs pequenos) -->
+		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
+			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
+				<i class="fas fa-tachometer-alt text-xl"></i>
+				<span class="text-xs mt-1">Painel</span>
+			</a>
+			<a onclick="window.App.showPage('page-inadimplentes')" id="mobile-tab-inadimplentes" class="mobile-nav-item">
+				<i class="fas fa-exclamation-triangle text-xl"></i>
+				<span class="text-xs mt-1">Pendentes</span>
+			</a>
+			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item">
+				<i class="fas fa-tasks text-xl"></i>
+				<span class="text-xs mt-1">Serviços</span>
+			</a>
+			<!-- [MUDANÇA v4] Botão de Notificações Mobile -->
+			<a onclick="window.App.showPage('page-notifications')" id="mobile-tab-notifications" class="mobile-nav-item relative">
+				<i class="fas fa-bell text-xl"></i>
+				<span class="text-xs mt-1">Avisos</span>
+				<span id="mobile-notification-dot" class="absolute top-2 right-1/4 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+			</a>
+			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
+				<i class="fas fa-trash-alt text-xl"></i>
+				<span class="text-xs mt-1">Lixeira</span>
+			</a>
+		</nav>
+
+	</div> <!-- Fim do <div id="app-container"> -->
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
+		</div>
+		
+		<!-- Corpo do Modal -->
+		<div class="p-6 modal-body">
+			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
+			<form id="formDisplayName">
+				<div class="mb-4">
+					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400 mb-2">O seu Nome de Exibição</label>
+					<!-- [REFINAMENTO] Input com novo estilo -->
+					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
+				</div>
+				<!-- [REFINAMENTO] Botão com gradiente -->
+				<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar e Entrar</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
+			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
+			<!-- [MUDANÇA v4] Datalist para Autocomplete -->
+			<datalist id="client-names-list"></datalist>
+			
+			<!-- Corpo do Modal (com scroll) -->
+			<div class="p-6 space-y-4 overflow-y-auto modal-body">
+				<input type="hidden" id="contractId">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
+						<!-- [MUDANÇA v4] Adicionado list="client-names-list" -->
+						<input type="text" id="clienteNome" list="client-names-list" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
 					</div>
 					<div>
 						<label for="advogadoResponsavel" class="block text-sm font-medium text-gray-400 mb-1">Advogado Responsável</label>
@@ -1220,10 +2222,7 @@
 				return { labels, data };
 			}
 		}
-		
-
-
-		/**
+/**
 		 * @class DOMBuilder
 		 */
 		class DOMBuilder {
@@ -1318,7 +2317,7 @@
 				return card;
 			}
 			
-			// [MUDANÇA v3] O cartão de êxito agora tem w-80 (320px), o mesmo que .kanban-column
+			// [MUDANÇA v4] O cartão de êxito agora tem w-80 (320px), o mesmo que .kanban-column
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
@@ -1630,7 +2629,7 @@
 				this.currentInadimplentesSort = 'days-desc';
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
-				this.contractStatusFilter = 'ativos'; // [MUDANÇA v3] Novo filtro de status
+				this.contractStatusFilter = 'ativos'; // [MUDANÇA v4] Novo filtro de status
 				
 				// Referências DOM
 				this.backdrop = document.getElementById('modal-backdrop');
@@ -1691,7 +2690,7 @@
 				const debouncedServicos = Utils.debounce(() => this.renderServicosPage(), 300);
 				document.getElementById('servicosSearchInput').addEventListener('input', debouncedServicos);
 		
-				// [REVOLUÇÃO] Listener do menu mobile
+				// Listener do menu mobile
 				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
 					const sidebar = document.getElementById('sidebar');
 					sidebar.classList.toggle('hidden'); // Alterna a sidebar
@@ -1710,7 +2709,7 @@
 							this.closeModal(this.openModalId);
 						}
 				
-						// [REVOLUÇÃO] Fecha a sidebar se estiver aberta no telemóvel
+						// Fecha a sidebar se estiver aberta no telemóvel
 						const sidebar = document.getElementById('sidebar');
 						if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
 							sidebar.classList.add('hidden');
@@ -1731,7 +2730,7 @@
 					if (!user.displayName) {
 						// Primeiro login, pedir nome
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
+						this.authOverlay.style.display = 'flex';
 						this.appContainer.style.display = 'none';
 						this.openModal('modalDisplayName');
 					} else {
@@ -1739,7 +2738,7 @@
 						document.getElementById('user-display-name').textContent = user.displayName;
 						this.loadingOverlay.style.display = 'none';
 						this.authOverlay.style.display = 'none';
-						this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
+						this.appContainer.style.display = 'flex';
 						this.setupUIAccess();
 						this.firebaseService.startSnapshotListener('contracts');
 					}
@@ -1748,7 +2747,7 @@
 					this.currentUserDisplayName = null;
 					this.isUserAdmin = false;
 					document.body.classList.remove('is-admin');
-					this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
+					this.authOverlay.style.display = 'flex';
 					this.appContainer.style.display = 'none';
 					this.loadingOverlay.style.display = 'none';
 					this.firebaseService.stopSnapshotListener();
@@ -1759,6 +2758,7 @@
 				this.database.contracts = contracts;
 				this.contractListPage = 0;
 				this.render();
+				this.populateClientDatalist(); // [MUDANÇA v4] Atualiza o autocomplete
 			}
 		
 			// --- 3. LÓGICA DE RENDERIZAÇÃO PRINCIPAL ---
@@ -1789,7 +2789,7 @@
 				this.renderAdvogadoFilters();
 			}
 		
-			// [MUDANÇA v3] Kanban e Êxito separados
+			// [MUDANÇA v4] Kanban e Êxito separados
 			async renderKanban() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
@@ -1842,7 +2842,7 @@
 						}
 					}
 					
-					// [MUDANÇA v3] Lógica de status de êxito atualizada
+					// [MUDANÇA v4] Lógica de status de êxito atualizada
 					const statusInfo = this.getContractStatus(contract);
 					if (statusInfo.statusText === 'Aguardando Êxito') {
 						fragExito.append(this.domBuilder.createExitoCard(contract));
@@ -1872,7 +2872,7 @@
 				const allContracts = this.getFilteredContracts(true);
 				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
 				
-				// [MUDANÇA v3] Passa 4 stats para o renderDashboard
+				// [MUDANÇA v4] Passa 4 stats para o renderDashboard
 				// Filtra contratos 'Ativos' para a contagem (exclui concluídos e lixeira)
 				const totalContratosAtivos = this.getFilteredContracts(false)
 					.filter(c => this.getContractStatus(c).statusText !== 'Concluído')
@@ -1880,7 +2880,7 @@
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, totalContratosAtivos);
 			}
 		
-			// [MUDANÇA v3] Stats de volta para 4
+			// [MUDANÇA v4] Stats de volta para 4
 			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(vencido);
@@ -1888,7 +2888,7 @@
 				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
 		
-			// [MUDANÇA v3] Atualizado para ler o novo filtro de status
+			// [MUDANÇA v4] Atualizado para ler o novo filtro de status
 			renderContractList() {
 				const listContainer = document.getElementById('contractListContainer');
 				const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase();
@@ -2017,7 +3017,6 @@
 					activeContracts.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
 				}
 
-				// Filtra os que não têm serviços
 				activeContracts = activeContracts.filter(c => c.serviceTypes && c.serviceTypes.length > 0);
 		
 				if (activeContracts.length === 0) {
@@ -2039,13 +3038,11 @@
 					const totalPaid = (contract.parcels || []).reduce((sum, p) => sum + (p.valuePaid || 0), 0) + (contract.successFeeValueReceived || 0);
 					const financialProgress = (contract.totalValue || 0) > 0 ? (totalPaid / contract.totalValue) * 100 : (totalPaid > 0 ? 100 : 0);
 					
-					// [MUDANÇA v3] Só mostra se o serviço não estiver 100%
 					if(serviceProgress < 100) {
 						fragment.append(this.domBuilder.createServicoCard(contract, serviceProgress, financialProgress));
 					}
 				});
 
-				// [MUDANÇA v3] Mensagem se todos os serviços estiverem concluídos
 				if(fragment.children.length === 0) {
 					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços estão concluídos.</p><p class="text-sm text-gray-400">Nenhum serviço pendente para os filtros selecionados.</p></div></div>`;
 					return;
@@ -2097,12 +3094,14 @@
 					'page-dashboard': 'Painel Principal',
 					'page-inadimplentes': 'Inadimplentes',
 					'page-servicos': 'Produção de Serviços',
-					'page-lixeira': 'Lixeira'
+					'page-lixeira': 'Lixeira',
+					'page-notifications': 'Notificações' // [MUDANÇA v4] Título da nova página
 				};
 				
 				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
 		
-				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira'].forEach(id => {
+				// [MUDANÇA v4] Adiciona 'page-notifications' à lista
+				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira', 'page-notifications'].forEach(id => {
 					const el = document.getElementById(id);
 					if (el) el.classList.add('hidden');
 				});
@@ -2158,7 +3157,7 @@
 				return allContracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted));
 			}
 		
-			// [MUDANÇA v3] Lógica de "Concluído" atualizada
+			// [MUDANÇA v4] Lógica de "Concluído" atualizada para incluir serviços
 			getContractStatus(contract) {
 				const allParcelsPaid = (contract.parcels || []).every(p => p.status === 'Paga');
 				// Verifica se todos os serviços definidos estão concluídos
@@ -2182,7 +3181,7 @@
 				return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
 			}
 		
-			// [MUDANÇA v3] Renderiza os novos botões de filtro (Ativos/Concluídos)
+			// [MUDANÇA v4] Renderiza os novos botões de filtro (Ativos/Concluídos)
 			renderSortButtons() {
 				const contractSortContainer = document.getElementById('contractSortButtons');
 				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
@@ -2267,6 +3266,19 @@
 		
 				select.value = currentValue && currentValue !== 'Não Informado' ? currentValue : (this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName);
 				select.disabled = !this.isUserAdmin && !!this.currentUserDisplayName;
+			}
+
+			// [MUDANÇA v4] Popula o datalist de autocomplete de clientes
+			populateClientDatalist() {
+				const datalist = document.getElementById('client-names-list');
+				if (!datalist) return;
+				datalist.innerHTML = '';
+				const clientNames = new Set(this.database.contracts.map(c => c.clientName));
+				clientNames.forEach(name => {
+					const option = document.createElement('option');
+					option.value = name;
+					datalist.appendChild(option);
+				});
 			}
 			
 			changeContractPage(pageIndex) {
@@ -2591,6 +3603,7 @@
 				this.openModal('modalPagamento');
 			}
 		
+			// [MUDANÇA v4] Adiciona barra de progresso financeira
 			openClientHistoryModal(clientName) {
 				const clientContracts = (this.isUserAdmin ? this.database.contracts : this.getFilteredContracts(true))
 					.filter(c => c.clientName === clientName);
@@ -2602,6 +3615,7 @@
 		
 				clientContracts.forEach(contract => {
 					const contractValue = contract.totalValue || 0;
+					let contractPaid = 0;
 					if (this.isUserAdmin) totalContratado += contractValue;
 		
 					let contractHtml = `<div class="bg-gray-700 p-4 rounded-lg ${contract.isDeleted ? 'opacity-60 border-l-4 border-gray-500' : ''}">`;
@@ -2618,7 +3632,7 @@
 							const statusClass = p.status === 'Paga' ? 'text-green-400' : 'text-red-400';
 							let valorPagoDisplay = '';
 							if (p.status === 'Paga') {
-								if (this.isUserAdmin) totalPago += p.valuePaid || 0;
+								if (this.isUserAdmin) contractPaid += p.valuePaid || 0;
 								valorPagoDisplay = this.isUserAdmin ? `(pago ${Utils.formatCurrency(p.valuePaid || 0)})` : '(pago)';
 							}
 							const valorParcelaDisplay = this.isUserAdmin ? Utils.formatCurrency(p.value) : '[Restrito]';
@@ -2628,9 +3642,24 @@
 					}
 					if (contract.successFeePaymentDate) {
 						const exitoRecebidoDisplay = this.isUserAdmin ? Utils.formatCurrency(contract.successFeeValueReceived) : '[Recebido]';
-						if (this.isUserAdmin) totalPago += contract.successFeeValueReceived || 0;
+						if (this.isUserAdmin) contractPaid += contract.successFeeValueReceived || 0;
 						contractHtml += `<p class="mt-2 text-sm text-green-400">Êxito Recebido: ${exitoRecebidoDisplay}</p>`;
 					}
+
+					// [MUDANÇA v4] Barra de Progresso Financeira
+					if (this.isUserAdmin && contractValue > 0) {
+						const financialProgress = (contractPaid / contractValue) * 100;
+						contractHtml += `
+						<div class="mt-4">
+							<div class="flex justify-between text-xs mb-1 text-gray-300">
+								<label>Progresso Financeiro</label>
+								<span class="font-medium text-teal-300">${Utils.formatCurrency(contractPaid)} / ${Utils.formatCurrency(contractValue)}</span>
+							</div>
+							<div class="progress-bar-bg h-2 w-full"><div class="progress-bar bg-teal-500" style="width: ${financialProgress > 100 ? 100 : financialProgress}%"></div></div>
+						</div>`;
+					}
+
+					totalPago += contractPaid; // Adiciona ao total geral
 					contractHtml += `</div>`;
 					
 					const el = this.domBuilder.buildElement('div');
