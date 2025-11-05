@@ -11,7 +11,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<style>
 		/* [SEÇÃO 1: Estilos Gerais] */
-		/* ERRO CORRIGIDO: Removido ':' de body: */
 		body {
 			font-family: 'Inter', sans-serif;
 			position: relative;
@@ -30,7 +29,19 @@
 			opacity: 0.12;
 		}
 		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
-		.modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; max-height: 90vh; overflow-y: auto; }
+		
+		/* [REFINAMENTO] Modais agora têm sombra mais forte e borda sutil */
+		.modal { 
+			display: none; 
+			position: fixed; 
+			top: 50%; left: 50%; 
+			transform: translate(-50%, -50%); 
+			z-index: 9001; 
+			max-height: 90vh; 
+			overflow-y: auto;
+			border: 1px solid #374151;
+			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
+		}
 		.kanban-column { min-width: 320px; }
 		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 8px; }
 		::-webkit-scrollbar { width: 8px; }
@@ -39,6 +50,8 @@
 		.service-tag { display: inline-flex; justify-content: space-between; align-items: center; background-color: #374151; color: #d1d5db; padding: 4px 10px; border-radius: 12px; font-size: 14px; margin-right: 4px; margin-bottom: 4px; width: 100%; }
 		.service-tag-small { display: inline-block; background-color: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
 		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
+		
+		/* [REFINAMENTO] Adicionada transição às abas */
 		.nav-tab { cursor: pointer; padding: 10px 20px; border-bottom: 3px solid transparent; color: #9ca3af; transition: all 0.2s; }
 		.nav-tab:hover { color: #e5e7eb; }
 		.nav-tab.active { border-bottom-color: #6366f1; color: #e5e7eb; }
@@ -47,17 +60,37 @@
 		.nav-tab-icon.active { color: #6366f1; }
 		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
-		.dark-card { background-color: #1f2937; border: 1px solid #374151; }
+		
+		/* [REFINAMENTO] Removida a borda, pois usaremos 'shadow-lg' do Tailwind nos cards */
+		.dark-card { 
+			background-color: #1f2937;
+			/* border: 1px solid #374151; <-- REMOVIDO */
+		}
+		
 		.header-with-logo { position: relative; display: flex; justify-content: space-between; align-items: center; }
 		.header-user-block { margin-right: 160px; }
 		.header-logo { position: absolute; right: 0; top: 50%; transform: translateY(-50%); max-height: 60px; opacity: 0.8; }
 		.sort-button, .filter-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
 		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
-		.filter-select { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+		
+		/* [REFINAMENTO] Inputs de filtro (Select) */
+		.filter-select { 
+			background-color: #1f2937; /* Mais escuro */
+			border: 1px solid #4b5563; 
+			color: #9ca3af; 
+			padding: 8px 12px; 
+			border-radius: 6px; 
+			font-size: 14px;
+			transition: all 0.2s ease-in-out;
+		}
+		.filter-select:focus {
+			border-color: #6366f1;
+			box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+			outline: none;
+		}
 		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
 		
-		/* --- Bloco Corrigido (Login/Loading) --- */
 		/* Regra APENAS para o loading */
 		#loading-overlay { 
 			position: fixed; 
@@ -72,17 +105,15 @@
 			font-size: 1.2rem; 
 			transition: opacity 0.3s; 
 		}
-		/* As regras CSS antigas para #auth-overlay foram COMPLETAMENTE REMOVIDAS */
+		/* As regras CSS antigas para #auth-overlay foram removidas */
 		#app-container { display: none; }
-		/* --- Fim da Correção --- */
 		
 		.admin-only { display: none; }
 		body.is-admin .admin-only { display: block; }
 		body.is-admin .flex.admin-only { display: flex; }
 		body:not(.is-admin) .non-admin-hidden { display: none; }
 		
-		/* CSS antigo do .login-modal não é mais necessário */
-		.login-modal { }
+		.login-modal { } /* Estilos antigos não são mais necessários */
 
 		@keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 		.notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 11000; animation: slideIn 0.3s ease; }
@@ -92,7 +123,7 @@
 		body.light-theme .login-modal { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
 		@media (max-width: 768px) { .kanban-column { min-width: 100%; } .header-user-block { margin-right: 0; } }
 
-		/* === INÍCIO: ESTILOS DE PAGINAÇÃO === */
+		/* === ESTILOS DE PAGINAÇÃO === */
 		.pagination-button {
 			background-color: #374151;
 			border: 1px solid #4b5563;
@@ -123,12 +154,8 @@
 			font-size: 14px;
 			color: #6b7280;
 		}
-		/* === FIM: ESTILOS DE PAGINAÇÃO === */
-
-		/* === INÍCIO: ESTILOS (UX/TRANSIÇÕES) === */
-		.modal input, .modal select, .modal textarea {
-			transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-		}
+		
+		/* === ESTILOS (UX/TRANSIÇÕES) === */
 		.modal button {
 			transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 		}
@@ -136,9 +163,8 @@
 			transform: translateY(-1px);
 			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 		}
-		/* === FIM: ESTILOS (UX/TRANSIÇÕES) === */
 		
-		/* === INÍCIO: ESTILOS (NOVO LOGIN) === */
+		/* === ESTILOS (NOVO LOGIN) === */
 		@keyframes blob {
 			0%, 100% { transform: translate(0, 0) scale(1); }
 			33% { transform: translate(30px, -50px) scale(1.1); }
@@ -147,29 +173,22 @@
 		.animate-blob {
 			animation: blob 7s infinite;
 		}
-		/* === FIM: ESTILOS (NOVO LOGIN) === */
 	</style>
-</head>
-<body class="text-gray-300">
+	<body class="text-gray-300">
 	<div id="notifications"></div>
 
 	<div id="loading-overlay">
 		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
 	</div>
 
-	<!-- [NOVO HTML DE LOGIN (Tradução do seu React)] -->
+	<!-- [TELA DE LOGIN - SEM ALTERAÇÕES CONFORME O PEDIDO] -->
 	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
-		<!-- Efeito de Fundo -->
 		<div class="absolute inset-0 opacity-5">
 			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
 		</div>
-	
-		<!-- Elementos Decorativos -->
 		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
 		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
-	
 		<div class="relative z-10 w-full max-w-md">
-			<!-- Logótipo e Cabeçalho -->
 			<div class="mb-8 text-center">
 				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
 				<h1 class="text-3xl font-bold text-white mb-2">
@@ -179,18 +198,13 @@
 					Gestão profissional para advocacia
 				</p>
 			</div>
-	
-			<!-- Cartão de Login -->
 			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
-				<!-- Mantive o ID "login-form" para o JS funcionar -->
 				<form id="login-form" class="space-y-5">
-					<!-- Input de Email -->
 					<div>
 						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
 							Email
 						</label>
 						<div class="relative">
-							<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
 							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="email"
 								   id="login-email"
@@ -199,14 +213,11 @@
 								   required />
 						</div>
 					</div>
-	
-					<!-- Input de Senha -->
 					<div>
 						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
 							Senha
 						</label>
 						<div class="relative">
-							<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
 							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="password"
 								   id="login-password"
@@ -215,30 +226,23 @@
 								   required />
 						</div>
 					</div>
-	
-					<!-- Mensagem de Erro (Mantive o ID "auth-error" e apliquei o seu novo estilo) -->
 					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
 						<!-- O JS vai preencher o erro aqui -->
 					</div>
-	
-					<!-- Botão de Submeter -->
 					<button type="submit"
 							id="login-submit-button"
 							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
-						<!-- Usei FontAwesome (que já temos) no lugar do Lucide-React -->
 						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
 						<span id="login-button-text">Entrar no Sistema</span>
 					</button>
 				</form>
-	
-				<!-- Rodapé -->
 				<div class="mt-6 text-center text-gray-400 text-xs">
 					<p>Acesso restrito a utilizadores autorizados</p>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- [FIM DO NOVO HTML DE LOGIN] -->
+	<!-- [FIM DA TELA DE LOGIN] -->
 
 
 	<div id="app-container" class="container mx-auto p-4 md:p-8" aria-hidden="false">
@@ -249,7 +253,7 @@
 			</div>
 			<div class="flex items-center header-user-block">
 				<span id="user-display-name" class="text-sm text-gray-300 font-medium mr-4"></span>
-				<button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-sm flex items-center gap-2">
+				<button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-sm flex items-center gap-2 transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5">
 					<i class="fas fa-sign-out-alt"></i> Sair
 				</button>
 			</div>
@@ -279,64 +283,69 @@
 
 		<div id="page-dashboard">
 			<div class="flex flex-wrap gap-4 mb-8">
-				<button onclick="window.App.openContractModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center gap-2">
+				<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
+				<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
 					<i class="fas fa-plus-circle"></i> Novo Contrato
 				</button>
-				<button onclick="window.App.openReportModal()" class="admin-only bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center gap-2">
+				<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
 					<i class="fas fa-chart-line"></i> Relatório Mensal
 				</button>
 			</div>
 
-			<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only">
+			<!-- [REFINAMENTO] Cards com sombra, transição e hover -->
+			<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 					<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
 					<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
 				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only">
+				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 					<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
 					<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
 				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only">
+				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 					<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
 					<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
 				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg">
+				<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 					<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
 					<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
 				</div>
 			</div>
-
+</head>
 			<div class="mb-4 border-b border-gray-700">
 				<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 			</div>
 
-			<div id="kanban-board" class="flex overflow-x-auto space-x-4 pb-4">
-				<div class="kanban-column bg-gray-900/70 rounded-lg p-4 flex-1">
+			<!-- [REFINAMENTO] Mais 'respiro' (space-x-6) e colunas com sombra/transição -->
+			<div id="kanban-board" class="flex overflow-x-auto space-x-6 pb-4">
+				<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 					<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
 					<div id="kanban-vencidas" class="kanban-content space-y-3"></div>
 				</div>
-				<div class="kanban-column bg-gray-900/70 rounded-lg p-4 flex-1">
+				<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 					<h3 class="font-bold text-lg mb-4 text-yellow-400 flex items-center gap-2"><i class="far fa-clock"></i>A Vencer (Próx. 30 dias)</h3>
 					<div id="kanban-a-vencer" class="kanban-content space-y-3"></div>
 				</div>
-				<div class="kanban-column bg-gray-900/70 rounded-lg p-4 flex-1">
+				<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 					<h3 class="font-bold text-lg mb-4 text-gray-400 flex items-center gap-2"><i class="fas fa-check-circle"></i>Pagas (Este Mês)</h3>
 					<div id="kanban-pagas" class="kanban-content space-y-3"></div>
 				</div>
-				<div class="kanban-column bg-gray-900/70 rounded-lg p-4 flex-1">
+				<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 					<h3 class="font-bold text-lg mb-4 text-indigo-400 flex items-center gap-2"><i class="fas fa-gavel"></i>Aguardando Êxito</h3>
 					<div id="kanban-exito" class="kanban-content space-y-3"></div>
 				</div>
 			</div>
 
 			<div class="mt-12">
-				<div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
+				<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-4 gap-4">
 					<h2 class="text-2xl font-semibold text-white">Meus Contratos</h2>
-					<div class="flex items-center gap-4">
-						<button onclick="window.App.exportContractsCSV()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center gap-2 text-sm">
+					<div class="flex flex-wrap items-center gap-4">
+						<!-- [REFINAMENTO] Botão com gradiente, sombra e transição -->
+						<button onclick="window.App.exportContractsCSV()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-3 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2 text-sm">
 							<i class="fas fa-file-csv"></i> Exportar (CSV)
 						</button>
-						<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only"></select>
+						<!-- [REFINAMENTO] Select com classes de foco premium -->
+						<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
 						<div class="flex items-center gap-2">
 							<span class="text-sm text-gray-400">Ordenar por:</span>
 							<div id="contractSortButtons" class="flex gap-1"></div>
@@ -344,13 +353,15 @@
 					</div>
 				</div>
 				<div class="mb-4">
-					<input type="text" id="searchInput" placeholder="🔎 Pesquisar por cliente ou tipo de serviço..." class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white">
+					<!-- [REFINAMENTO] Input de pesquisa com estilos de foco premium -->
+					<input type="text" id="searchInput" placeholder="🔎 Pesquisar por cliente ou tipo de serviço..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
 				</div>
+				<!-- O JS vai gerar o grid de cards aqui (gap-8 será aplicado via JS) -->
 				<div id="contractListContainer"></div>
 				
 				<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
-					</div>
 				</div>
+			</div>
 		</div>
 
 		<div id="page-inadimplentes" class="hidden">
@@ -361,22 +372,26 @@
 					<div id="inadimplentesSortButtons" class="flex gap-1"></div>
 				</div>
 			</div>
-			<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+			<!-- [REFINAMENTO] Mais 'respiro' (gap-8) -->
+			<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 		</div>
 
 		<div id="page-servicos" class="hidden">
-			<div class="flex justify-between items-center mb-4">
+			<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
 				<h2 class="text-2xl font-semibold text-white">Controlo de Produção de Serviços (Meus Contratos)</h2>
-				<div class="flex items-center gap-4">
-					<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only"></select>
+				<div class="flex flex-wrap items-center gap-4">
+					<!-- [REFINAMENTO] Select com classes de foco premium -->
+					<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
 					<div class="flex items-center gap-2">
 						<span class="text-sm text-gray-400">Ordenar por:</span>
 						<div id="servicosSortButtons" class="flex gap-1"></div>
 					</div>
-					<input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="w-full md:w-auto p-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white">
+					<!-- [REFINAMENTO] Input de pesquisa com estilos de foco premium -->
+					<input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
 				</div>
 			</div>
-			<div id="servicosListContainer" class="space-y-6"></div>
+			<!-- [REFINAMENTO] Mais 'respiro' (space-y-8) -->
+			<div id="servicosListContainer" class="space-y-8"></div>
 		</div>
 
 		<div id="page-lixeira" class="hidden">
@@ -384,73 +399,84 @@
 				<h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2>
 			</div>
 			<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
-			<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+			<!-- [REFINAMENTO] Mais 'respiro' (gap-8) -->
+			<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 		</div>
 	</div>
-
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalDisplayName" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
+		<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
+		</div>
+		
+		<!-- Corpo do Modal -->
 		<div class="p-6">
-			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white mb-4">Bem-vindo(a)!</h2>
 			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
 			<form id="formDisplayName">
 				<div class="mb-4">
-					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400">O seu Nome de Exibição</label>
-					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" required>
+					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400 mb-2">O seu Nome de Exibição</label>
+					<!-- [REFINAMENTO] Input com novo estilo -->
+					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
 				</div>
-				<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar e Entrar</button>
+				<!-- [REFINAMENTO] Botão com gradiente -->
+				<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar e Entrar</button>
 			</form>
 		</div>
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalContrato" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
-		<div class="p-6">
-			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
-				<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
-			</div>
-			<form id="formContrato">
+	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
+			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formContrato">
+			<!-- Corpo do Modal -->
+			<div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
 				<input type="hidden" id="contractId">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
-						<label for="clienteNome" class="block text-sm font-medium text-gray-400">Nome do Cliente</label>
-						<input type="text" id="clienteNome" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" required>
+						<label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
+						<input type="text" id="clienteNome" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
 					</div>
 					<div>
-						<label for="advogadoResponsavel" class="block text-sm font-medium text-gray-400">Advogado Responsável</label>
-						<select id="advogadoResponsavel" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" required></select>
+						<label for="advogadoResponsavel" class="block text-sm font-medium text-gray-400 mb-1">Advogado Responsável</label>
+						<select id="advogadoResponsavel" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required></select>
 					</div>
 				</div>
-				<div class="mb-4">
-					<label class="block text-sm font-medium text-gray-400">Adicionar Serviços</label>
-					<div id="servicosContainerWrapper" class="mt-1 p-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm">
+				<div>
+					<label class="block text-sm font-medium text-gray-400 mb-1">Adicionar Serviços</label>
+					<div id="servicosContainerWrapper" class="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm">
 						<div id="servicosContainer" class="flex flex-wrap items-center gap-1 w-full mb-2">
-							</div>
+							<!-- Tags de serviço entram aqui -->
+						</div>
 						<div class="flex gap-2">
-							<input type="text" id="contratoServicoInput" class="flex-grow outline-none bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white" placeholder="Nome do Serviço...">
-							<input type="date" id="contratoPrazoInput" class="bg-gray-800 border border-gray-600 rounded-md shadow-sm text-gray-400 px-3 py-2" style="color-scheme: dark;">
+							<input type="text" id="contratoServicoInput" class="flex-grow outline-none bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white" placeholder="Nome do Serviço...">
+							<input type="date" id="contratoPrazoInput" class="bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-400 px-3 py-2" style="color-scheme: dark;">
 							<button type="button" id="addServiceButton" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-3 rounded-lg">Adicionar</button>
 						</div>
 					</div>
 				</div>
-				<div class="mb-4">
-					<label for="contratoTipoPagamento" class="block text-sm font-medium text-gray-400">Modalidade de Pagamento</label>
-					<select id="contratoTipoPagamento" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white">
+				<div>
+					<label for="contratoTipoPagamento" class="block text-sm font-medium text-gray-400 mb-1">Modalidade de Pagamento</label>
+					<select id="contratoTipoPagamento" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
 						<option>Parcelado</option>
 						<option>Pró-labore</option>
 						<option>Entrada única</option>
 					</select>
 				</div>
-				<div class="mb-4">
-					<label for="contratoObservacoes" class="block text-sm font-medium text-gray-400">Observações</label>
-					<textarea id="contratoObservacoes" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white" placeholder="Detalhes da negociação, informações do caso, etc..."></textarea>
+				<div>
+					<label for="contratoObservacoes" class="block text-sm font-medium text-gray-400 mb-1">Observações</label>
+					<textarea id="contratoObservacoes" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" placeholder="Detalhes da negociação, informações do caso, etc..."></textarea>
 				</div>
 				
-				<div class="admin-only">
+				<div class="admin-only space-y-4">
 					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros</h3>
 					
-					<div class="mb-4 p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+					<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
 						<label for="contratoJaQuitado" class="flex items-center">
 							<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
 							<span class="ml-2 text-sm font-medium text-gray-300">Marcar valor fixo como já quitado (contrato antigo)</span>
@@ -458,111 +484,121 @@
 						<p class="text-xs text-gray-500 ml-6 mt-1">Isto criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="mb-4">
-							<label for="valorTotal" class="block text-sm font-medium text-gray-400">Valor Fixo Total (R$)</label>
-							<input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white">
+						<div>
+							<label for="valorTotal" class="block text-sm font-medium text-gray-400 mb-1">Valor Fixo Total (R$)</label>
+							<input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
 						</div>
-						<div class="mb-4">
-							<label for="numParcelas" class="block text-sm font-medium text-gray-400">N° de Parcelas</label>
-							<input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white" value="1">
+						<div>
+							<label for="numParcelas" class="block text-sm font-medium text-gray-400 mb-1">N° de Parcelas</label>
+							<input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" value="1">
 						</div>
 					</div>
-					<div class="mb-4">
-						<label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400">Vencimento da 1ª Parcela</label>
-						<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white" style="color-scheme: dark;">
+					<div>
+						<label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400 mb-1">Vencimento da 1ª Parcela</label>
+						<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;">
 					</div>
-					<div class="mb-4">
-						<label for="taxaExito" class="block text-sm font-medium text-gray-400">Taxa de Êxito (Bonificação)</label>
-						<input type="text" id="taxaExito" placeholder="Ex: 20%, 10000, 5 SALARIOS" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white">
+					<div>
+						<label for="taxaExito" class="block text-sm font-medium text-gray-400 mb-1">Taxa de Êxito (Bonificação)</label>
+						<input type="text" id="taxaExito" placeholder="Ex: 20%, 10000, 5 SALARIOS" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
 					</div>
 				</div>
+			</div>
 
-				<div class="flex justify-end mt-6">
-					<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2">Cancelar</button>
-					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
-				</div>
-			</form>
-		</div>
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
+			</div>
+		</form>
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalPagamento" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
-		<div class="p-6">
-			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
-				<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
-			</div>
-			<form id="formPagamento">
+	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
+			<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formPagamento">
+			<!-- Corpo do Modal -->
+			<div class="p-6 space-y-4">
 				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded-md text-white"></div>
-				<div class="mb-4">
-					<label for="pagamentoValor" class="block text-sm font-medium text-gray-400">Valor Pago (R$)</label>
-					<input type="number" step="0.01" id="pagamentoValor" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white" required>
+				<div>
+					<label for="pagamentoValor" class="block text-sm font-medium text-gray-400 mb-1">Valor Pago (R$)</label>
+					<input type="number" step="0.01" id="pagamentoValor" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required>
 				</div>
-				<div class="mb-4">
-					<label for="pagamentoData" class="block text-sm font-medium text-gray-400">Data do Pagamento</label>
-					<input type="date" id="pagamentoData" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white" required style="color-scheme: dark;">
+				<div>
+					<label for="pagamentoData" class="block text-sm font-medium text-gray-400 mb-1">Data do Pagamento</label>
+					<input type="date" id="pagamentoData" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required style="color-scheme: dark;">
 				</div>
 				<input type="hidden" id="pagamentoContractId">
 				<input type="hidden" id="pagamentoParcelIndex">
-				<div class="flex justify-end mt-6">
-					<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2">Cancelar</button>
-					<button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Confirmar Pagamento</button>
-				</div>
-			</form>
-		</div>
+			</div>
+			
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Confirmar Pagamento</button>
+			</div>
+		</form>
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalCliente" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
-		<div class="p-6">
-			<div class="flex justify-between items-center mb-4">
-				<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
-				<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
-			</div>
-			<div id="clienteModalContent" class="space-y-6"></div>
+	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
+			<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
+		<!-- Corpo do Modal -->
+		<div id="clienteModalContent" class="p-6 space-y-6 max-h-[70vh] overflow-y-auto"></div>
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalRelatorio" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
-		<div class="p-6">
-			<div class="flex justify-between items-center mb-6">
-				<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório e Análise</h2>
-				<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
-			</div>
+	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório e Análise</h2>
+			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<!-- Corpo do Modal -->
+		<div class="p-6 max-h-[70vh] overflow-y-auto">
 			<div class="flex gap-4 mb-4">
 				<div class="flex-1">
-					<label for="reportMonth" class="block text-sm font-medium text-gray-400">Mês</label>
-					<select id="reportMonth" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white"></select>
+					<label for="reportMonth" class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+					<select id="reportMonth" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select>
 				</div>
 				<div class="flex-1">
-					<label for="reportYear" class="block text-sm font-medium text-gray-400">Ano</label>
-					<select id="reportYear" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-white"></select>
+					<label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
+					<select id="reportYear" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select>
 				</div>
 			</div>
 			<div class="flex gap-4 mb-6">
-				<button onclick="window.App.generateAndShowReport()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg">
+				<button onclick="window.App.generateAndShowReport()" class="flex-1 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
 					<i class="fas fa-file-invoice-dollar mr-2"></i> Relatório
 				</button>
-				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">
+				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
 					<i class="fas fa-chart-bar mr-2"></i> Gráficos
 				</button>
-				<button onclick="window.App.exportReportCSV()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+				<button onclick="window.App.exportReportCSV()" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
 					<i class="fas fa-file-csv mr-2"></i> Exportar (CSV)
 				</button>
 			</div>
 
 			<div id="reportResult" class="space-y-4">
-				</div>
+				<!-- O JS preenche aqui -->
+			</div>
 
 			<div id="reportChartsContainer" class="hidden space-y-8">
-				<div class="dark-card p-6 rounded-lg shadow-lg">
+				<div class="dark-card shadow-lg p-6 rounded-lg">
 					<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real (Últimos 12 Meses)</h3>
 					<div class="relative" style="height: 350px;">
 						<canvas id="actualIncomeChartModal"></canvas>
 					</div>
 				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg">
+				<div class="dark-card shadow-lg p-6 rounded-lg">
 					<h3 class="text-lg font-semibold text-gray-300 mb-4">Projeção de Ganhos (Próximos 12 Meses)</h3>
 					<p class="text-sm text-gray-400 mb-4 -mt-3">(Baseado em parcelas pendentes)</p>
 					<div class="relative" style="height: 350px;">
@@ -574,32 +610,37 @@
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalExito" class="modal bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-11/12 md:w-1/3" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
-		<div class="p-6">
-			<div class="flex justify-between items-center mb-4">
-				<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
-				<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl" aria-label="Fechar modal">&times;</button>
-			</div>
-			<form id="formExito">
+	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
+		<!-- [REFINAMENTO] Cabeçalho do Modal -->
+		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+			<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
+			<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
+		</div>
+		
+		<form id="formExito">
+			<!-- Corpo do Modal -->
+			<div class="p-6 space-y-4">
 				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded-md"></div>
-				<div class="mb-4 admin-only">
-					<label for="exitoValorRecebido" class="block text-sm font-medium text-gray-400">Valor Líquido Recebido (R$)</label>
-					<input type="number" step="0.01" id="exitoValorRecebido" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white" placeholder="Ex: 9500.00" required>
+				<div class="admin-only">
+					<label for="exitoValorRecebido" class="block text-sm font-medium text-gray-400 mb-1">Valor Líquido Recebido (R$)</label>
+					<input type="number" step="0.01" id="exitoValorRecebido" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" placeholder="Ex: 9500.00" required>
 				</div>
 				<p class="mb-4 text-gray-400 non-admin-hidden">Confirme o recebimento do valor de êxito.</p>
 				<input type="hidden" id="exitoContractId">
-				<div class="flex justify-end mt-6">
-					<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2">Cancelar</button>
-					<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Recebimento</button>
-				</div>
-			</form>
-		</div>
+			</div>
+
+			<!-- [REFINAMENTO] Rodapé do Modal -->
+			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
+				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar Recebimento</button>
+			</div>
+		</form>
 	</div>
 
 	<div id="modal-backdrop" class="modal-backdrop"></div>
 
 	<script type="module">
-		// Imports do Firebase
+	// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -1137,15 +1178,15 @@
 				return el;
 			}
 		
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement com novas classes de design (sombra, transição)
 			createParcelCard(contract, parcel, index, type, remainingValue, valorCorrigido = null) {
 				const formattedDate = Utils.formatDate(parcel.dueDate);
 				const formattedValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const formattedRemaining = this.app.isUserAdmin ? Utils.formatCurrency(remainingValue) : '[Restrito]';
 				const formattedCorrigido = this.app.isUserAdmin && valorCorrigido ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
 		
-				let statusClass = '';
-				const card = this.buildElement('div', { className: 'dark-card p-4 rounded-lg shadow-md border-l-4' });
+				let borderColor = '';
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1' });
 		
 				const title = this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName });
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
@@ -1155,7 +1196,7 @@
 				let actionButton;
 		
 				if (type === 'vencida') {
-					statusClass = 'border-red-400';
+					borderColor = 'border-red-500';
 					if (this.app.isUserAdmin) {
 						details.innerHTML = `
 						<div class="flex items-center text-gray-400 text-xs"><strong>Original:</strong><span class="ml-auto font-medium line-through">${formattedValue}</span></div>
@@ -1164,14 +1205,14 @@
 						details.append(this.buildElement('div', { className: 'text-red-400 font-semibold', text: 'Vencida' }));
 					}
 				} else if (type === 'a-vencer') {
-					statusClass = 'border-yellow-400';
+					borderColor = 'border-yellow-500';
 					if (this.app.isUserAdmin) {
 						details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
 					} else {
 						details.append(this.buildElement('div', { className: 'text-yellow-400 font-semibold', text: 'A vencer' }));
 					}
 				} else { // Paga
-					statusClass = 'border-gray-600';
+					borderColor = 'border-gray-700';
 					const formattedPaidValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.valuePaid || 0) : '[Restrito]';
 					const paymentDate = Utils.formatDate(parcel.paymentDate);
 					if (this.app.isUserAdmin) {
@@ -1182,20 +1223,20 @@
 						text: `Pago ${this.app.isUserAdmin ? formattedPaidValue : ''} em ${paymentDate}`
 					});
 				}
-				card.classList.add(statusClass);
+				card.classList.add('border-l-4', borderColor); // Mantém a borda lateral colorida
 		
 				// Data de Vencimento (comum a todos)
-				const vencimentoDiv = this.buildElement('div', { className: 'flex items-center text-gray-300' });
+				const vencimentoDiv = this.buildElement('div', { className: 'flex items-center text-gray-400' });
 				vencimentoDiv.append(this.buildIcon('fas fa-calendar-alt w-5 text-center mr-2 text-gray-500'));
 				vencimentoDiv.append(this.buildElement('strong', { text: 'Vencimento:' }));
-				vencimentoDiv.append(this.buildElement('span', { className: 'ml-auto font-medium', text: formattedDate }));
+				vencimentoDiv.append(this.buildElement('span', { className: 'ml-auto font-medium text-gray-300', text: formattedDate }));
 				details.append(vencimentoDiv);
 		
 				card.append(title, subtitle, details);
 		
 				// Informações extras (Admin)
 				if (this.app.isUserAdmin) {
-					const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-400 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
+					const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-500 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
 					extraInfo.innerHTML = `<span>Contrato: <strong>${Utils.formatCurrency(contract.totalValue || 0)}</strong></span> <span>Restante: <strong>${formattedRemaining}</strong></span>`;
 					card.append(extraInfo);
 				}
@@ -1203,7 +1244,7 @@
 				// Botão de Ação
 				if (type !== 'paga') {
 					actionButton = this.buildElement('button', { 
-						className: 'mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
+						className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg text-sm shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
 						html: '<i class="fas fa-check"></i> Registar Pagamento'
 					});
 					actionButton.onclick = () => window.App.openPaymentModal(contract.id, index);
@@ -1213,11 +1254,11 @@
 				return card;
 			}
 			
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement com novas classes de design
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
-				const card = this.buildElement('div', { className: 'dark-card p-4 rounded-lg shadow-md border-l-4 border-indigo-400' });
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500' });
 				card.append(this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName }));
 				
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
@@ -1229,7 +1270,7 @@
 				card.append(infoDiv);
 				
 				const button = this.buildElement('button', {
-					className: 'w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
+					className: 'w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold py-2 px-3 rounded-lg text-sm shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
 					html: '<i class="fas fa-gavel"></i> Registar Recebimento'
 				});
 				button.onclick = () => window.App.openExitoModal(contract.id);
@@ -1238,11 +1279,11 @@
 				return card;
 			}
 		
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement com novas classes de design
 			createContractCard(contract, statusInfo) {
 				const { statusText, statusColor, borderColor } = statusInfo;
 				
-				const card = this.buildElement('div', { className: `dark-card rounded-lg shadow-lg overflow-hidden border-l-4 ${borderColor} flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl` });
+				const card = this.buildElement('div', { className: `dark-card shadow-lg rounded-lg overflow-hidden ${borderColor} flex flex-col justify-between transition-all duration-200 transform hover:-translate-y-1 hover:shadow-xl border-l-4` });
 				const cardBody = this.buildElement('div', { className: 'p-5' });
 				
 				// Header do Card
@@ -1251,7 +1292,7 @@
 				header.append(this.buildElement('span', { className: `px-2 py-1 rounded-full text-xs font-semibold ${statusColor}`, text: statusText }));
 				cardBody.append(header);
 		
-				// Advogado
+				// Advogado (Tipografia refinada)
 				const adv = this.buildElement('p', { className: 'text-xs text-indigo-300 mb-3' });
 				adv.append(this.buildIcon('fas fa-user-tie mr-1'));
 				adv.append(document.createTextNode(` ${contract.advogadoResponsavel}`));
@@ -1264,19 +1305,19 @@
 				});
 				cardBody.append(servicesContainer);
 		
-				// Detalhes Financeiros
+				// Detalhes Financeiros (Tipografia refinada)
 				const financialInfo = this.buildElement('div', { className: 'border-t border-gray-700 pt-4 space-y-3 text-sm' });
 				const valorFixoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(contract.totalValue) : '[Restrito]';
 				const exitoDisplay = this.app.isUserAdmin && contract.successFee ? contract.successFee : (contract.successFee ? '[Restrito]' : '');
 		
-				const fixedValueDiv = this.buildElement('div', { className: 'flex items-center text-gray-300' });
+				const fixedValueDiv = this.buildElement('div', { className: 'flex items-center text-gray-400' });
 				fixedValueDiv.append(this.buildIcon('fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500'));
 				fixedValueDiv.append(this.buildElement('strong', { text: 'Valor Fixo:' }));
-				fixedValueDiv.append(this.buildElement('span', { className: 'ml-auto font-medium', text: valorFixoDisplay }));
+				fixedValueDiv.append(this.buildElement('span', { className: 'ml-auto font-medium text-gray-300', text: valorFixoDisplay }));
 				financialInfo.append(fixedValueDiv);
 				
 				if (contract.successFee) {
-					const exitoDiv = this.buildElement('div', { className: 'flex items-center text-gray-300' });
+					const exitoDiv = this.buildElement('div', { className: 'flex items-center text-gray-400' });
 					exitoDiv.append(this.buildIcon('fas fa-star w-5 text-center mr-2 text-gray-500'));
 					exitoDiv.append(this.buildElement('strong', { text: 'Êxito:' }));
 					exitoDiv.append(this.buildElement('span', { className: 'ml-auto font-medium text-indigo-400', text: exitoDisplay }));
@@ -1308,12 +1349,12 @@
 				return card;
 			}
 			
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement com novas classes de design
 			createInadimplenteCard({ contract, parcel, index, diffDays, valorCorrigido }) {
 				const valorOriginalDisplay = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const valorCorrigidoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
 		
-				const card = this.buildElement('div', { className: 'dark-card p-5 rounded-lg shadow-lg border-l-4 border-red-500' });
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-red-500 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl' });
 				card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 				
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
@@ -1346,7 +1387,7 @@
 				card.append(details);
 		
 				const button = this.buildElement('button', {
-					className: 'mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2',
+					className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
 					html: '<i class="fas fa-check"></i> Registar Pagamento'
 				});
 				button.onclick = () => window.App.openPaymentModal(contract.id, index);
@@ -1355,9 +1396,9 @@
 				return card;
 			}
 			
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement com novas classes de design
 			createServicoCard(contract, serviceProgress, financialProgress) {
-				const card = this.buildElement('div', { className: 'dark-card p-5 rounded-lg shadow-lg' });
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg transition-all duration-200 hover:-translate-y-1' });
 				
 				const header = this.buildElement('div', { className: 'flex justify-between items-start' });
 				header.append(this.buildElement('h3', { className: 'font-bold text-xl text-indigo-300 mb-4', text: contract.clientName }));
@@ -1393,7 +1434,7 @@
 				return card;
 			}
 			
-			// [REFATORADO] Helper para createServicoCard
+			// [REFINAMENTO] Helper para createServicoCard
 			createServiceListItem(contract, service, index) {
 				const li = this.buildElement('li', { className: 'flex items-center justify-between p-2 rounded-md' });
 		
@@ -1471,7 +1512,7 @@
 				return btn;
 			}
 		
-			// [REFATORADO] Usa createElement
+			// [REFINAMENTO] Usa createElement
 			renderPaginationControls(container, totalItems, totalPages, currentPage) {
 				container.innerHTML = ''; // Limpa
 				if (totalPages <= 1) return;
@@ -1815,13 +1856,14 @@
 				const paginationContainer = document.getElementById('paginationContainer');
 		
 				if (totalItems === 0) {
-					listContainer.innerHTML = '<div class="dark-card p-4 rounded-lg shadow-md text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>';
+					listContainer.innerHTML = '<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>';
 					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0); // Limpa controles
 					return;
 				}
 		
 				// 7. Cria o grid e o fragmento
-				const gridContainer = this.domBuilder.buildElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' });
+				// [REFINAMENTO] Usa gap-8 para mais 'respiro'
+				const gridContainer = this.domBuilder.buildElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' });
 				const fragment = document.createDocumentFragment();
 		
 				paginatedContracts.forEach(contract => {
@@ -1914,7 +1956,7 @@
 				}
 		
 				if (activeContracts.length === 0) {
-					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card text-indigo-400 p-6 rounded-lg shadow-md"><i class="fas fa-coffee fa-3x mb-3"></i><p class="font-bold text-xl">Nenhum contrato ativo encontrado.</p><p class="text-sm text-gray-400">Nenhum resultado para a busca ou todos os trabalhos estão concluídos.</p></div></div>`;
+					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-indigo-400 p-6 rounded-lg"><i class="fas fa-coffee fa-3x mb-3"></i><p class="font-bold text-xl">Nenhum contrato ativo encontrado.</p><p class="text-sm text-gray-400">Nenhum resultado para a busca ou todos os trabalhos estão concluídos.</p></div></div>`;
 					return;
 				}
 		
@@ -1948,25 +1990,25 @@
 				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true);
 		
 				if (deletedContracts.length === 0) {
-					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card text-gray-400 p-6 rounded-lg shadow-md"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
+					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
 					return;
 				}
 		
 				const fragment = document.createDocumentFragment();
 				deletedContracts.forEach(contract => {
-					const card = this.domBuilder.buildElement('div', { className: 'dark-card p-5 rounded-lg shadow-lg border-l-4 border-gray-600' });
+					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
 					card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
 					card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
 					
 					const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
 					
-					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
+					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
 					restoreBtn.onclick = () => this.restoreContract(contract.id);
 					footer.append(restoreBtn);
 		
 					if (this.isUserAdmin) {
-						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition-all flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+						const deleteBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
 						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
 						footer.append(deleteBtn);
 					}
@@ -2559,8 +2601,8 @@
 		
 				resultDiv.innerHTML = `
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div class="dark-card p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Parcelas)</p><p class="text-2xl font-bold text-white">${Utils.formatCurrency(income.totalParcelas)}</p></div>
-						<div class="dark-card p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Êxito)</p><p class="text-2xl font-bold text-indigo-400">${Utils.formatCurrency(income.totalExito)}</p></div>
+						<div class="dark-card shadow-lg p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Parcelas)</p><p class="text-2xl font-bold text-white">${Utils.formatCurrency(income.totalParcelas)}</p></div>
+						<div class="dark-card shadow-lg p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Êxito)</p><p class="text-2xl font-bold text-indigo-400">${Utils.formatCurrency(income.totalExito)}</p></div>
 					</div>
 					<div class="bg-gray-900 p-4 rounded-lg border border-gray-700 text-center"><p class="text-white font-bold">TOTAL GERAL RECEBIDO</p><p class="text-3xl font-extrabold text-green-400">${Utils.formatCurrency(income.totalGeral)}</p></div>
 				` + detailsHtml;
@@ -2759,5 +2801,3 @@
 	</script>
 </body>
 </html>
-
-
