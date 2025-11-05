@@ -2438,44 +2438,45 @@ vencidasPromises.push(
 			}
 			
 			// [MUDANÇA v5] Correção de Bug: Lógica da Lixeira
-			renderLixeiraPage() {
-				// Usa "true" para incluir deletados
-				const contractsToRender = this.getFilteredContracts(true);
-				const container = document.getElementById('lixeiraListContainer');
-				container.innerHTML = '';
-				
-				// Filtra APENAS os deletados
-				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true);
-		
-				if (deletedContracts.length === 0) {
-					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
-					return;
-				}
-		
-				const fragment = document.createDocumentFragment();
-				deletedContracts.forEach(contract => {
-					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
-					card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
-					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
-					card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
-					
-					const footer = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
-					
-					const restoreBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
-					restoreBtn.onclick = () => this.restoreContract(contract.id);
-					footer.append(restoreBtn);
-		
-					if (this.isUserAdmin) {
-						const deleteBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
-						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
-						footer.append(deleteBtn);
-					}
-					
-					card.append(footer);
-					fragment.append(card);
-				});
-				container.append(fragment);
-			}
+		// [COLE ESTA NOVA VERSÃO NA PARTE 7]
+renderLixeiraPage() {
+    // Pega TODOS os contratos, incluindo deletados
+    const contractsToRender = this.getFilteredContracts(true); 
+    const container = document.getElementById('lixeiraListContainer');
+    container.innerHTML = '';
+
+    // Filtra APENAS os deletados (Esta é a lógica do seu v5.0)
+    const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
+
+    if (deletedContracts.length === 0) {
+        container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    deletedContracts.forEach(contract => {
+        const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
+        card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
+        const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
+        card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
+        
+        const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
+        
+        const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
+        restoreBtn.onclick = () => this.restoreContract(contract.id);
+        footer.append(restoreBtn);
+
+        if (this.isUserAdmin) {
+            const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+            deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
+            footer.append(deleteBtn);
+        }
+        
+        card.append(footer);
+        fragment.append(card);
+    });
+    container.append(fragment);
+}
 
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
