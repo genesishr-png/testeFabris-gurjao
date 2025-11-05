@@ -57,10 +57,6 @@
 		.service-tag-small { display: inline-block; background-color: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
 		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
 		
-		/* [REVOLUÇÃO] Abas antigas removidas */
-		.nav-tab { }
-		.nav-tab-icon { }
-		
 		/* [REVOLUÇÃO] Novos estilos da Sidebar */
 		.sidebar-nav-item {
 			display: flex;
@@ -108,11 +104,6 @@
 			background-color: #1f2937;
 		}
 		
-		/* [REVOLUÇÃO] Estilos do header antigo removidos */
-		.header-with-logo { }
-		.header-user-block { }
-		.header-logo { }
-		
 		.sort-button, .filter-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
 		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
@@ -125,6 +116,7 @@
 			border-radius: 6px; 
 			font-size: 14px;
 			transition: all 0.2s ease-in-out;
+			color-scheme: dark; /* Garante que o date picker é dark */
 		}
 		.filter-select:focus {
 			border-color: #6366f1;
@@ -146,11 +138,14 @@
 			font-size: 1.2rem; 
 			transition: opacity 0.3s; 
 		}
+		/* [MUDANÇA v5] O App Container é flex, não display: none */
 		#app-container { display: none; }
 		
 		.admin-only { display: none; }
 		body.is-admin .admin-only { display: block; }
-		body.is-admin .flex.admin-only { display: flex; }
+		/* [MUDANÇA v5] Flex admin-only */
+		body.is-admin .flex.admin-only, body.is-admin .grid.admin-only { display: flex; display: grid; }
+		
 		body:not(.is-admin) .non-admin-hidden { display: none; }
 		
 		.login-modal { }
@@ -215,6 +210,39 @@
 		.animate-blob {
 			animation: blob 7s infinite;
 		}
+
+		/* [MUDANÇA v5] === Estilos do Dropdown de Notificação === */
+		#notification-list .notification-item {
+			background-color: #374151; /* gray-700 */
+			padding: 12px;
+			border-radius: 8px;
+			transition: background-color 0.2s;
+			border-left: 4px solid #4f46e5; /* indigo-600 */
+			cursor: pointer;
+		}
+		#notification-list .notification-item:hover {
+			background-color: #4b5563; /* gray-600 */
+		}
+		#notification-list .notification-item.is-read {
+			background-color: #1f2937; /* dark-card */
+			border-left-color: #4b5563; /* gray-600 */
+			opacity: 0.8;
+		}
+		#notification-list .notification-item p {
+			font-size: 14px;
+			color: #d1d5db; /* text-gray-300 */
+		}
+		#notification-list .notification-item .time {
+			font-size: 12px;
+			color: #9ca3af; /* text-gray-400 */
+			margin-top: 4px;
+		}
+		#notification-list-empty {
+			padding: 24px;
+			text-align: center;
+			font-size: 14px;
+			color: #9ca3af; /* text-gray-400 */
+		}
 	</style>
 </head>
 <body class="text-gray-300">
@@ -224,7 +252,6 @@
 		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
 	</div>
 
-	<!-- [TELA DE LOGIN - SEM ALTERAÇÕES CONFORME O PEDIDO] -->
 	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
 		<div class="absolute inset-0 opacity-5">
 			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
@@ -270,8 +297,7 @@
 						</div>
 					</div>
 					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-						<!-- O JS vai preencher o erro aqui -->
-					</div>
+						</div>
 					<button type="submit"
 							id="login-submit-button"
 							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
@@ -285,12 +311,8 @@
 			</div>
 		</div>
 	</div>
-	<!-- [FIM DA TELA DE LOGIN] -->
-
-	<!-- [REVOLUÇÃO] Novo layout principal com Sidebar -->
 	<div id="app-container" class="flex h-screen">
 		
-		<!-- [REVOLUÇÃO] Sidebar (Desktop) -->
 		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
 			<div class="flex-shrink-0 mb-8">
 				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
@@ -308,6 +330,10 @@
 				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
 					<i class="fas fa-tasks w-5 text-center"></i>
 					<span>Serviços</span>
+				</a>
+				<a onclick="window.App.showPage('page-relatorios')" id="tab-relatorios" class="sidebar-nav-item admin-only">
+					<i class="fas fa-chart-pie w-5 text-center"></i>
+					<span>Relatórios</span>
 				</a>
 				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
 					<i class="fas fa-trash-alt w-5 text-center"></i>
@@ -328,33 +354,50 @@
 			</div>
 		</aside>
 
-		<!-- [REVOLUÇÃO] Conteúdo Principal (com scroll próprio) -->
 		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
 			
-			<!-- [REVOLUÇÃO] Cabeçalho do Conteúdo (Limpo) -->
 			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
 				<div class="flex justify-between items-center">
 					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
-					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
-						<i class="fas fa-bars text-xl"></i>
-					</button>
+					
+					<div class="flex items-center gap-4">
+						<div class="relative">
+							<button id="notification-bell" class="p-2 text-gray-300 hover:text-white transition-colors">
+								<i class="fas fa-bell text-xl"></i>
+								<span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900"></span>
+							</button>
+							<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 md:w-96 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+								<div class="flex justify-between items-center p-3 bg-gray-900/50 border-b border-gray-700">
+									<h3 class="font-semibold text-white">Notificações</h3>
+									<button id="clear-notifications-button" class="text-xs text-indigo-400 hover:text-indigo-300">Marcar todas como lidas</button>
+								</div>
+								<div id="notification-list" class="max-h-80 overflow-y-auto space-y-2 p-2">
+									<div id="notification-list-empty" class="hidden">
+										<i class="fas fa-check-circle text-gray-500 text-3xl mb-2"></i>
+										<p>Nenhuma notificação nova.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
+							<i class="fas fa-bars text-xl"></i>
+						</button>
+					</div>
 				</div>
 			</header>
 
-			<!-- O wrapper para as páginas -->
 			<div class="p-4 md:p-8 flex-1">
 				<div id="page-dashboard">
 					<div class="flex flex-wrap gap-4 mb-8">
-						<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
 						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
 							<i class="fas fa-plus-circle"></i> Novo Contrato
 						</button>
 						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-							<i class="fas fa-chart-line"></i> Relatório Mensal
+							<i class="fas fa-chart-line"></i> Relatório Mensal (Legado)
 						</button>
 					</div>
 
-					<!-- [MUDANÇA v3] Stats do Painel de volta para 4 colunas -->
 					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
 						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
@@ -368,7 +411,6 @@
 							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
 							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
 						</div>
-						<!-- [MUDANÇA v3] Cartão de "Contratos Ativos" de volta -->
 						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
 							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
@@ -378,7 +420,6 @@
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
 
-					<!-- [MUDANÇA v3] Kanban agora com 3 colunas, sem scroll (em grid) -->
 					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
 						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 							<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
@@ -394,15 +435,11 @@
 						</div>
 					</div>
 
-					<!-- [MUDANÇA v3] Nova secção dedicada para Êxito -->
 					<div id="exito-section" class="mt-12">
 						<div class="mb-4 border-b border-gray-700">
 							<h2 class="text-2xl font-semibold mb-4 text-white">Bonificações de Êxito Pendentes</h2>
 						</div>
-						<!-- Esta secção tem scroll horizontal se houver muitos cartões -->
 						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4">
-							<!-- O JS vai preencher o #kanban-exito aqui -->
-							<!-- [MUDANÇA v3] O 'kanban-column' foi removido dos cartões de êxito no JS -->
 							<div id="kanban-exito" class="flex space-x-6"></div>
 						</div>
 					</div>
@@ -416,12 +453,10 @@
 								</button>
 								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
 								
-								<!-- [MUDANÇA v3] Novo Filtro Ativos/Concluídos -->
 								<div class="flex items-center gap-2">
 									<span class="text-sm text-gray-400">Mostrar:</span>
 									<div id="contractStatusFilterButtons" class="flex gap-1">
-										<!-- Botões serão gerados pelo JS -->
-									</div>
+										</div>
 								</div>
 
 								<div class="flex items-center gap-2">
@@ -466,6 +501,64 @@
 					<div id="servicosListContainer" class="space-y-8"></div>
 				</div>
 
+				<div id="page-relatorios" class="hidden admin-only">
+					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
+						<h2 class="text-2xl font-semibold text-white">Relatórios Avançados</h2>
+						<div class="flex flex-wrap items-center gap-4">
+							<div>
+								<label for="reportStartDate" class="text-sm text-gray-400">De:</label>
+								<input type="date" id="reportStartDate" class="filter-select ml-2">
+							</div>
+							<div>
+								<label for="reportEndDate" class="text-sm text-gray-400">Até:</label>
+								<input type="date" id="reportEndDate" class="filter-select ml-2">
+							</div>
+							
+							<button onclick="window.App.generateAdvancedReport()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+								<i class="fas fa-sync-alt"></i> Gerar Relatório
+							</button>
+							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2" disabled>
+								<i class="fas fa-file-pdf"></i> Exportar PDF
+							</button>
+						</div>
+					</div>
+
+					<div id="advancedReportContainer" class="space-y-8">
+						<div id="report-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+							</div>
+						
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+							<div class="dark-card shadow-lg p-6 rounded-lg">
+								<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real (Linha do Tempo)</h3>
+								<div class="relative" style="height: 350px;">
+									<canvas id="advReportTimelineChart"></canvas>
+								</div>
+							</div>
+							<div class="dark-card shadow-lg p-6 rounded-lg">
+								<h3 class="text-lg font-semibold text-gray-300 mb-4">Novos Contratos (Mensal)</h3>
+								<div class="relative" style="height: 350px;">
+									<canvas id="advReportNewContractsChart"></canvas>
+								</div>
+							</div>
+						</div>
+						<div class="grid grid-cols-1 gap-8">
+							<div class="dark-card shadow-lg p-6 rounded-lg">
+								<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação por Advogado</h3>
+								<div class="relative" style="height: 400px; max-width: 600px; margin: auto;">
+									<canvas id="advReportByAdvogadoChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="advancedReportEmpty" class="hidden text-center py-10">
+						<div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg">
+							<i class="fas fa-chart-pie fa-3x mb-3"></i>
+							<p class="font-bold text-xl">Nenhum dado encontrado.</p>
+							<p class="text-sm">Ajuste as datas ou aguarde novos registos.</p>
+						</div>
+					</div>
+				</div>
+
 				<div id="page-lixeira" class="hidden">
 					<div class="flex justify-between items-center mb-4">
 						<h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2>
@@ -473,11 +566,7 @@
 					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
 					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
-			</div> <!-- Fim do wrapper da página -->
-			</main> <!-- Fim do <main id="main-content"> -->
-
-		<!-- [REVOLUÇÃO] Navbar Mobile (Fica no fundo em ecrãs pequenos) -->
-		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
+			</div> </main> <nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
 			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
 				<i class="fas fa-tachometer-alt text-xl"></i>
 				<span class="text-xs mt-1">Painel</span>
@@ -490,46 +579,40 @@
 				<i class="fas fa-tasks text-xl"></i>
 				<span class="text-xs mt-1">Serviços</span>
 			</a>
+			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only" style="display: none;"> <i class="fas fa-chart-pie text-xl"></i>
+				<span class="text-xs mt-1">Relatórios</span>
+			</a>
 			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
 				<i class="fas fa-trash-alt text-xl"></i>
 				<span class="text-xs mt-1">Lixeira</span>
 			</a>
 		</nav>
 
-	</div> <!-- Fim do <div id="app-container"> -->
-
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	</div> ```
 	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
 		</div>
 		
-		<!-- Corpo do Modal -->
 		<div class="p-6 modal-body">
 			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
 			<form id="formDisplayName">
 				<div class="mb-4">
 					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400 mb-2">O seu Nome de Exibição</label>
-					<!-- [REFINAMENTO] Input com novo estilo -->
 					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
 				</div>
-				<!-- [REFINAMENTO] Botão com gradiente -->
 				<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar e Entrar</button>
 			</form>
 		</div>
 	</div>
 
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
 			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
 		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
-			<!-- Corpo do Modal (com scroll) -->
 			<div class="p-6 space-y-4 overflow-y-auto modal-body">
 				<input type="hidden" id="contractId">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -546,8 +629,7 @@
 					<label class="block text-sm font-medium text-gray-400 mb-1">Adicionar Serviços</label>
 					<div id="servicosContainerWrapper" class="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm">
 						<div id="servicosContainer" class="flex flex-wrap items-center gap-1 w-full mb-2">
-							<!-- Tags de serviço entram aqui -->
-						</div>
+							</div>
 						<div class="flex gap-2">
 							<input type="text" id="contratoServicoInput" class="flex-grow outline-none bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white" placeholder="Nome do Serviço...">
 							<input type="date" id="contratoPrazoInput" class="bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-400 px-3 py-2" style="color-scheme: dark;">
@@ -599,7 +681,6 @@
 				</div>
 			</div>
 
-			<!-- [REFINAMENTO] Rodapé do Modal -->
 			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
 				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
 				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
@@ -607,16 +688,13 @@
 		</form>
 	</div>
 
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
 			<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
 		<form id="formPagamento">
-			<!-- Corpo do Modal -->
 			<div class="p-6 space-y-4 modal-body">
 				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded-md text-white"></div>
 				<div>
@@ -631,7 +709,6 @@
 				<input type="hidden" id="pagamentoParcelIndex">
 			</div>
 			
-			<!-- [REFINAMENTO] Rodapé do Modal -->
 			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
 				<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
 				<button type="submit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Confirmar Pagamento</button>
@@ -639,26 +716,20 @@
 		</form>
 	</div>
 
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
 			<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
-		<!-- Corpo do Modal (com scroll) -->
 		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
 	</div>
 
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório e Análise</h2>
+			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal (Legado)</h2>
 			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
-		<!-- Corpo do Modal (com scroll) -->
 		<div class="p-6 overflow-y-auto modal-body">
 			<div class="flex gap-4 mb-4">
 				<div class="flex-1">
@@ -683,8 +754,7 @@
 			</div>
 
 			<div id="reportResult" class="space-y-4">
-				<!-- O JS preenche aqui -->
-			</div>
+				</div>
 
 			<div id="reportChartsContainer" class="hidden space-y-8">
 				<div class="dark-card shadow-lg p-6 rounded-lg">
@@ -704,16 +774,13 @@
 		</div>
 	</div>
 
-	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
-		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
 			<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
 		<form id="formExito">
-			<!-- Corpo do Modal -->
 			<div class="p-6 space-y-4 modal-body">
 				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded-md"></div>
 				<div class="admin-only">
@@ -724,7 +791,6 @@
 				<input type="hidden" id="exitoContractId">
 			</div>
 
-			<!-- [REFINAMENTO] Rodapé do Modal -->
 			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
 				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
 				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar Recebimento</button>
@@ -738,7 +804,7 @@
 		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
 		const ADMIN_USERS = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Lilian"];
@@ -748,21 +814,26 @@
 		const Utils = {
 			toastContainer: null,
 			initToast() {
-				if (this.toastContainer) return;
-				const el = document.createElement('div');
-				el.id = 'toast-container';
-				el.style.position = 'fixed';
-				el.style.bottom = '20px';
-				el.style.right = '20px';
-				el.style.zIndex = '11000';
-				el.style.display = 'flex';
-				el.style.flexDirection = 'column';
-				el.style.gap = '8px';
-				document.body.appendChild(el);
+				// [MUDANÇA v5] Usa o div #notifications se existir, se não, cria um.
+				let el = document.getElementById('notifications');
+				if (!el) {
+					el = document.createElement('div');
+					el.id = 'toast-container-fallback'; // Nome diferente para evitar conflito
+					el.style.position = 'fixed';
+					el.style.bottom = '20px';
+					el.style.right = '20px';
+					el.style.zIndex = '11000';
+					el.style.display = 'flex';
+					el.style.flexDirection = 'column';
+					el.style.gap = '8px';
+					document.body.appendChild(el);
+				}
 				this.toastContainer = el;
 			},
 			showToast(message, type = 'info') {
-				this.initToast();
+				if (!this.toastContainer) {
+					this.initToast();
+				}
 				const n = document.createElement('div');
 				n.className = 'px-4 py-3 rounded-lg shadow-lg text-sm';
 				n.style.background = type === 'error' ? '#7f1d1d' : (type === 'success' ? '#065f46' : '#374151');
@@ -785,6 +856,11 @@
 				const div = document.createElement('div');
 				div.textContent = str;
 				return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;').trim();
+			},
+			// [MUDANÇA v5] Helper para "sanitizar" nomes para IDs do Firestore
+			sanitizeForFirestoreId(name) {
+				if (!name) return 'unknown_user';
+				return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
 			},
 			parseNumber(n) {
 				const v = Number(n);
@@ -821,10 +897,32 @@
 			formatDate(dateStr) {
 				if (!dateStr) return '';
 				const date = new Date(dateStr);
-				return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+				// [MUDANÇA v5] Corrigido para garantir UTC na formatação de datas simples
+				const d = date.getUTCDate();
+				const m = date.getUTCMonth() + 1;
+				const y = date.getUTCFullYear();
+				return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
+			},
+			// [MUDANÇA v5] Novo helper para "tempo atrás"
+			timeAgo(dateInput) {
+				if (!dateInput) return '';
+				const date = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+				const now = new Date();
+				const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+				
+				let interval = seconds / 31536000;
+				if (interval > 1) return `há ${Math.floor(interval)} ano(s)`;
+				interval = seconds / 2592000;
+				if (interval > 1) return `há ${Math.floor(interval)} mes(es)`;
+				interval = seconds / 86400;
+				if (interval > 1) return `há ${Math.floor(interval)} dia(s)`;
+				interval = seconds / 3600;
+				if (interval > 1) return `há ${Math.floor(interval)} hora(s)`;
+				interval = seconds / 60;
+				if (interval > 1) return `há ${Math.floor(interval)} min(s)`;
+				return `há ${Math.floor(seconds)} seg(s)`;
 			}
 		};
-		
 		/**
 		 * @class CorrectionCalculator
 		 */
@@ -1003,6 +1101,9 @@
 				this.db = null;
 				this.contractsCollection = null;
 				this.snapshotListenerUnsubscribe = null;
+				// [MUDANÇA v5] Listeners de Notificação
+				this.notificationListenerUnsubscribe = null;
+				this.notificationCollection = null;
 			}
 		
 			setDB(dbInstance) {
@@ -1029,6 +1130,60 @@
 					this.snapshotListenerUnsubscribe = null;
 				}
 			}
+
+			// [MUDANÇA v5] Lógica de Notificações
+			startNotificationListener(safeName) {
+				if (this.notificationListenerUnsubscribe) {
+					this.notificationListenerUnsubscribe();
+				}
+				this.notificationCollection = collection(this.db, `notifications/${safeName}/alerts`);
+				const q = query(this.notificationCollection, orderBy("timestamp", "desc"), limit(20));
+				
+				this.notificationListenerUnsubscribe = onSnapshot(q, (snapshot) => {
+					const notifications = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+					this.app.handleNotificationUpdate(notifications);
+				}, (error) => {
+					console.error("Erro ao buscar notificações:", error);
+					Utils.showToast('Erro ao buscar notificações.', 'error');
+				});
+			}
+
+			stopNotificationListener() {
+				if (this.notificationListenerUnsubscribe) {
+					this.notificationListenerUnsubscribe();
+					this.notificationListenerUnsubscribe = null;
+				}
+			}
+
+			async sendNotification(safeRecipientName, notificationData) {
+				try {
+					const targetCollection = collection(this.db, `notifications/${safeRecipientName}/alerts`);
+					await addDoc(targetCollection, {
+						...notificationData,
+						isRead: false,
+						timestamp: serverTimestamp()
+					});
+					return true;
+				} catch (error) {
+					console.error("Erro ao enviar notificação:", error);
+					return false;
+				}
+			}
+
+			async markNotificationsAsRead(safeUserName, notificationIds) {
+				try {
+					const batch = writeBatch(this.db);
+					notificationIds.forEach(id => {
+						const docRef = doc(this.db, `notifications/${safeUserName}/alerts`, id);
+						batch.update(docRef, { isRead: true });
+					});
+					await batch.commit();
+				} catch (error) {
+					console.error("Erro ao marcar notificações como lidas:", error);
+					Utils.showToast('Erro ao atualizar notificações.', 'error');
+				}
+			}
+			// [FIM MUDANÇA v5]
 		
 			async addContract(contractData) {
 				try {
@@ -1087,27 +1242,27 @@
 			constructor() {
 				this.actualIncomeChartInstance = null;
 				this.projectedIncomeChartInstance = null;
+				// [MUDANÇA v5] Gráficos do Relatório Avançado
+				this.advReportTimelineChart = null;
+				this.advReportByAdvogadoChart = null;
+				this.advReportNewContractsChart = null;
 			}
 			
-			getChartConfig(labels, data, label, backgroundColor, borderColor) {
+			getChartConfig(type, labels, datasets) {
+				const isHorizontal = type.startsWith('horizontal');
+				const axis = isHorizontal ? 'x' : 'y';
+				const indexAxis = isHorizontal ? 'y' : 'x';
+				
 				return {
-					type: 'bar',
-					data: {
-						labels: labels,
-						datasets: [{
-							label: label,
-							data: data,
-							backgroundColor: backgroundColor,
-							borderColor: borderColor,
-							borderWidth: 1
-						}]
-					},
+					type: type.replace('horizontal', ''),
+					data: { labels, datasets },
 					options: {
+						indexAxis: indexAxis,
 						responsive: true,
 						maintainAspectRatio: false,
 						scales: {
-							y: { beginAtZero: true, ticks: { color: '#9ca3af' } },
-							x: { ticks: { color: '#9ca3af' } }
+							[axis]: { beginAtZero: true, ticks: { color: '#9ca3af' } },
+							[indexAxis]: { ticks: { color: '#9ca3af' } }
 						},
 						plugins: {
 							legend: { labels: { color: '#d1d5db' } }
@@ -1115,30 +1270,59 @@
 					}
 				};
 			}
-		
+
+			// Gráficos do Modal Legado
 			renderActualIncomeChart(ctx, labels, data) {
 				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
 				this.actualIncomeChartInstance = new Chart(ctx, this.getChartConfig(
-					labels, data, 'Faturação Real', 'rgba(74, 222, 128, 0.6)', 'rgba(74, 222, 128, 1)'
+					'bar', labels, [{ label: 'Faturação Real', data, backgroundColor: 'rgba(74, 222, 128, 0.6)', borderColor: 'rgba(74, 222, 128, 1)', borderWidth: 1 }]
 				));
 			}
 		
 			renderProjectedIncomeChart(ctx, labels, data) {
 				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
 				this.projectedIncomeChartInstance = new Chart(ctx, this.getChartConfig(
-					labels, data, 'Projeção (Parcelas)', 'rgba(139, 92, 246, 0.6)', 'rgba(139, 92, 246, 1)'
+					'bar', labels, [{ label: 'Projeção (Parcelas)', data, backgroundColor: 'rgba(139, 92, 246, 0.6)', borderColor: 'rgba(139, 92, 246, 1)', borderWidth: 1 }]
 				));
 			}
+
+			// [MUDANÇA v5] Novos Gráficos do Relatório Avançado
+			renderTimelineChart(ctx, labels, data) {
+				if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
+				this.advReportTimelineChart = new Chart(ctx, this.getChartConfig(
+					'line', labels, [{ label: 'Faturação', data, backgroundColor: 'rgba(74, 222, 128, 0.2)', borderColor: 'rgba(74, 222, 128, 1)', borderWidth: 2, fill: true, tension: 0.1 }]
+				));
+			}
+
+			renderByAdvogadoChart(ctx, labels, data) {
+				if (this.advReportByAdvogadoChart) this.advReportByAdvogadoChart.destroy();
+				this.advReportByAdvogadoChart = new Chart(ctx, this.getChartConfig(
+					'pie', labels, [{ label: 'Faturação', data, 
+						backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#0ea5e9', '#22c55e', '#eab308', '#dc2626'],
+						borderWidth: 0 }]
+				));
+			}
+			
+			renderNewContractsChart(ctx, labels, data) {
+				if (this.advReportNewContractsChart) this.advReportNewContractsChart.destroy();
+				this.advReportNewContractsChart = new Chart(ctx, this.getChartConfig(
+					'bar', labels, [{ label: 'Novos Contratos', data, backgroundColor: 'rgba(139, 92, 246, 0.6)', borderColor: 'rgba(139, 92, 246, 1)', borderWidth: 1 }]
+				));
+			}
+			// Fim Mudança v5
 		
 			destroyAllCharts() {
-				if (this.actualIncomeChartInstance) {
-					this.actualIncomeChartInstance.destroy();
-					this.actualIncomeChartInstance = null;
-				}
-				if (this.projectedIncomeChartInstance) {
-					this.projectedIncomeChartInstance.destroy();
-					this.projectedIncomeChartInstance = null;
-				}
+				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
+				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
+				if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
+				if (this.advReportByAdvogadoChart) this.advReportByAdvogadoChart.destroy();
+				if (this.advReportNewContractsChart) this.advReportNewContractsChart.destroy();
+				
+				this.actualIncomeChartInstance = null;
+				this.projectedIncomeChartInstance = null;
+				this.advReportTimelineChart = null;
+				this.advReportByAdvogadoChart = null;
+				this.advReportNewContractsChart = null;
 			}
 		}
 		
@@ -1150,34 +1334,73 @@
 				this.app = appInstance;
 			}
 		
-			calculateMonthlyIncome(year, month, contractsToRender) {
-				if (!this.app.isUserAdmin) return { totalParcelas: 0, totalExito: 0, totalGeral: 0, detailedPayments: [] };
+			// [MUDANÇA v5] Lógica atualizada para usar datas (Date Objects)
+			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
+				if (!this.app.isUserAdmin) return { totalParcelas: 0, totalExito: 0, totalGeral: 0, detailedPayments: [], byAdvogado: {}, byMonth: {}, newContractsByMonth: {} };
 		
-				let totalParcelas = 0, totalExito = 0, detailedPayments = [];
-				contractsToRender.filter(c => !c.isDeleted).forEach(contract => {
+				let totalParcelas = 0, totalExito = 0;
+				const detailedPayments = [];
+				const byAdvogado = {};
+				const byMonth = {};
+				const newContractsByMonth = {};
+				const allContracts = contractsToRender.filter(c => !c.isDeleted);
+				
+				// Helper para agrupar por mês
+				const addData = (map, date, value) => {
+					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+					map[monthKey] = (map[monthKey] || 0) + value;
+				};
+
+				allContracts.forEach(contract => {
+					// 1. Processa novos contratos
+					if (contract.createdAt) {
+						const d = new Date(contract.createdAt);
+						if (d >= startDate && d <= endDate) {
+							addData(newContractsByMonth, d, 1);
+						}
+					}
+					
+					// 2. Processa pagamentos de parcelas
 					(contract.parcels || []).forEach(parcel => {
-						if (parcel.status === 'Paga') {
+						if (parcel.status === 'Paga' && parcel.paymentDate) {
 							const d = new Date(parcel.paymentDate);
-							if (d.getFullYear() === year && d.getMonth() === month) {
-								totalParcelas += parcel.valuePaid;
-								detailedPayments.push({ type: `Parcela ${parcel.number}/${contract.parcels.length}`, clientName: contract.clientName, date: Utils.formatDate(d), value: parcel.valuePaid });
+							if (d >= startDate && d <= endDate) {
+								const value = parcel.valuePaid;
+								totalParcelas += value;
+								detailedPayments.push({ type: `Parcela ${parcel.number}/${contract.parcels.length}`, clientName: contract.clientName, date: d, value: value, advogado: contract.advogadoResponsavel });
+								byAdvogado[contract.advogadoResponsavel] = (byAdvogado[contract.advogadoResponsavel] || 0) + value;
+								addData(byMonth, d, value);
 							}
 						}
 					});
+					
+					// 3. Processa pagamentos de êxito
 					if (contract.successFeePaymentDate) {
 						const d = new Date(contract.successFeePaymentDate);
-						if (d.getFullYear() === year && d.getMonth() === month) {
-							totalExito += contract.successFeeValueReceived;
-							detailedPayments.push({ type: 'Taxa de Êxito', clientName: contract.clientName, date: Utils.formatDate(d), value: contract.successFeeValueReceived });
+						if (d >= startDate && d <= endDate) {
+							const value = contract.successFeeValueReceived;
+							totalExito += value;
+							detailedPayments.push({ type: 'Taxa de Êxito', clientName: contract.clientName, date: d, value: value, advogado: contract.advogadoResponsavel });
+							byAdvogado[contract.advogadoResponsavel] = (byAdvogado[contract.advogadoResponsavel] || 0) + value;
+							addData(byMonth, d, value);
 						}
 					}
 				});
-				detailedPayments.sort((a, b) => {
-					const da = new Date(a.date.split('/').reverse().join('-'));
-					const db = new Date(b.date.split('/').reverse().join('-'));
-					return da - db;
-				});
-				return { totalParcelas, totalExito, totalGeral: totalParcelas + totalExito, detailedPayments };
+				
+				detailedPayments.sort((a, b) => a.date - b.date);
+				
+				const totalGeral = totalParcelas + totalExito;
+				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
+				
+				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
+			}
+
+			// Função legada (ainda usada pelo modal antigo)
+			calculateMonthlyIncome(year, month, contractsToRender) {
+				const startDate = new Date(year, month, 1);
+				const endDate = new Date(year, month + 1, 0, 23, 59, 59); // Fim do mês
+				const data = this.calculateIncomeByDateRange(startDate, endDate, contractsToRender);
+				return { totalParcelas: data.totalParcelas, totalExito: data.totalExito, totalGeral: data.totalGeral, detailedPayments: data.detailedPayments };
 			}
 		
 			getActualIncomeData(contractsToRender) {
@@ -1316,10 +1539,11 @@
 				return card;
 			}
 			
-			// [MUDANÇA v3] O cartão de êxito agora tem w-80 (320px), o mesmo que .kanban-column
+			// [MUDANÇA v5] Correção de Bug: Adicionado w-80 e flex-shrink-0
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
+				// AQUI A CORREÇÃO: w-80 e flex-shrink-0
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 w-80 flex-shrink-0' });
 				card.append(this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName }));
 				
@@ -1535,16 +1759,16 @@
 						break;
 					case '50% Concluído':
 						statusClass = 'text-xs font-bold text-purple-400'; statusHtml = '50%';
-						actionsDiv.append(this.createServiceButton('Concluir', 'bg-indigo-600 hover:bg-indigo-500', () => this.app.updateServiceStatus(contract.id, index, 'Concluído')));
+						actionsDiv.append(this.createServiceButton('Concluir', 'bg-indigo-600 hover:bg-indigo-500', () => this.app.updateServiceStatus(contract, index, 'Concluído')));
 						break;
 					case 'Em Andamento':
 						statusClass = 'text-xs font-bold text-yellow-400'; statusHtml = 'EM ANDAMENTO';
-						actionsDiv.append(this.createServiceButton('50%', 'bg-purple-600 hover:bg-purple-500', () => this.app.updateServiceStatus(contract.id, index, '50% Concluído')));
-						actionsDiv.append(this.createServiceButton('Concluir', 'bg-indigo-600 hover:bg-indigo-500', () => this.app.updateServiceStatus(contract.id, index, 'Concluído')));
+						actionsDiv.append(this.createServiceButton('50%', 'bg-purple-600 hover:bg-purple-500', () => this.app.updateServiceStatus(contract, index, '50% Concluído')));
+						actionsDiv.append(this.createServiceButton('Concluir', 'bg-indigo-600 hover:bg-indigo-500', () => this.app.updateServiceStatus(contract, index, 'Concluído')));
 						break;
 					default:
 						statusClass = 'text-xs font-bold text-gray-400'; statusHtml = 'PENDENTE';
-						actionsDiv.append(this.createServiceButton('Iniciar', 'bg-yellow-600 hover:bg-yellow-500', () => this.app.updateServiceStatus(contract.id, index, 'Em Andamento')));
+						actionsDiv.append(this.createServiceButton('Iniciar', 'bg-yellow-600 hover:bg-yellow-500', () => this.app.updateServiceStatus(contract, index, 'Em Andamento')));
 						break;
 				}
 				actionsDiv.append(this.buildElement('span', { className: statusClass, text: statusHtml }));
@@ -1609,6 +1833,28 @@
 		
 				container.append(createPageButton(currentPage + 1, 'Próx »', currentPage === totalPages - 1));
 			}
+
+			// [MUDANÇA v5] Novo: Cria item do dropdown de notificação
+			createNotificationItem(notification) {
+				const item = this.buildElement('div', { className: 'notification-item' });
+				if (notification.isRead) item.classList.add('is-read');
+				item.dataset.id = notification.id;
+				
+				item.innerHTML = `
+					<p>${Utils.sanitizeText(notification.message)}</p>
+					<div class="time">${Utils.timeAgo(notification.timestamp?.toDate())}</div>
+				`;
+				
+				item.onclick = () => {
+					// Marcar como lida e talvez navegar para o contrato
+					if (!notification.isRead) {
+						this.app.markNotificationsAsRead([notification.id]);
+					}
+					// TODO: Navegar para o contrato (ex: this.app.navigateToContract(notification.contractId))
+					this.app.closeNotificationDropdown();
+				};
+				return item;
+			}
 		}
 		
 		
@@ -1619,22 +1865,33 @@
 		class App {
 			constructor() {
 				// Estado da Aplicação
-				this.database = { contracts: [] };
+				this.database = { 
+					contracts: [],
+					notifications: [] // [MUDANÇA v5]
+				};
 				this.currentUserDisplayName = null;
+				this.currentSafeName = null; // [MUDANÇA v5]
 				this.isUserAdmin = false;
+				this.currentAdvancedReportData = null; // [MUDANÇA v5]
 				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
 				this.currentInadimplentesSort = 'days-desc';
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
-				this.contractStatusFilter = 'ativos'; // [MUDANÇA v3] Novo filtro de status
+				this.contractStatusFilter = 'ativos';
 				
-				// Referências DOM
-				this.backdrop = document.getElementById('modal-backdrop');
-				this.appContainer = document.getElementById('app-container');
-				this.loadingOverlay = document.getElementById('loading-overlay');
-				this.authOverlay = document.getElementById('auth-overlay');
+				// [MUDANÇA v5] Referências DOM movidas para _initDOMReferences
+				this.backdrop = null;
+				this.appContainer = null;
+				this.loadingOverlay = null;
+				this.authOverlay = null;
+				this.notificationBell = null;
+				this.notificationBadge = null;
+				this.notificationDropdown = null;
+				this.notificationList = null;
+				this.notificationListEmpty = null;
+				this.clearNotificationsButton = null;
 				
 				// Estado dos Modais
 				this.openModalId = null;
@@ -1653,8 +1910,26 @@
 		
 			initialize() {
 				this.authService.initialize();
+				// [MUDANÇA v5] Corrigido o "Race Condition"
+				this._initDOMReferences();
 				this.setupEventListeners();
 				this._setupModalAccessibility();
+			}
+
+			// [MUDANÇA v5] Novo método para carregar referências DOM PÓS-DOMContentLoaded
+			_initDOMReferences() {
+				this.backdrop = document.getElementById('modal-backdrop');
+				this.appContainer = document.getElementById('app-container');
+				this.loadingOverlay = document.getElementById('loading-overlay');
+				this.authOverlay = document.getElementById('auth-overlay');
+				
+				// Referências de Notificação
+				this.notificationBell = document.getElementById('notification-bell');
+				this.notificationBadge = document.getElementById('notification-badge');
+				this.notificationDropdown = document.getElementById('notification-dropdown');
+				this.notificationList = document.getElementById('notification-list');
+				this.notificationListEmpty = document.getElementById('notification-list-empty');
+				this.clearNotificationsButton = document.getElementById('clear-notifications-button');
 			}
 		
 			setupEventListeners() {
@@ -1714,7 +1989,36 @@
 							sidebar.classList.add('hidden');
 							this.backdrop.style.display = 'none';
 						}
+						// [MUDANÇA v5] Fecha o dropdown de notificação
+						this.closeNotificationDropdown();
 					});
+				}
+
+				// [MUDANÇA v5] Listeners do Sino de Notificação
+				if (this.notificationBell) {
+					this.notificationBell.addEventListener('click', (e) => {
+						e.stopPropagation();
+						this.notificationDropdown.classList.toggle('hidden');
+					});
+				}
+				if (this.clearNotificationsButton) {
+					this.clearNotificationsButton.addEventListener('click', () => {
+						this.markNotificationsAsRead();
+					});
+				}
+				// Fecha o dropdown se clicar fora
+				document.addEventListener('click', (e) => {
+					if (this.notificationDropdown && !this.notificationDropdown.classList.contains('hidden')) {
+						if (!this.notificationBell.contains(e.target) && !this.notificationDropdown.contains(e.target)) {
+							this.closeNotificationDropdown();
+						}
+					}
+				});
+				
+				// [MUDANÇA v5] Listener do PDF
+				const pdfBtn = document.getElementById('exportPdfButton');
+				if (pdfBtn) {
+					pdfBtn.addEventListener('click', () => this.exportReportPDF());
 				}
 			}
 		
@@ -1723,6 +2027,7 @@
 			handleAuthStateChange(user) {
 				if (user) {
 					this.currentUserDisplayName = user.displayName;
+					this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); // [MUDANÇA v5]
 					this.isUserAdmin = ADMIN_USERS.includes(this.currentUserDisplayName);
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 		
@@ -1740,16 +2045,19 @@
 						this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
 						this.setupUIAccess();
 						this.firebaseService.startSnapshotListener('contracts');
+						this.firebaseService.startNotificationListener(this.currentSafeName); // [MUDANÇA v5]
 					}
 				} else {
 					// Utilizador deslogado
 					this.currentUserDisplayName = null;
+					this.currentSafeName = null;
 					this.isUserAdmin = false;
 					document.body.classList.remove('is-admin');
 					this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
 					this.appContainer.style.display = 'none';
 					this.loadingOverlay.style.display = 'none';
 					this.firebaseService.stopSnapshotListener();
+					this.firebaseService.stopNotificationListener(); // [MUDANÇA v5]
 				}
 			}
 		
@@ -1757,6 +2065,12 @@
 				this.database.contracts = contracts;
 				this.contractListPage = 0;
 				this.render();
+			}
+
+			// [MUDANÇA v5] Novo Handler de Notificações
+			handleNotificationUpdate(notifications) {
+				this.database.notifications = notifications;
+				this.renderNotificationDropdown();
 			}
 		
 			// --- 3. LÓGICA DE RENDERIZAÇÃO PRINCIPAL ---
@@ -1781,6 +2095,8 @@
 					this.renderServicosPage();
 				} else if (pageId === 'page-lixeira') {
 					this.renderLixeiraPage();
+				} else if (pageId === 'page-relatorios') {
+					this.renderAdvancedReportPage();
 				}
 		
 				this.renderSortButtons();
@@ -2047,10 +2363,14 @@
 				container.append(fragment);
 			}
 			
+			// [MUDANÇA v5] Correção de Bug: Lógica da Lixeira
 			renderLixeiraPage() {
+				// Usa "true" para incluir deletados
 				const contractsToRender = this.getFilteredContracts(true);
 				const container = document.getElementById('lixeiraListContainer');
 				container.innerHTML = '';
+				
+				// Filtra APENAS os deletados
 				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true);
 		
 				if (deletedContracts.length === 0) {
@@ -2063,7 +2383,7 @@
 					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
 					card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
-					card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
+					card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
 					
 					const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
 					
@@ -2082,6 +2402,25 @@
 				});
 				container.append(fragment);
 			}
+
+			// [MUDANÇA v5] Nova Página de Relatórios
+			renderAdvancedReportPage() {
+				// Define datas padrão (início do mês até hoje)
+				const startDateEl = document.getElementById('reportStartDate');
+				const endDateEl = document.getElementById('reportEndDate');
+				if (!startDateEl.value || !endDateEl.value) {
+					const hoje = new Date();
+					const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+					startDateEl.value = inicioMes.toISOString().split('T')[0];
+					endDateEl.value = hoje.toISOString().split('T')[0];
+				}
+				// Limpa o estado anterior
+				this.currentAdvancedReportData = null;
+				document.getElementById('exportPdfButton').disabled = true;
+				document.getElementById('advancedReportContainer').classList.add('hidden');
+				document.getElementById('advancedReportEmpty').classList.remove('hidden');
+				this.analyticsHandler.destroyAllCharts();
+			}
 		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
 		
@@ -2090,23 +2429,28 @@
 					'page-dashboard': 'Painel Principal',
 					'page-inadimplentes': 'Inadimplentes',
 					'page-servicos': 'Produção de Serviços',
+					'page-relatorios': 'Relatórios Avançados', // [MUDANÇA v5]
 					'page-lixeira': 'Lixeira'
 				};
 				
 				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
 		
-				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira'].forEach(id => {
+				// Esconde todas as páginas
+				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira', 'page-relatorios'].forEach(id => {
 					const el = document.getElementById(id);
 					if (el) el.classList.add('hidden');
 				});
 		
+				// Remove 'active' de todas as tabs
 				document.querySelectorAll('.sidebar-nav-item, .mobile-nav-item').forEach(tab => {
 					tab.classList.remove('active');
 				});
 		
+				// Mostra a página alvo
 				const targetPage = document.getElementById(pageId);
 				if (targetPage) targetPage.classList.remove('hidden');
 		
+				// Ativa a tab correspondente
 				const tabBaseId = pageId.split('-')[1];
 				const desktopTab = document.getElementById(`tab-${tabBaseId}`);
 				const mobileTab = document.getElementById(`mobile-tab-${tabBaseId}`);
@@ -2114,12 +2458,14 @@
 				if (desktopTab) desktopTab.classList.add('active');
 				if (mobileTab) mobileTab.classList.add('active');
 		
+				// Fecha a sidebar no mobile
 				const sidebar = document.getElementById('sidebar');
 				if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
 					sidebar.classList.add('hidden');
 					this.backdrop.style.display = 'none';
 				}
 		
+				// Renderiza o conteúdo da página que acabou de ser aberta
 				this.render();
 			}
 		
@@ -2277,6 +2623,7 @@
 				const name = document.getElementById('inputDisplayName').value;
 				if (name && (await this.authService.updateUserProfile(name))) {
 					this.currentUserDisplayName = name;
+					this.currentSafeName = Utils.sanitizeForFirestoreId(name);
 					this.isUserAdmin = ADMIN_USERS.includes(name);
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 					document.getElementById('user-display-name').textContent = name;
@@ -2284,6 +2631,7 @@
 					this.appContainer.style.display = 'flex';
 					this.setupUIAccess();
 					this.firebaseService.startSnapshotListener('contracts');
+					this.firebaseService.startNotificationListener(this.currentSafeName); // [MUDANÇA v5]
 				}
 			}
 		
@@ -2318,7 +2666,8 @@
 						successFeeValueReceived: 0,
 						successFeePaymentDate: null,
 						isDeleted: false,
-						parcels: []
+						parcels: [],
+						createdAt: new Date().toISOString() // [MUDANÇA v5]
 					});
 		
 					if (this.isUserAdmin) {
@@ -2364,6 +2713,7 @@
 						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
 					}
 					contractData.isDeleted = existingContract?.isDeleted || false;
+					contractData.createdAt = existingContract?.createdAt || new Date().toISOString(); // Preserva o createdAt
 					
 					if (await this.firebaseService.updateContract(contractId, contractData)) {
 						this.closeModal('modalContrato');
@@ -2435,13 +2785,36 @@
 				}
 			}
 			
-			async updateServiceStatus(contractId, serviceIndex, newStatus) {
-				const contract = this.database.contracts.find(c => c.id === contractId);
+			// [MUDANÇA v5] Atualizado para aceitar 'contract' e enviar notificação
+			async updateServiceStatus(contract, serviceIndex, newStatus) {
+				const contractId = contract.id;
 				if (contract && (contract.serviceTypes || [])[serviceIndex]) {
 					const updatedServiceTypes = [...contract.serviceTypes];
+					const serviceName = updatedServiceTypes[serviceIndex].name;
 					updatedServiceTypes[serviceIndex].status = newStatus;
-					await this.firebaseService.updateContractField(contractId, { serviceTypes: updatedServiceTypes });
+					
+					const success = await this.firebaseService.updateContractField(contractId, { serviceTypes: updatedServiceTypes });
+
+					// Lógica de Notificação
+					if (success && newStatus === 'Concluído') {
+						const recipientName = contract.advogadoResponsavel;
+						// Só envia notificação se o utilizador atual NÃO for o advogado responsável (ex: admin atualizando)
+						if (recipientName && recipientName !== this.currentUserDisplayName) {
+							this.sendNotification(recipientName, {
+								message: `${this.currentUserDisplayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
+								contractId: contractId,
+								sender: this.currentUserDisplayName
+							});
+						}
+					}
 				}
+			}
+
+			// [MUDANÇA v5] Nova função de notificação
+			async sendNotification(recipientName, data) {
+				const safeRecipientName = Utils.sanitizeForFirestoreId(recipientName);
+				await this.firebaseService.sendNotification(safeRecipientName, data);
+				Utils.showToast('Notificação enviada.', 'info');
 			}
 		
 			async moveToLixeira(contractId) {
@@ -2644,6 +3017,7 @@
 				this.openModal('modalCliente');
 			}
 			
+			// Modal Legado
 			openReportModal() {
 				if (!this.isUserAdmin) { Utils.showToast('Apenas admins podem abrir o relatório.', 'error'); return; }
 				this.openModal('modalRelatorio');
@@ -2681,7 +3055,7 @@
 				if (income.detailedPayments.length > 0) {
 					detailsHtml += '<ul class="space-y-2 mt-2 text-sm">';
 					income.detailedPayments.forEach(p => {
-						detailsHtml += `<li class="flex justify-between items-center bg-gray-700/50 p-3 rounded-md"><div><p class="font-semibold text-white">${p.clientName}</p><p class="text-xs text-gray-400">${p.type} - ${p.date}</p></div><span class="font-semibold text-green-400 text-lg">${Utils.formatCurrency(p.value)}</span></li>`;
+						detailsHtml += `<li class="flex justify-between items-center bg-gray-700/50 p-3 rounded-md"><div><p class="font-semibold text-white">${p.clientName}</p><p class="text-xs text-gray-400">${p.type} - ${Utils.formatDate(p.date)}</p></div><span class="font-semibold text-green-400 text-lg">${Utils.formatCurrency(p.value)}</span></li>`;
 					});
 					detailsHtml += '</ul>';
 				} else {
@@ -2750,7 +3124,199 @@
 				container.appendChild(tag);
 			}
 		
-			// --- 7. EXPORTAÇÃO E FUNÇÕES AUXILIARES ---
+			// --- 7. EXPORTAÇÃO, NOTIFICAÇÕES E RELATÓRIOS (v5) ---
+		
+			// [MUDANÇA v5] Lógica do Dropdown de Notificação
+			renderNotificationDropdown() {
+				const notifications = this.database.notifications;
+				this.notificationList.innerHTML = '';
+				
+				const unread = notifications.filter(n => !n.isRead);
+				if (unread.length > 0) {
+					this.notificationBadge.classList.remove('hidden');
+				} else {
+					this.notificationBadge.classList.add('hidden');
+				}
+				
+				if (notifications.length === 0) {
+					this.notificationListEmpty.classList.remove('hidden');
+					return;
+				}
+				
+				this.notificationListEmpty.classList.add('hidden');
+				const fragment = document.createDocumentFragment();
+				notifications.forEach(n => {
+					fragment.append(this.domBuilder.createNotificationItem(n));
+				});
+				this.notificationList.append(fragment);
+			}
+
+			async markNotificationsAsRead(ids = null) {
+				const unreadIds = ids || this.database.notifications.filter(n => !n.isRead).map(n => n.id);
+				if (unreadIds.length === 0) return;
+				
+				await this.firebaseService.markNotificationsAsRead(this.currentSafeName, unreadIds);
+				// O listener vai atualizar a UI
+			}
+
+			closeNotificationDropdown() {
+				if (this.notificationDropdown) {
+					this.notificationDropdown.classList.add('hidden');
+				}
+			}
+
+			// [MUDANÇA v5] Lógica dos Relatórios Avançados
+			generateAdvancedReport() {
+				this.analyticsHandler.destroyAllCharts();
+				const startDate = new Date(document.getElementById('reportStartDate').value + 'T00:00:00-04:00'); // Fuso de RO
+				const endDate = new Date(document.getElementById('reportEndDate').value + 'T23:59:59-04:00'); // Fuso de RO
+				
+				if (endDate < startDate) {
+					Utils.showToast('Data final deve ser maior que a data inicial.', 'error');
+					return;
+				}
+				
+				const contracts = this.getFilteredContracts(true);
+				const data = this.reportHandler.calculateIncomeByDateRange(startDate, endDate, contracts);
+				this.currentAdvancedReportData = data; // Salva os dados para o PDF
+				
+				if (data.totalGeral === 0 && data.totalContratos === 0) {
+					document.getElementById('advancedReportContainer').classList.add('hidden');
+					document.getElementById('advancedReportEmpty').classList.remove('hidden');
+					document.getElementById('exportPdfButton').disabled = true;
+					return;
+				}
+
+				document.getElementById('advancedReportContainer').classList.remove('hidden');
+				document.getElementById('advancedReportEmpty').classList.add('hidden');
+				document.getElementById('exportPdfButton').disabled = false;
+				
+				// 1. Renderiza KPIs
+				this.renderReportKPIs(data);
+				// 2. Renderiza Gráficos
+				this.renderAdvancedReportCharts(data);
+			}
+
+			renderReportKPIs(data) {
+				const container = document.getElementById('report-kpis');
+				container.innerHTML = `
+					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
+						<h3 class="text-lg font-semibold text-gray-400">Faturação Total</h3>
+						<p class="text-3xl font-bold text-green-400">${Utils.formatCurrency(data.totalGeral)}</p>
+					</div>
+					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
+						<h3 class="text-lg font-semibold text-gray-400">Total (Parcelas)</h3>
+						<p class="text-3xl font-bold text-white">${Utils.formatCurrency(data.totalParcelas)}</p>
+					</div>
+					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
+						<h3 class="text-lg font-semibold text-gray-400">Total (Êxito)</h3>
+						<p class="text-3xl font-bold text-indigo-400">${Utils.formatCurrency(data.totalExito)}</p>
+					</div>
+					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
+						<h3 class="text-lg font-semibold text-gray-400">Novos Contratos</h3>
+						<p class="text-3xl font-bold text-blue-400">${data.totalContratos}</p>
+					</div>
+				`;
+			}
+
+			renderAdvancedReportCharts(data) {
+				// 1. Gráfico de Linha (Faturação no Tempo)
+				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
+				const sortedMonths = Object.keys(data.byMonth).sort();
+				const timelineLabels = sortedMonths.map(key => {
+					const [year, month] = key.split('-');
+					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+				});
+				const timelineData = sortedMonths.map(key => data.byMonth[key]);
+				this.analyticsHandler.renderTimelineChart(timelineCtx, timelineLabels, timelineData);
+				
+				// 2. Gráfico de Pizza (Faturação por Advogado)
+				const byAdvCtx = document.getElementById('advReportByAdvogadoChart').getContext('2d');
+				const advLabels = Object.keys(data.byAdvogado);
+				const advData = Object.values(data.byAdvogado);
+				this.analyticsHandler.renderByAdvogadoChart(byAdvCtx, advLabels, advData);
+
+				// 3. Gráfico de Barras (Novos Contratos)
+				const newContractsCtx = document.getElementById('advReportNewContractsChart').getContext('2d');
+				const sortedContractMonths = Object.keys(data.newContractsByMonth).sort();
+				const contractLabels = sortedContractMonths.map(key => {
+					const [year, month] = key.split('-');
+					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+				});
+				const contractData = sortedContractMonths.map(key => data.newContractsByMonth[key]);
+				this.analyticsHandler.renderNewContractsChart(newContractsCtx, contractLabels, contractData);
+			}
+
+			// [MUDANÇA v5] Nova função de PDF
+			exportReportPDF() {
+				if (!this.currentAdvancedReportData) {
+					Utils.showToast('Gere um relatório primeiro.', 'error');
+					return;
+				}
+				
+				const data = this.currentAdvancedReportData;
+				const { jsPDF } = window.jspdf;
+				const doc = new jsPDF();
+				const startDate = new Date(document.getElementById('reportStartDate').value + 'T12:00:00Z');
+				const endDate = new Date(document.getElementById('reportEndDate').value + 'T12:00:00Z');
+				
+				doc.setFontSize(18);
+				doc.text("Relatório Financeiro Avançado", 14, 22);
+				
+				doc.setFontSize(11);
+				doc.text(`Período: ${Utils.formatDate(startDate)} a ${Utils.formatDate(endDate)}`, 14, 30);
+				
+				doc.setFontSize(16);
+				doc.text("Resumo Financeiro", 14, 45);
+				doc.autoTable({
+					startY: 50,
+					head: [['Métrica', 'Valor']],
+					body: [
+						['Faturação Total', Utils.formatCurrency(data.totalGeral)],
+						['Total Recebido (Parcelas)', Utils.formatCurrency(data.totalParcelas)],
+						['Total Recebido (Êxito)', Utils.formatCurrency(data.totalExito)],
+						['Novos Contratos no Período', data.totalContratos],
+					],
+					theme: 'grid',
+					headStyles: { fillColor: [79, 70, 229] } // Índigo
+				});
+				
+				doc.addPage();
+				doc.setFontSize(16);
+				doc.text("Faturação por Advogado", 14, 22);
+				const advData = Object.entries(data.byAdvogado)
+					.sort(([, a], [, b]) => b - a)
+					.map(([adv, valor]) => [adv, Utils.formatCurrency(valor)]);
+					
+				doc.autoTable({
+					startY: 28,
+					head: [['Advogado(a)', 'Valor Faturado']],
+					body: advData,
+					theme: 'grid',
+					headStyles: { fillColor: [79, 70, 229] }
+				});
+
+				doc.setFontSize(16);
+				doc.text("Detalhes dos Recebimentos", 14, doc.autoTable.previous.finalY + 15);
+				const paymentData = data.detailedPayments.map(p => [
+					p.clientName,
+					p.type,
+					Utils.formatDate(p.date),
+					p.advogado,
+					Utils.formatCurrency(p.value)
+				]);
+				
+				doc.autoTable({
+					startY: doc.autoTable.previous.finalY + 21,
+					head: [['Cliente', 'Tipo', 'Data', 'Advogado', 'Valor']],
+					body: paymentData,
+					theme: 'striped',
+					headStyles: { fillColor: [79, 70, 229] }
+				});
+
+				doc.save(`Relatorio_FG_${startDate.toISOString().split('T')[0]}_a_${endDate.toISOString().split('T')[0]}.pdf`);
+			}
+			// Fim Mudança v5
 		
 			_formatCSVCell(data) {
 				if (data == null) return '';
@@ -2801,7 +3367,7 @@
 				const headers = ["Cliente", "Tipo", "Data", "Valor"];
 				let csvRows = [headers.join(',')];
 				income.detailedPayments.forEach(p => {
-					const row = [p.clientName, p.type, p.date, p.value].map(this._formatCSVCell).join(',');
+					const row = [p.clientName, p.type, Utils.formatDate(p.date), p.value].map(this._formatCSVCell).join(',');
 					csvRows.push(row);
 				});
 				const monthName = document.getElementById('reportMonth').options[month].text;
@@ -2843,6 +3409,8 @@
 						sidebar.classList.add('hidden');
 						this.backdrop.style.display = 'none';
 					}
+					// [MUDANÇA v5] Fecha o dropdown de notificação com Esc
+					this.closeNotificationDropdown();
 				}
 		
 				if (event.key === 'Tab' && this.openModalId) {
@@ -2882,11 +3450,20 @@
 		
 		// --- INICIALIZAÇÃO DA APLICAÇÃO ---
 		document.addEventListener('DOMContentLoaded', () => {
-			window.App = new App();
-			window.App.initialize();
+			// [MUDANÇA v5] Garante que o jspdf-autotable está carregado
+			// (Numa app real, isto seria feito com um bundler, mas aqui garantimos a ordem)
+			const autoTableScript = document.createElement('script');
+			autoTableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+			autoTableScript.onload = () => {
+				window.App = new App();
+				window.App.initialize();
+			};
+			autoTableScript.onerror = () => {
+				document.getElementById('loading-overlay').textContent = "Erro ao carregar dependência (AutoTable).";
+			};
+			document.head.appendChild(autoTableScript);
 		});
 		
 	</script>
 </body>
 </html>
-	
