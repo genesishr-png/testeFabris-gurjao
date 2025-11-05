@@ -217,7 +217,6 @@
 		}
 	</style>
 </head>
-	</head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
 
@@ -355,8 +354,8 @@
 						</button>
 					</div>
 
-					<!-- [MUDANÇA v2] Stats do Painel agora são 3 -->
-					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+					<!-- [MUDANÇA v3] Stats do Painel de volta para 4 colunas -->
+					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
 						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
 							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
@@ -369,12 +368,17 @@
 							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
 							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
 						</div>
+						<!-- [MUDANÇA v3] Cartão de "Contratos Ativos" de volta -->
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
+							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+						</div>
 					</div>
 					<div class="mb-4 border-b border-gray-700">
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
 
-					<!-- [MUDANÇA v2] Kanban agora com 3 colunas, sem scroll (em grid) -->
+					<!-- [MUDANÇA v3] Kanban agora com 3 colunas, sem scroll (em grid) -->
 					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
 						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
 							<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
@@ -390,15 +394,15 @@
 						</div>
 					</div>
 
-					<!-- [MUDANÇA v2] Nova secção dedicada para Êxito -->
-					<div class="mt-12">
+					<!-- [MUDANÇA v3] Nova secção dedicada para Êxito -->
+					<div id="exito-section" class="mt-12">
 						<div class="mb-4 border-b border-gray-700">
 							<h2 class="text-2xl font-semibold mb-4 text-white">Bonificações de Êxito Pendentes</h2>
 						</div>
 						<!-- Esta secção tem scroll horizontal se houver muitos cartões -->
 						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4">
 							<!-- O JS vai preencher o #kanban-exito aqui -->
-							<!-- Cada cartão de êxito terá .kanban-column para manter o tamanho -->
+							<!-- [MUDANÇA v3] O 'kanban-column' foi removido dos cartões de êxito no JS -->
 							<div id="kanban-exito" class="flex space-x-6"></div>
 						</div>
 					</div>
@@ -411,6 +415,15 @@
 									<i class="fas fa-file-csv"></i> Exportar (CSV)
 								</button>
 								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
+								
+								<!-- [MUDANÇA v3] Novo Filtro Ativos/Concluídos -->
+								<div class="flex items-center gap-2">
+									<span class="text-sm text-gray-400">Mostrar:</span>
+									<div id="contractStatusFilterButtons" class="flex gap-1">
+										<!-- Botões serão gerados pelo JS -->
+									</div>
+								</div>
+
 								<div class="flex items-center gap-2">
 									<span class="text-sm text-gray-400">Ordenar por:</span>
 									<div id="contractSortButtons" class="flex gap-1"></div>
@@ -1303,11 +1316,11 @@
 				return card;
 			}
 			
+			// [MUDANÇA v3] O cartão de êxito agora tem w-80 (320px), o mesmo que .kanban-column
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
-				// [MUDANÇA v2] O cartão de êxito agora é um .kanban-column para manter o tamanho
-				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 kanban-column' });
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 w-80 flex-shrink-0' });
 				card.append(this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName }));
 				
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
@@ -1615,6 +1628,7 @@
 				this.currentInadimplentesSort = 'days-desc';
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
+				this.contractStatusFilter = 'ativos'; // [MUDANÇA v3] Novo filtro de status
 				
 				// Referências DOM
 				this.backdrop = document.getElementById('modal-backdrop');
@@ -1773,7 +1787,7 @@
 				this.renderAdvogadoFilters();
 			}
 		
-			// [MUDANÇA v2] Kanban e Êxito separados
+			// [MUDANÇA v3] Kanban e Êxito separados
 			async renderKanban() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
@@ -1825,7 +1839,7 @@
 							}
 						}
 					}
-					// Lógica de Êxito movida
+					// Lógica de Êxito
 					if (contract.successFee && !contract.successFeePaymentDate && (contract.parcels || []).every(p => p.status === 'Paga')) {
 						fragExito.append(this.domBuilder.createExitoCard(contract));
 						exitoPendente++;
@@ -1835,7 +1849,7 @@
 				kanbanVencidas.innerHTML = '';
 				kanbanAVencer.innerHTML = '';
 				kanbanPagas.innerHTML = '';
-				kanbanExito.innerHTML = ''; // Limpa a nova secção
+				kanbanExito.innerHTML = '';
 		
 				const vencidasCards = await Promise.all(vencidasPromises);
 				vencidasCards.forEach(card => fragVencidas.append(card));
@@ -1844,28 +1858,28 @@
 				kanbanAVencer.append(fragAVencer);
 				kanbanPagas.append(fragPagas);
 				
-				// Adiciona cartões de êxito à nova secção
 				if(exitoPendente > 0) {
 					kanbanExito.append(fragExito);
-					document.getElementById('kanban-exito-wrapper').parentElement.style.display = 'block';
+					document.getElementById('exito-section').style.display = 'block';
 				} else {
-					// Esconde a secção de Êxito se não houver nenhum pendente
-					document.getElementById('kanban-exito-wrapper').parentElement.style.display = 'none';
+					document.getElementById('exito-section').style.display = 'none';
 				}
 		
 				const allContracts = this.getFilteredContracts(true);
 				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
-				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes);
+				// [MUDANÇA v3] Passa 4 stats para o renderDashboard
+				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
 		
-			// [MUDANÇA v2] Apenas 3 stats
-			renderDashboard(aVencer, vencido, pago) {
+			// [MUDANÇA v3] Stats de volta para 4
+			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(vencido);
 				document.getElementById('dash-recebido').textContent = Utils.formatCurrency(pago);
-				// 'dash-contratos' foi removido
+				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
 		
+			// [MUDANÇA v3] Atualizado para ler o novo filtro de status
 			renderContractList() {
 				const listContainer = document.getElementById('contractListContainer');
 				const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase();
@@ -1874,18 +1888,28 @@
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
 		
+				// 1. Filtra os contratos (incluindo o novo filtro de status)
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
+					const statusInfo = this.getContractStatus(c);
+					const isConcluido = statusInfo.statusText === 'Concluído';
+					
+					// Lógica do novo filtro
+					if (this.contractStatusFilter === 'ativos' && isConcluido) return false;
+					if (this.contractStatusFilter === 'concluidos' && !isConcluido) return false;
+
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
 					return matchesAdvogado && matchesSearch;
 				});
 		
+				// 2. Ordena os contratos
 				if (this.currentContractSort === 'name-asc') {
 					filteredContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				} else if (this.currentContractSort === 'value-desc' && this.isUserAdmin) {
 					filteredContracts.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
 				}
 		
+				// 3. Calcula paginação
 				const totalItems = filteredContracts.length;
 				const totalPages = Math.ceil(totalItems / CONTRACTS_PER_PAGE);
 		
@@ -1895,11 +1919,12 @@
 				const startIndex = this.contractListPage * CONTRACTS_PER_PAGE;
 				const paginatedContracts = filteredContracts.slice(startIndex, startIndex + CONTRACTS_PER_PAGE);
 		
+				// 4. Renderiza
 				listContainer.innerHTML = '';
 				const paginationContainer = document.getElementById('paginationContainer');
 		
 				if (totalItems === 0) {
-					listContainer.innerHTML = '<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>';
+					listContainer.innerHTML = `<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato ${this.contractStatusFilter === 'ativos' ? 'ativo' : 'concluído'} encontrado.</div>`;
 					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0);
 					return;
 				}
@@ -1972,8 +1997,9 @@
 				container.innerHTML = '';
 		
 				let activeContracts = contractsToRender.filter(c => {
-					const isNotConcluded = this.getContractStatus(c).statusText !== 'Concluído';
-					if (!isNotConcluded) return false;
+					// [MUDANÇA v3] Não filtra mais os concluídos, pois a lógica de status já trata disso
+					// const isNotConcluded = this.getContractStatus(c).statusText !== 'Concluído';
+					// if (!isNotConcluded) return false; 
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm)) || c.advogadoResponsavel.toLowerCase().includes(searchTerm);
 					return matchesAdvogado && matchesSearch;
@@ -1984,6 +2010,9 @@
 				} else if (this.currentServicosSort === 'adv-asc') {
 					activeContracts.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
 				}
+
+				// Filtra os que não têm serviços
+				activeContracts = activeContracts.filter(c => c.serviceTypes && c.serviceTypes.length > 0);
 		
 				if (activeContracts.length === 0) {
 					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-indigo-400 p-6 rounded-lg"><i class="fas fa-coffee fa-3x mb-3"></i><p class="font-bold text-xl">Nenhum contrato ativo encontrado.</p><p class="text-sm text-gray-400">Nenhum resultado para a busca ou todos os trabalhos estão concluídos.</p></div></div>`;
@@ -2004,8 +2033,17 @@
 					const totalPaid = (contract.parcels || []).reduce((sum, p) => sum + (p.valuePaid || 0), 0) + (contract.successFeeValueReceived || 0);
 					const financialProgress = (contract.totalValue || 0) > 0 ? (totalPaid / contract.totalValue) * 100 : (totalPaid > 0 ? 100 : 0);
 					
-					fragment.append(this.domBuilder.createServicoCard(contract, serviceProgress, financialProgress));
+					// Só mostra se o serviço não estiver 100%
+					if(serviceProgress < 100) {
+						fragment.append(this.domBuilder.createServicoCard(contract, serviceProgress, financialProgress));
+					}
 				});
+
+				if(fragment.children.length === 0) {
+					container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços estão concluídos.</p><p class="text-sm text-gray-400">Nenhum serviço pendente para os filtros selecionados.</p></div></div>`;
+					return;
+				}
+
 				container.append(fragment);
 			}
 			
@@ -2113,18 +2151,34 @@
 				return allContracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted));
 			}
 		
+			// [MUDANÇA v3] Lógica de "Concluído" atualizada
 			getContractStatus(contract) {
-				const hasPendingParcels = (contract.parcels || []).some(p => p.status === 'Pendente');
-				if (hasPendingParcels) return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
-				if (contract.successFee && !contract.successFeePaymentDate) return { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' };
-				return { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' };
+				const allParcelsPaid = (contract.parcels || []).every(p => p.status === 'Paga');
+				const allServicesDone = (contract.serviceTypes || []).every(s => s.status === 'Concluído');
+				
+				if (allParcelsPaid && allServicesDone) {
+					if (contract.successFee && !contract.successFeePaymentDate) {
+						return { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' };
+					}
+					return { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' };
+				}
+				
+				// Se não está concluído, mas parcelas estão pagas, está "Em Andamento (Serviços)"
+				if(allParcelsPaid && !allServicesDone) {
+					return { statusText: 'Em Andamento', statusColor: 'bg-blue-900/50 text-blue-300', borderColor: 'border-blue-500' };
+				}
+				
+				// Se parcelas estão pendentes, está "Ativo (Pagamento)"
+				return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
 			}
 		
+			// [MUDANÇA v3] Renderiza os novos botões de filtro (Ativos/Concluídos)
 			renderSortButtons() {
 				const contractSortContainer = document.getElementById('contractSortButtons');
 				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
 				const servicosSortContainer = document.getElementById('servicosSortButtons');
-				if (!contractSortContainer || !inadimplentesSortContainer || !servicosSortContainer) return;
+				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons');
+				if (!contractSortContainer || !inadimplentesSortContainer || !servicosSortContainer || !contractStatusFilterContainer) return;
 				
 				const createButton = (container, sortKey, sortLabel, currentSort, callback) => {
 					const button = this.domBuilder.buildElement('button', { text: sortLabel, className: 'sort-button' });
@@ -2136,22 +2190,31 @@
 					};
 					container.append(button);
 				};
-		
+
+				// Limpa
 				contractSortContainer.innerHTML = '';
 				inadimplentesSortContainer.innerHTML = '';
 				servicosSortContainer.innerHTML = '';
+				contractStatusFilterContainer.innerHTML = '';
+
+				// Botões de Status (Ativos/Concluídos)
+				createButton(contractStatusFilterContainer, 'ativos', 'Ativos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
+				createButton(contractStatusFilterContainer, 'concluidos', 'Concluídos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
 		
+				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				if (this.isUserAdmin) {
 					createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				}
 		
+				// Botões de Inadimplentes
 				createButton(inadimplentesSortContainer, 'days-desc', 'Mais Antigas', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				createButton(inadimplentesSortContainer, 'name-asc', 'Nome (A-Z)', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				if (this.isUserAdmin) {
 					createButton(inadimplentesSortContainer, 'value-desc', 'Maior Valor', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				}
 		
+				// Botões de Serviços
 				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 			}
@@ -2826,7 +2889,4 @@
 	</script>
 </body>
 </html>
-
-
-
 	
