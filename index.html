@@ -2071,6 +2071,28 @@
 		
 			handleAuthStateChange(user) {
 				if (user) {
+					handleAuthStateChange(user) {
+    if (user) {
+
+        // --- INÍCIO DO BLOCO DE TESTE ---
+        // Cole todo este bloco para debug
+        const nomeDoFirebase = user.displayName;
+        const nomeEmMinusculas = nomeDoFirebase ? nomeDoFirebase.toLowerCase() : '';
+        const listaDeAdmins = ["dra. renata fabris", "dr. felipe gurjão", "lilian"]; // A lista que está na Parte 6
+        const euSouAdmin = listaDeAdmins.includes(nomeEmMinusculas);
+
+        console.log("===============================");
+        console.log("TESTE DE PERMISSÃO DA LIXEIRA");
+        console.log("Nome lido do Firebase:", nomeDoFirebase);
+        console.log("Nome convertido p/ minúsculas:", nomeEmMinusculas);
+        console.log("Lista de Admins (minúsculas):", listaDeAdmins);
+        console.log("O sistema me considera Admin?", euSouAdmin);
+        console.log("===============================");
+        // --- FIM DO BLOCO DE TESTE ---
+
+        // O resto do seu código continua aqui
+        
+// ... (o resto da função) ...
 					this.currentUserDisplayName = user.displayName;
 this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); // [MUDANÇA v5]
 
