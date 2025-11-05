@@ -16,11 +16,13 @@
 			position: relative;
 			background-color: #0f172a;
 			color: #d1d5db;
+			/* [REVOLUÇÃO] Trava o scroll do body, o main content que vai rolar */
+			overflow-y: hidden; 
 		}
 		body::after {
 			content: '';
 			position: fixed;
-			z-index: -1;
+			z-index: -2; /* Atrás de tudo */
 			top: 0; left: 0; right: 0; bottom: 0;
 			background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg');
 			background-repeat: no-repeat;
@@ -30,7 +32,6 @@
 		}
 		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
 		
-		/* [REFINAMENTO] Modais agora têm sombra mais forte e borda sutil */
 		.modal { 
 			display: none; 
 			position: fixed; 
@@ -38,10 +39,15 @@
 			transform: translate(-50%, -50%); 
 			z-index: 9001; 
 			max-height: 90vh; 
-			overflow-y: auto;
 			border: 1px solid #374151;
 			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
 		}
+		/* [REVOLUÇÃO] O conteúdo do modal rola, não o modal inteiro */
+		.modal-body {
+			overflow-y: auto;
+			max-height: 70vh;
+		}
+
 		.kanban-column { min-width: 320px; }
 		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 8px; }
 		::-webkit-scrollbar { width: 8px; }
@@ -51,32 +57,68 @@
 		.service-tag-small { display: inline-block; background-color: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
 		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
 		
-		/* [REFINAMENTO] Adicionada transição às abas */
-		.nav-tab { cursor: pointer; padding: 10px 20px; border-bottom: 3px solid transparent; color: #9ca3af; transition: all 0.2s; }
-		.nav-tab:hover { color: #e5e7eb; }
-		.nav-tab.active { border-bottom-color: #6366f1; color: #e5e7eb; }
-		.nav-tab-icon { cursor: pointer; padding: 10px 15px; color: #9ca3af; transition: all 0.2s; }
-		.nav-tab-icon:hover { color: #e5e7eb; }
-		.nav-tab-icon.active { color: #6366f1; }
+		/* [REVOLUÇÃO] Abas antigas removidas */
+		.nav-tab { }
+		.nav-tab-icon { }
+		
+		/* [REVOLUÇÃO] Novos estilos da Sidebar */
+		.sidebar-nav-item {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem; /* 12px */
+			padding: 0.75rem 1rem; /* 12px 16px */
+			border-radius: 0.5rem; /* 8px */
+			color: #d1d5db; /* text-gray-300 */
+			transition: all 0.2s ease-in-out;
+			cursor: pointer;
+		}
+		.sidebar-nav-item:hover {
+			background-color: #4338ca; /* indigo-700 */
+			color: #ffffff;
+		}
+		.sidebar-nav-item.active {
+			background-color: #4f46e5; /* indigo-600 */
+			color: #ffffff;
+			box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.5); /* Sombra/brilho índigo */
+		}
+		
+		/* [REVOLUÇÃO] Novos estilos da Navbar Mobile */
+		.mobile-nav-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			flex: 1;
+			padding: 0.75rem 0.5rem; /* 12px 8px */
+			color: #9ca3af; /* text-gray-400 */
+			transition: all 0.2s ease-in-out;
+		}
+		.mobile-nav-item:hover {
+			color: #6366f1; /* text-indigo-500 */
+		}
+		.mobile-nav-item.active {
+			color: #6366f1; /* text-indigo-500 */
+			background-color: rgba(79, 70, 229, 0.1); /* indigo-600/10 */
+		}
+
 		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
 		
-		/* [REFINAMENTO] Removida a borda, pois usaremos 'shadow-lg' do Tailwind nos cards */
 		.dark-card { 
 			background-color: #1f2937;
-			/* border: 1px solid #374151; <-- REMOVIDO */
 		}
 		
-		.header-with-logo { position: relative; display: flex; justify-content: space-between; align-items: center; }
-		.header-user-block { margin-right: 160px; }
-		.header-logo { position: absolute; right: 0; top: 50%; transform: translateY(-50%); max-height: 60px; opacity: 0.8; }
+		/* [REVOLUÇÃO] Estilos do header antigo removidos */
+		.header-with-logo { }
+		.header-user-block { }
+		.header-logo { }
+		
 		.sort-button, .filter-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
 		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
 		
-		/* [REFINAMENTO] Inputs de filtro (Select) */
 		.filter-select { 
-			background-color: #1f2937; /* Mais escuro */
+			background-color: #1f2937;
 			border: 1px solid #4b5563; 
 			color: #9ca3af; 
 			padding: 8px 12px; 
@@ -91,7 +133,6 @@
 		}
 		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
 		
-		/* Regra APENAS para o loading */
 		#loading-overlay { 
 			position: fixed; 
 			top: 0; left: 0; 
@@ -105,7 +146,6 @@
 			font-size: 1.2rem; 
 			transition: opacity 0.3s; 
 		}
-		/* As regras CSS antigas para #auth-overlay foram removidas */
 		#app-container { display: none; }
 		
 		.admin-only { display: none; }
@@ -113,15 +153,17 @@
 		body.is-admin .flex.admin-only { display: flex; }
 		body:not(.is-admin) .non-admin-hidden { display: none; }
 		
-		.login-modal { } /* Estilos antigos não são mais necessários */
+		.login-modal { }
 
 		@keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 		.notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 11000; animation: slideIn 0.3s ease; }
 		@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-		body.light-theme { background-color: #f8fafc; color: #1e293b; }
-		body.light-theme .dark-card { background-color: #ffffff; border-color: #e2e8f0; }
-		body.light-theme .login-modal { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
-		@media (max-width: 768px) { .kanban-column { min-width: 100%; } .header-user-block { margin-right: 0; } }
+		
+		/* [REVOLUÇÃO] Media query para o layout da sidebar */
+		@media (max-width: 768px) {
+			.kanban-column { min-width: 100%; }
+			/* O JS vai tratar de esconder/mostrar a sidebar e ajustar a margem */
+		}
 
 		/* === ESTILOS DE PAGINAÇÃO === */
 		.pagination-button {
@@ -244,75 +286,94 @@
 	</div>
 	<!-- [FIM DA TELA DE LOGIN] -->
 
-
-	<div id="app-container" class="container mx-auto p-4 md:p-8" aria-hidden="false">
-		<header class="mb-6 header-with-logo">
-			<div>
-				<h1 class="text-3xl font-bold text-white">Painel de Gestão</h1>
-				<p class="text-gray-400">Controlo Financeiro e de Produção do Escritório</p>
+	<!-- [REVOLUÇÃO] Novo layout principal com Sidebar -->
+	<div id="app-container" class="flex h-screen">
+		
+		<!-- [REVOLUÇÃO] Sidebar (Desktop) -->
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
+			<div class="flex-shrink-0 mb-8">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
 			</div>
-			<div class="flex items-center header-user-block">
-				<span id="user-display-name" class="text-sm text-gray-300 font-medium mr-4"></span>
-				<button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-sm flex items-center gap-2 transition-all duration-150 hover:shadow-lg hover:-translate-y-0.5">
-					<i class="fas fa-sign-out-alt"></i> Sair
-				</button>
-			</div>
-			<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="header-logo">
-		</header>
-
-		<div class="border-b border-gray-700 mb-8">
-			<nav class="flex justify-between items-center -mb-px">
-				<div class="flex">
-					<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="nav-tab active">
-						<i class="fas fa-tachometer-alt mr-2"></i>Painel Principal
-					</a>
-					<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="nav-tab">
-						<i class="fas fa-exclamation-triangle mr-2"></i>Inadimplentes
-					</a>
-					<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="nav-tab">
-						<i class="fas fa-tasks mr-2"></i>Serviços
-					</a>
-				</div>
-				<div>
-					<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="nav-tab-icon" title="Lixeira" aria-label="Abrir Lixeira">
-						<i class="fas fa-trash-alt"></i>
-					</a>
-				</div>
+			
+			<nav class="flex-1 space-y-3">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active">
+					<i class="fas fa-tachometer-alt w-5 text-center"></i>
+					<span>Painel Principal</span>
+				</a>
+				<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="sidebar-nav-item">
+					<i class="fas fa-exclamation-triangle w-5 text-center"></i>
+					<span>Inadimplentes</span>
+				</a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
+					<i class="fas fa-tasks w-5 text-center"></i>
+					<span>Serviços</span>
+				</a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
+					<i class="fas fa-trash-alt w-5 text-center"></i>
+					<span>Lixeira</span>
+				</a>
 			</nav>
-		</div>
 
-		<div id="page-dashboard">
-			<div class="flex flex-wrap gap-4 mb-8">
-				<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
-				<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-					<i class="fas fa-plus-circle"></i> Novo Contrato
-				</button>
-				<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-					<i class="fas fa-chart-line"></i> Relatório Mensal
-				</button>
-			</div>
-
-			<!-- [REFINAMENTO] Cards com sombra, transição e hover -->
-			<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-					<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
-					<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
-				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-					<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
-					<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
-				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-					<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
-					<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
-				</div>
-				<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-					<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
-					<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
+				<div class="flex items-center gap-3 p-2 rounded-lg">
+					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white">
+						<i class="fas fa-user"></i>
+					</div>
+					<div>
+						<span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span>
+						<button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button>
+					</div>
 				</div>
 			</div>
+		</aside>
+
+		<!-- [REVOLUÇÃO] Conteúdo Principal (com scroll próprio) -->
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
+			
+			<!-- [REVOLUÇÃO] Cabeçalho do Conteúdo (Limpo) -->
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
+				<div class="flex justify-between items-center">
+					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+				</div>
+			</header>
+
+			<!-- O wrapper para as páginas -->
+			<div class="p-4 md:p-8 flex-1">
+				<div id="page-dashboard">
+					<div class="flex flex-wrap gap-4 mb-8">
+						<!-- [REFINAMENTO] Botões com gradiente, sombra e transição -->
+						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-plus-circle"></i> Novo Contrato
+						</button>
+						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
+							<i class="fas fa-chart-line"></i> Relatório Mensal
+						</button>
+					</div>
+
+					<!-- [REFINAMENTO] Cards com sombra, transição e hover -->
+					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
+							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
+							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
+						</div>
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
+							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
+						</div>
+					</div>
 </head>
-			<div class="mb-4 border-b border-gray-700">
+					<div class="mb-4 border-b border-gray-700">
 				<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 			</div>
 
@@ -365,7 +426,7 @@
 		</div>
 
 		<div id="page-inadimplentes" class="hidden">
-			<div class="flex justify-between items-center mb-4">
+			<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
 				<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
 				<div class="flex items-center gap-2">
 					<span class="text-sm text-gray-400">Ordenar por:</span>
@@ -402,8 +463,33 @@
 			<!-- [REFINAMENTO] Mais 'respiro' (gap-8) -->
 			<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 		</div>
-	</div>
-		<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
+	</div> <!-- Fim do wrapper da página -->
+
+			</main> <!-- Fim do <main id="main-content"> -->
+
+		<!-- [REVOLUÇÃO] Navbar Mobile (Fica no fundo em ecrãs pequenos) -->
+		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
+			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
+				<i class="fas fa-tachometer-alt text-xl"></i>
+				<span class="text-xs mt-1">Painel</span>
+			</a>
+			<a onclick="window.App.showPage('page-inadimplentes')" id="mobile-tab-inadimplentes" class="mobile-nav-item">
+				<i class="fas fa-exclamation-triangle text-xl"></i>
+				<span class="text-xs mt-1">Pendentes</span>
+			</a>
+			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item">
+				<i class="fas fa-tasks text-xl"></i>
+				<span class="text-xs mt-1">Serviços</span>
+			</a>
+			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
+				<i class="fas fa-trash-alt text-xl"></i>
+				<span class="text-xs mt-1">Lixeira</span>
+			</a>
+		</nav>
+
+	</div> <!-- Fim do <div id="app-container"> -->
+
+	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
 		<!-- [REFINAMENTO] Cabeçalho do Modal -->
 		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
@@ -411,7 +497,7 @@
 		</div>
 		
 		<!-- Corpo do Modal -->
-		<div class="p-6">
+		<div class="p-6 modal-body">
 			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
 			<form id="formDisplayName">
 				<div class="mb-4">
@@ -426,16 +512,16 @@
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
+	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
 		<!-- [REFINAMENTO] Cabeçalho do Modal -->
-		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
 			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
-		<form id="formContrato">
-			<!-- Corpo do Modal -->
-			<div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
+			<!-- Corpo do Modal (com scroll) -->
+			<div class="p-6 space-y-4 overflow-y-auto modal-body">
 				<input type="hidden" id="contractId">
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
@@ -505,7 +591,7 @@
 			</div>
 
 			<!-- [REFINAMENTO] Rodapé do Modal -->
-			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
 				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
 				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
 			</div>
@@ -522,7 +608,7 @@
 		
 		<form id="formPagamento">
 			<!-- Corpo do Modal -->
-			<div class="p-6 space-y-4">
+			<div class="p-6 space-y-4 modal-body">
 				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded-md text-white"></div>
 				<div>
 					<label for="pagamentoValor" class="block text-sm font-medium text-gray-400 mb-1">Valor Pago (R$)</label>
@@ -545,26 +631,26 @@
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
+	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
 		<!-- [REFINAMENTO] Cabeçalho do Modal -->
-		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
 			<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
-		<!-- Corpo do Modal -->
-		<div id="clienteModalContent" class="p-6 space-y-6 max-h-[70vh] overflow-y-auto"></div>
+		<!-- Corpo do Modal (com scroll) -->
+		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
 	</div>
 
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
-	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
+	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
 		<!-- [REFINAMENTO] Cabeçalho do Modal -->
-		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório e Análise</h2>
 			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
-		<!-- Corpo do Modal -->
-		<div class="p-6 max-h-[70vh] overflow-y-auto">
+		<!-- Corpo do Modal (com scroll) -->
+		<div class="p-6 overflow-y-auto modal-body">
 			<div class="flex gap-4 mb-4">
 				<div class="flex-1">
 					<label for="reportMonth" class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
@@ -612,14 +698,14 @@
 	<!-- [MUDANÇA ARIA]: role, aria-modal, aria-labelledby -->
 	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
 		<!-- [REFINAMENTO] Cabeçalho do Modal -->
-		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
+		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Recebimento de Êxito</h2>
 			<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
 		</div>
 		
 		<form id="formExito">
 			<!-- Corpo do Modal -->
-			<div class="p-6 space-y-4">
+			<div class="p-6 space-y-4 modal-body">
 				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded-md"></div>
 				<div class="admin-only">
 					<label for="exitoValorRecebido" class="block text-sm font-medium text-gray-400 mb-1">Valor Líquido Recebido (R$)</label>
@@ -630,7 +716,7 @@
 			</div>
 
 			<!-- [REFINAMENTO] Rodapé do Modal -->
-			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
+			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
 				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
 				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar Recebimento</button>
 			</div>
@@ -640,7 +726,7 @@
 	<div id="modal-backdrop" class="modal-backdrop"></div>
 
 	<script type="module">
-	// Imports do Firebase
+		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -649,7 +735,7 @@
 		const ADMIN_USERS = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Lilian"];
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
 		
-		// Objeto de Utilitários (Refatorado para ser independente)
+		// Objeto de Utilitários
 		const Utils = {
 			toastContainer: null,
 			initToast() {
@@ -672,7 +758,7 @@
 				n.className = 'px-4 py-3 rounded-lg shadow-lg text-sm';
 				n.style.background = type === 'error' ? '#7f1d1d' : (type === 'success' ? '#065f46' : '#374151');
 				n.style.color = '#fff';
-				n.setAttribute('role', 'alert'); // Acessibilidade
+				n.setAttribute('role', 'alert');
 				n.textContent = message;
 				this.toastContainer.appendChild(n);
 				setTimeout(() => n.remove(), 2500);
@@ -685,7 +771,7 @@
 				};
 			},
 			sanitizeText(s) {
-				if (s == null) return ''; // Trata null e undefined
+				if (s == null) return '';
 				const str = String(s);
 				const div = document.createElement('div');
 				div.textContent = str;
@@ -732,12 +818,11 @@
 		
 		/**
 		 * @class CorrectionCalculator
-		 * @description Encapsula a lógica de cálculo de correção (IPCA + Juros)
 		 */
 		class CorrectionCalculator {
 			constructor() {
 				this.ipcaWindowCache = new Map();
-				this.ipcaErrorToastShown = false; // [CORREÇÃO] Trava para o spam de toast de erro
+				this.ipcaErrorToastShown = false;
 			}
 		
 			toUTCDate(y, m, d) { const dt = new Date(Date.UTC(y, m, d)); dt.setUTCHours(0,0,0,0); return dt; }
@@ -789,16 +874,11 @@
 					return finalFactor;
 				} catch (e) {
 					console.error('Falha ao buscar IPCA:', e);
-					
-					// [CORREÇÃO] Acalma o "spam" de alertas de erro do IPCA
 					if (!this.ipcaErrorToastShown) {
 						Utils.showToast('Falha ao buscar índice IPCA. A correção pode estar incompleta.', 'error');
-						this.ipcaErrorToastShown = true; // Ativa a trava
-						
-						// Reseta a trava depois de 1 minuto
+						this.ipcaErrorToastShown = true;
 						setTimeout(() => { this.ipcaErrorToastShown = false; }, 60000); 
 					}
-					
 					return 1;
 				}
 			}
@@ -809,25 +889,19 @@
 				const venc = this.toUTCDate(vRaw.getUTCFullYear(), vRaw.getUTCMonth(), vRaw.getUTCDate());
 				
 				if (ref <= venc) return valorOriginal;
-		
-				// 1. Correção (IPCA)
 				const ipcaFactor = await this.fetchIPCAAccumulatedFactor(venc, ref);
-				
-				// 2. Juros (1% a.m. simples)
 				const meses = this.diffMonths_30_360(venc, ref);
 				const jurosSimplesFactor = 1 + 0.01 * meses;
-				
 				return valorOriginal * ipcaFactor * jurosSimplesFactor;
 			}
 		}
 		
 		/**
 		 * @class AuthService
-		 * @description Gerencia a autenticação com o Firebase
 		 */
 		class AuthService {
 			constructor(appInstance) {
-				this.app = appInstance; // Referência à instância principal do App
+				this.app = appInstance;
 				this.auth = null;
 				this.firebaseConfig = {
 					apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
@@ -845,10 +919,8 @@
 					const firebaseApp = initializeApp(this.firebaseConfig);
 					this.auth = getAuth(firebaseApp);
 					setLogLevel('debug');
-					
-					const db = getFirestore(firebaseApp); // O DB é inicializado aqui
-					this.app.firebaseService.setDB(db); // E passado para o FirebaseService
-		
+					const db = getFirestore(firebaseApp);
+					this.app.firebaseService.setDB(db);
 					this.setupAuthListener();
 				} catch (error) {
 					console.error("Erro na inicialização do Firebase:", error);
@@ -866,7 +938,6 @@
 				const authError = document.getElementById('auth-error');
 				authError.classList.add('hidden');
 				
-				// [NOVO] Lógica de loading do botão de login
 				const loginButton = document.getElementById('login-submit-button');
 				const buttonText = document.getElementById('login-button-text');
 				const buttonIcon = document.getElementById('login-button-icon');
@@ -877,8 +948,6 @@
 		
 				try {
 					await signInWithEmailAndPassword(this.auth, email, password);
-					// O onAuthStateChanged vai tratar do resto
-				
 				} catch (error) {
 					const showAuthError = (m) => { authError.textContent = m; authError.classList.remove('hidden'); };
 					if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(error.code)) {
@@ -888,7 +957,6 @@
 						console.error("Erro de login:", error.code, error.message);
 					}
 				} finally {
-					// [NOVO] Reverte o estado do botão
 					if (loginButton) loginButton.disabled = false;
 					if (buttonText) buttonText.textContent = "Entrar no Sistema";
 					if (buttonIcon) buttonIcon.className = "fas fa-sign-in-alt";
@@ -919,11 +987,10 @@
 		
 		/**
 		 * @class FirebaseService
-		 * @description Centraliza todas as operações do Firestore (CRUD)
 		 */
 		class FirebaseService {
 			constructor(appInstance) {
-				this.app = appInstance; // Referência à instância principal do App
+				this.app = appInstance;
 				this.db = null;
 				this.contractsCollection = null;
 				this.snapshotListenerUnsubscribe = null;
@@ -933,14 +1000,11 @@
 				this.db = dbInstance;
 			}
 			
-			// Inicia o listener e armazena a função 'unsubscribe'
 			startSnapshotListener(collectionName) {
 				if (this.snapshotListenerUnsubscribe) {
-					this.snapshotListenerUnsubscribe(); // Cancela listener anterior, se houver
+					this.snapshotListenerUnsubscribe();
 				}
-				
 				this.contractsCollection = collection(this.db, collectionName);
-				
 				this.snapshotListenerUnsubscribe = onSnapshot(this.contractsCollection, (snapshot) => {
 					const contracts = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 					this.app.handleSnapshotUpdate(contracts);
@@ -950,7 +1014,6 @@
 				});
 			}
 			
-			// Para o listener (ex: no logout)
 			stopSnapshotListener() {
 				if (this.snapshotListenerUnsubscribe) {
 					this.snapshotListenerUnsubscribe();
@@ -984,11 +1047,10 @@
 			}
 		
 			async updateContractField(contractId, fieldData) {
-				// Usado para operações simples como 'isDeleted' ou 'serviceTypes'
 				try {
 					const contractRef = doc(this.contractsCollection, contractId);
 					await updateDoc(contractRef, fieldData);
-					return true; // Toast é geralmente mostrado pela função chamadora (ex: 'Contrato restaurado')
+					return true;
 				} catch (error) {
 					console.error(`Erro ao atualizar campo do contrato (${contractId}):`, error);
 					Utils.showToast('Erro ao atualizar o item. Tente novamente.', 'error');
@@ -1011,7 +1073,6 @@
 		
 		/**
 		 * @class AnalyticsHandler
-		 * @description Gerencia a criação e destruição dos gráficos (Chart.js)
 		 */
 		class AnalyticsHandler {
 			constructor() {
@@ -1074,7 +1135,6 @@
 		
 		/**
 		 * @class ReportHandler
-		 * @description Encapsula a lógica de geração de relatórios
 		 */
 		class ReportHandler {
 			constructor(appInstance) {
@@ -1154,31 +1214,27 @@
 		
 		/**
 		 * @class DOMBuilder
-		 * @description Encapsula toda a criação de elementos DOM
 		 */
 		class DOMBuilder {
 			constructor(appInstance) {
-				this.app = appInstance; // Referência à instância principal do App
+				this.app = appInstance;
 			}
 		
-			// Helper para criar um elemento de ícone com segurança
 			buildIcon(classes) {
 				const icon = document.createElement('i');
 				icon.className = classes;
 				return icon;
 			}
 			
-			// Helper para criar elementos DOM de forma mais limpa
 			buildElement(tag, { className = '', text = '', html = '', id = '' } = {}) {
 				const el = document.createElement(tag);
 				if (className) el.className = className;
 				if (text) el.textContent = text;
-				if (html) el.innerHTML = html; // Usar com cuidado, ex: para ícones
+				if (html) el.innerHTML = html;
 				if (id) el.id = id;
 				return el;
 			}
 		
-			// [REFINAMENTO] Usa createElement com novas classes de design (sombra, transição)
 			createParcelCard(contract, parcel, index, type, remainingValue, valorCorrigido = null) {
 				const formattedDate = Utils.formatDate(parcel.dueDate);
 				const formattedValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
@@ -1211,7 +1267,7 @@
 					} else {
 						details.append(this.buildElement('div', { className: 'text-yellow-400 font-semibold', text: 'A vencer' }));
 					}
-				} else { // Paga
+				} else {
 					borderColor = 'border-gray-700';
 					const formattedPaidValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.valuePaid || 0) : '[Restrito]';
 					const paymentDate = Utils.formatDate(parcel.paymentDate);
@@ -1223,9 +1279,8 @@
 						text: `Pago ${this.app.isUserAdmin ? formattedPaidValue : ''} em ${paymentDate}`
 					});
 				}
-				card.classList.add('border-l-4', borderColor); // Mantém a borda lateral colorida
+				card.classList.add('border-l-4', borderColor);
 		
-				// Data de Vencimento (comum a todos)
 				const vencimentoDiv = this.buildElement('div', { className: 'flex items-center text-gray-400' });
 				vencimentoDiv.append(this.buildIcon('fas fa-calendar-alt w-5 text-center mr-2 text-gray-500'));
 				vencimentoDiv.append(this.buildElement('strong', { text: 'Vencimento:' }));
@@ -1234,14 +1289,12 @@
 		
 				card.append(title, subtitle, details);
 		
-				// Informações extras (Admin)
 				if (this.app.isUserAdmin) {
 					const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-500 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
 					extraInfo.innerHTML = `<span>Contrato: <strong>${Utils.formatCurrency(contract.totalValue || 0)}</strong></span> <span>Restante: <strong>${formattedRemaining}</strong></span>`;
 					card.append(extraInfo);
 				}
 		
-				// Botão de Ação
 				if (type !== 'paga') {
 					actionButton = this.buildElement('button', { 
 						className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg text-sm shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
@@ -1254,7 +1307,6 @@
 				return card;
 			}
 			
-			// [REFINAMENTO] Usa createElement com novas classes de design
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
@@ -1279,33 +1331,28 @@
 				return card;
 			}
 		
-			// [REFINAMENTO] Usa createElement com novas classes de design
 			createContractCard(contract, statusInfo) {
 				const { statusText, statusColor, borderColor } = statusInfo;
 				
 				const card = this.buildElement('div', { className: `dark-card shadow-lg rounded-lg overflow-hidden ${borderColor} flex flex-col justify-between transition-all duration-200 transform hover:-translate-y-1 hover:shadow-xl border-l-4` });
 				const cardBody = this.buildElement('div', { className: 'p-5' });
 				
-				// Header do Card
 				const header = this.buildElement('div', { className: 'flex justify-between items-start mb-3' });
 				header.append(this.buildElement('h3', { className: 'font-bold text-xl text-white', text: contract.clientName }));
 				header.append(this.buildElement('span', { className: `px-2 py-1 rounded-full text-xs font-semibold ${statusColor}`, text: statusText }));
 				cardBody.append(header);
 		
-				// Advogado (Tipografia refinada)
 				const adv = this.buildElement('p', { className: 'text-xs text-indigo-300 mb-3' });
 				adv.append(this.buildIcon('fas fa-user-tie mr-1'));
 				adv.append(document.createTextNode(` ${contract.advogadoResponsavel}`));
 				cardBody.append(adv);
 		
-				// Tags de Serviço
 				const servicesContainer = this.buildElement('div', { className: 'mb-4' });
 				(contract.serviceTypes || []).forEach(s => {
 					servicesContainer.append(this.buildElement('span', { className: 'service-tag-small', text: s.name }));
 				});
 				cardBody.append(servicesContainer);
 		
-				// Detalhes Financeiros (Tipografia refinada)
 				const financialInfo = this.buildElement('div', { className: 'border-t border-gray-700 pt-4 space-y-3 text-sm' });
 				const valorFixoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(contract.totalValue) : '[Restrito]';
 				const exitoDisplay = this.app.isUserAdmin && contract.successFee ? contract.successFee : (contract.successFee ? '[Restrito]' : '');
@@ -1325,7 +1372,6 @@
 				}
 				cardBody.append(financialInfo);
 				
-				// Footer do Card (Botões)
 				const footer = this.buildElement('div', { className: 'bg-gray-900/50 px-4 py-2 flex justify-end gap-2' });
 				
 				const historyBtn = this.buildElement('button', { className: 'text-sm flex items-center gap-2 text-gray-400 hover:text-indigo-400 hover:bg-indigo-900/20 py-1 px-3 rounded-md transition-colors', html: '<i class="fas fa-eye"></i> Histórico' });
@@ -1349,7 +1395,6 @@
 				return card;
 			}
 			
-			// [REFINAMENTO] Usa createElement com novas classes de design
 			createInadimplenteCard({ contract, parcel, index, diffDays, valorCorrigido }) {
 				const valorOriginalDisplay = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const valorCorrigidoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
@@ -1396,7 +1441,6 @@
 				return card;
 			}
 			
-			// [REFINAMENTO] Usa createElement com novas classes de design
 			createServicoCard(contract, serviceProgress, financialProgress) {
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg transition-all duration-200 hover:-translate-y-1' });
 				
@@ -1434,7 +1478,6 @@
 				return card;
 			}
 			
-			// [REFINAMENTO] Helper para createServicoCard
 			createServiceListItem(contract, service, index) {
 				const li = this.buildElement('li', { className: 'flex items-center justify-between p-2 rounded-md' });
 		
@@ -1452,10 +1495,9 @@
 				
 				const actionsDiv = this.buildElement('div', { className: 'flex items-center gap-2' });
 				
-				// Lógica de Prazo
 				if (service.deadline) {
 					const hoje = new Date(); hoje.setHours(0,0,0,0);
-					const prazo = new Date(service.deadline + "T12:00:00Z"); // Trata como UTC
+					const prazo = new Date(service.deadline + "T12:00:00Z");
 					const diffDays = Math.ceil((prazo - hoje) / 86400000);
 					const formattedPrazo = Utils.formatDate(prazo);
 					let deadlineHtml = '', deadlineClass = '';
@@ -1476,7 +1518,6 @@
 					actionsDiv.append(this.buildElement('span', { className: deadlineClass, html: deadlineHtml }));
 				}
 				
-				// Lógica de Status e Botões
 				let statusHtml = '', statusClass = '';
 				switch (service.status) {
 					case 'Concluído':
@@ -1491,7 +1532,7 @@
 						actionsDiv.append(this.createServiceButton('50%', 'bg-purple-600 hover:bg-purple-500', () => this.app.updateServiceStatus(contract.id, index, '50% Concluído')));
 						actionsDiv.append(this.createServiceButton('Concluir', 'bg-indigo-600 hover:bg-indigo-500', () => this.app.updateServiceStatus(contract.id, index, 'Concluído')));
 						break;
-					default: // Pendente
+					default:
 						statusClass = 'text-xs font-bold text-gray-400'; statusHtml = 'PENDENTE';
 						actionsDiv.append(this.createServiceButton('Iniciar', 'bg-yellow-600 hover:bg-yellow-500', () => this.app.updateServiceStatus(contract.id, index, 'Em Andamento')));
 						break;
@@ -1502,7 +1543,6 @@
 				return li;
 			}
 			
-			// Helper para createServiceListItem
 			createServiceButton(text, classes, onClick) {
 				const btn = this.buildElement('button', {
 					className: `text-xs text-white font-semibold py-1 px-2 rounded-md transition-colors ${classes}`,
@@ -1512,9 +1552,8 @@
 				return btn;
 			}
 		
-			// [REFINAMENTO] Usa createElement
 			renderPaginationControls(container, totalItems, totalPages, currentPage) {
-				container.innerHTML = ''; // Limpa
+				container.innerHTML = '';
 				if (totalPages <= 1) return;
 		
 				const createPageButton = (pageIndex, text = null, isDisabled = false, isActive = false) => {
@@ -1531,7 +1570,6 @@
 					return btn;
 				};
 		
-				// Botão "Anterior"
 				container.append(createPageButton(currentPage - 1, '« Ant', currentPage === 0));
 				
 				const maxVisibleButtons = 5;
@@ -1541,7 +1579,6 @@
 					startPage = Math.max(0, endPage - maxVisibleButtons + 1);
 				}
 		
-				// Botão "Primeira Página" e "..."
 				if (startPage > 0) {
 					container.append(createPageButton(0));
 					if (startPage > 1) {
@@ -1549,12 +1586,10 @@
 					}
 				}
 		
-				// Botões de números
 				for (let i = startPage; i <= endPage; i++) {
 					container.append(createPageButton(i, null, false, i === currentPage));
 				}
 		
-				// Botão "Última Página" e "..."
 				if (endPage < totalPages - 1) {
 					if (endPage < totalPages - 2) {
 						container.append(this.buildElement('span', { text: '...' }));
@@ -1562,7 +1597,6 @@
 					container.append(createPageButton(totalPages - 1));
 				}
 		
-				// Botão "Próximo"
 				container.append(createPageButton(currentPage + 1, 'Próx »', currentPage === totalPages - 1));
 			}
 		}
@@ -1579,19 +1613,19 @@
 				this.currentUserDisplayName = null;
 				this.isUserAdmin = false;
 				
-				// Estado de UI (Filtros, Ordenação, Paginação)
+				// Estado de UI
 				this.currentContractSort = 'name-asc';
 				this.currentInadimplentesSort = 'days-desc';
 				this.currentServicosSort = 'name-asc';
-				this.contractListPage = 0; // Página atual (base 0)
+				this.contractListPage = 0;
 				
-				// Referências DOM Principais
+				// Referências DOM
 				this.backdrop = document.getElementById('modal-backdrop');
 				this.appContainer = document.getElementById('app-container');
 				this.loadingOverlay = document.getElementById('loading-overlay');
 				this.authOverlay = document.getElementById('auth-overlay');
 				
-				// Estado dos Modais (para acessibilidade)
+				// Estado dos Modais
 				this.openModalId = null;
 				this.lastFocusedElement = null;
 		
@@ -1634,27 +1668,42 @@
 				document.getElementById('formPagamento').addEventListener('submit', this.handlePaymentSubmit.bind(this));
 				document.getElementById('formExito').addEventListener('submit', this.handleExitoSubmit.bind(this));
 		
-				// Botão de Adicionar Serviço (no modal de contrato)
+				// Botão de Adicionar Serviço
 				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
 		
-				// Inputs de Busca (com debounce)
+				// Inputs de Busca
 				const debouncedContracts = Utils.debounce(() => this.resetAndRenderContractList(), 300);
 				document.getElementById('searchInput').addEventListener('input', debouncedContracts);
 				
 				const debouncedServicos = Utils.debounce(() => this.renderServicosPage(), 300);
 				document.getElementById('servicosSearchInput').addEventListener('input', debouncedServicos);
 		
-				// Backdrop dos modais
+				// [REVOLUÇÃO] Listener do menu mobile
+				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
+					const sidebar = document.getElementById('sidebar');
+					sidebar.classList.remove('hidden'); // Mostra a sidebar
+					this.backdrop.style.display = 'block'; // Mostra o backdrop para fechar
+				});
+
+				// Listener do Backdrop (atualizado)
 				if (this.backdrop) {
 					this.backdrop.addEventListener('click', () => {
+						// Fecha modal se estiver aberto
 						if (this.openModalId && this.openModalId !== 'modalDisplayName') {
 							this.closeModal(this.openModalId);
+						}
+				
+						// [REVOLUÇÃO] Fecha a sidebar se estiver aberta no telemóvel
+						const sidebar = document.getElementById('sidebar');
+						if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
+							sidebar.classList.add('hidden');
+							this.backdrop.style.display = 'none';
 						}
 					});
 				}
 			}
 		
-			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS (Callbacks dos Serviços) ---
+			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
 		
 			handleAuthStateChange(user) {
 				if (user) {
@@ -1665,50 +1714,49 @@
 					if (!user.displayName) {
 						// Primeiro login, pedir nome
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
+						this.authOverlay.style.display = 'flex';
 						this.appContainer.style.display = 'none';
 						this.openModal('modalDisplayName');
 					} else {
-						// Utilizador logado e com nome
+						// Utilizador logado
 						document.getElementById('user-display-name').textContent = user.displayName;
 						this.loadingOverlay.style.display = 'none';
 						this.authOverlay.style.display = 'none';
-						this.appContainer.style.display = 'block';
+						this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
 						this.setupUIAccess();
-						this.firebaseService.startSnapshotListener('contracts'); // Inicia o listener
+						this.firebaseService.startSnapshotListener('contracts');
 					}
 				} else {
 					// Utilizador deslogado
 					this.currentUserDisplayName = null;
 					this.isUserAdmin = false;
 					document.body.classList.remove('is-admin');
-					this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
+					this.authOverlay.style.display = 'flex';
 					this.appContainer.style.display = 'none';
 					this.loadingOverlay.style.display = 'none';
-					this.firebaseService.stopSnapshotListener(); // Para o listener
+					this.firebaseService.stopSnapshotListener();
 				}
 			}
 		
 			handleSnapshotUpdate(contracts) {
 				this.database.contracts = contracts;
-				this.contractListPage = 0; // Reseta a paginação a cada nova atualização
-				this.render(); // Renderiza a aplicação com os novos dados
+				this.contractListPage = 0;
+				this.render();
 			}
 		
 			// --- 3. LÓGICA DE RENDERIZAÇÃO PRINCIPAL ---
 		
 			async render() {
-				if (this.appContainer.style.display !== 'block') return;
+				if (this.appContainer.style.display !== 'flex') return;
 		
 				const currentPage = document.querySelector('div[id^="page-"]:not(.hidden)');
 				if (!currentPage) {
-					this.showPage('page-dashboard'); // Padrão se nenhuma página estiver visível
+					this.showPage('page-dashboard');
 					return;
 				}
 		
 				const pageId = currentPage.id;
 				
-				// As funções de renderização agora pegam os dados filtrados
 				if (pageId === 'page-dashboard') {
 					await this.renderKanban();
 					this.renderContractList();
@@ -1724,9 +1772,6 @@
 				this.renderAdvogadoFilters();
 			}
 		
-			/**
-			 * @description Renderiza o quadro Kanban
-			 */
 			async renderKanban() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
@@ -1734,7 +1779,6 @@
 				const kanbanPagas = document.getElementById('kanban-pagas');
 				const kanbanExito = document.getElementById('kanban-exito');
 		
-				// Usar DocumentFragment para performance
 				const fragVencidas = document.createDocumentFragment();
 				const fragAVencer = document.createDocumentFragment();
 				const fragPagas = document.createDocumentFragment();
@@ -1763,8 +1807,8 @@
 							if (dataPagamento >= primeiroDiaMes && dataPagamento <= hoje) {
 								fragPagas.append(this.domBuilder.createParcelCard(contract, parcel, i, 'paga', remainingValue));
 							}
-						} else { // Pendente
-							if (vencimento < hoje) { // Vencida
+						} else {
+							if (vencimento < hoje) {
 								vencidasPromises.push(
 									this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate)
 										.then(valorCorrigido => {
@@ -1772,7 +1816,7 @@
 											return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido);
 										})
 								);
-							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) { // A vencer
+							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) {
 								fragAVencer.append(this.domBuilder.createParcelCard(contract, parcel, i, 'a-vencer', remainingValue));
 								if (this.isUserAdmin) totalAVencer30dias += parcel.value;
 							}
@@ -1783,30 +1827,24 @@
 					}
 				}
 		
-				// Limpa containers
 				kanbanVencidas.innerHTML = '';
 				kanbanAVencer.innerHTML = '';
 				kanbanPagas.innerHTML = '';
 				kanbanExito.innerHTML = '';
 		
-				// Processa promessas vencidas
 				const vencidasCards = await Promise.all(vencidasPromises);
 				vencidasCards.forEach(card => fragVencidas.append(card));
 		
-				// Anexa fragmentos
 				kanbanVencidas.append(fragVencidas);
 				kanbanAVencer.append(fragAVencer);
 				kanbanPagas.append(fragPagas);
 				kanbanExito.append(fragExito);
 		
-				const allContracts = this.getFilteredContracts(true); // Inclui deletados para cálculo histórico
+				const allContracts = this.getFilteredContracts(true);
 				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
 		
-			/**
-			 * @description Atualiza os números do Dashboard
-			 */
 			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(vencido);
@@ -1814,9 +1852,6 @@
 				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
 		
-			/**
-			 * @description Renderiza a lista principal de contratos com paginação
-			 */
 			renderContractList() {
 				const listContainer = document.getElementById('contractListContainer');
 				const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase();
@@ -1825,44 +1860,36 @@
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
 		
-				// 1. Filtra os contratos
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
 					return matchesAdvogado && matchesSearch;
 				});
 		
-				// 2. Ordena os contratos
 				if (this.currentContractSort === 'name-asc') {
 					filteredContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				} else if (this.currentContractSort === 'value-desc' && this.isUserAdmin) {
 					filteredContracts.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
 				}
 		
-				// 3. Calcula o total de itens e páginas
 				const totalItems = filteredContracts.length;
 				const totalPages = Math.ceil(totalItems / CONTRACTS_PER_PAGE);
 		
-				// 4. Garante que a página atual seja válida
 				if (this.contractListPage >= totalPages && totalPages > 0) this.contractListPage = totalPages - 1;
 				if (this.contractListPage < 0) this.contractListPage = 0;
 		
-				// 5. Pega apenas os itens da página atual
 				const startIndex = this.contractListPage * CONTRACTS_PER_PAGE;
 				const paginatedContracts = filteredContracts.slice(startIndex, startIndex + CONTRACTS_PER_PAGE);
 		
-				// 6. Limpa o container e renderiza
 				listContainer.innerHTML = '';
 				const paginationContainer = document.getElementById('paginationContainer');
 		
 				if (totalItems === 0) {
 					listContainer.innerHTML = '<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>';
-					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0); // Limpa controles
+					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0);
 					return;
 				}
 		
-				// 7. Cria o grid e o fragmento
-				// [REFINAMENTO] Usa gap-8 para mais 'respiro'
 				const gridContainer = this.domBuilder.buildElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' });
 				const fragment = document.createDocumentFragment();
 		
@@ -1874,20 +1901,15 @@
 				gridContainer.append(fragment);
 				listContainer.append(gridContainer);
 		
-				// 9. Renderiza os controles de paginação
 				this.domBuilder.renderPaginationControls(paginationContainer, totalItems, totalPages, this.contractListPage);
 			}
 		
-			/**
-			 * @description Renderiza a página de Inadimplentes
-			 */
 			async renderInadimplentesPage() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const container = document.getElementById('inadimplentesListContainer');
 				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 		
-				// 1. Mapeia todas as parcelas vencidas e calcula a correção
 				const results = await Promise.all(contractsToRender.map(async (contract) => {
 					if (!contract.parcels) return [];
 					const contractInadimplencias = [];
@@ -1904,7 +1926,6 @@
 				}));
 				let inadimplentesList = results.flat();
 		
-				// 2. Ordena
 				if (this.currentInadimplentesSort === 'days-desc') {
 					inadimplentesList.sort((a, b) => b.diffDays - a.diffDays);
 				} else if (this.currentInadimplentesSort === 'value-desc' && this.isUserAdmin) {
@@ -1913,7 +1934,6 @@
 					inadimplentesList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
 				}
 		
-				// 3. Renderiza
 				container.innerHTML = '';
 				if (inadimplentesList.length === 0) {
 					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block bg-gray-800 border border-gray-700 text-green-400 p-6 rounded-lg shadow-md"><i class="fas fa-check-circle fa-3x mb-3"></i><p class="font-bold text-xl">Nenhuma pendência encontrada!</p><p class="text-sm text-gray-400">Todos os pagamentos estão em dia.</p></div></div>`;
@@ -1927,9 +1947,6 @@
 				container.append(fragment);
 			}
 		
-			/**
-			 * @description Renderiza a página de Serviços/Produção
-			 */
 			renderServicosPage() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const container = document.getElementById('servicosListContainer');
@@ -1948,7 +1965,6 @@
 					return matchesAdvogado && matchesSearch;
 				});
 		
-				// Ordena
 				if (this.currentServicosSort === 'name-asc') {
 					activeContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				} else if (this.currentServicosSort === 'adv-asc') {
@@ -1960,7 +1976,6 @@
 					return;
 				}
 		
-				// Renderiza
 				const fragment = document.createDocumentFragment();
 				activeContracts.forEach(contract => {
 					const totalServices = (contract.serviceTypes || []).length;
@@ -1980,9 +1995,6 @@
 				container.append(fragment);
 			}
 			
-			/**
-			 * @description Renderiza a página da Lixeira
-			 */
 			renderLixeiraPage() {
 				const contractsToRender = this.getFilteredContracts(true);
 				const container = document.getElementById('lixeiraListContainer');
@@ -2008,7 +2020,7 @@
 					footer.append(restoreBtn);
 		
 					if (this.isUserAdmin) {
-						const deleteBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
 						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
 						footer.append(deleteBtn);
 					}
@@ -2021,24 +2033,49 @@
 		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
 		
+			// [REVOLUÇÃO] Função 'showPage' atualizada para o novo layout
 			showPage(pageId) {
+				const pageTitles = {
+					'page-dashboard': 'Painel Principal',
+					'page-inadimplentes': 'Inadimplentes',
+					'page-servicos': 'Produção de Serviços',
+					'page-lixeira': 'Lixeira'
+				};
+				
+				// 1. Atualiza o Título da Página
+				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
+		
+				// 2. Esconde todas as páginas
 				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira'].forEach(id => {
 					const el = document.getElementById(id);
 					if (el) el.classList.add('hidden');
 				});
-				['tab-dashboard', 'tab-inadimplentes', 'tab-servicos', 'tab-lixeira'].forEach(id => {
-					const tab = document.getElementById(id);
-					if (tab) tab.classList.remove('active');
+		
+				// 3. Remove 'active' de todos os itens de navegação (desktop e mobile)
+				document.querySelectorAll('.sidebar-nav-item, .mobile-nav-item').forEach(tab => {
+					tab.classList.remove('active');
 				});
 		
+				// 4. Mostra a página-alvo
 				const targetPage = document.getElementById(pageId);
 				if (targetPage) targetPage.classList.remove('hidden');
 		
-				const tabId = `tab-${pageId.split('-')[1]}`;
-				const targetTab = document.getElementById(tabId);
-				if (targetTab) targetTab.classList.add('active');
+				// 5. Ativa os separadores corretos (desktop e mobile)
+				const tabBaseId = pageId.split('-')[1]; // ex: 'dashboard'
+				const desktopTab = document.getElementById(`tab-${tabBaseId}`);
+				const mobileTab = document.getElementById(`mobile-tab-${tabBaseId}`);
+				
+				if (desktopTab) desktopTab.classList.add('active');
+				if (mobileTab) mobileTab.classList.add('active');
 		
-				// Chama o render, que agora é inteligente e renderiza a página ativa
+				// 6. [NOVO] Esconde a sidebar se estivermos no telemóvel
+				const sidebar = document.getElementById('sidebar');
+				if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
+					sidebar.classList.add('hidden');
+					this.backdrop.style.display = 'none';
+				}
+		
+				// 7. Renderiza o conteúdo da página
 				this.render();
 			}
 		
@@ -2087,32 +2124,28 @@
 					const button = this.domBuilder.buildElement('button', { text: sortLabel, className: 'sort-button' });
 					if (currentSort === sortKey) button.classList.add('active');
 					button.onclick = () => {
-						callback(sortKey); // Atualiza o estado de ordenação
-						this.render(); // Re-renderiza a página atual
-						this.renderSortButtons(); // Re-desenha os botões
+						callback(sortKey);
+						this.render();
+						this.renderSortButtons();
 					};
 					container.append(button);
 				};
 		
-				// Limpa
 				contractSortContainer.innerHTML = '';
 				inadimplentesSortContainer.innerHTML = '';
 				servicosSortContainer.innerHTML = '';
 		
-				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				if (this.isUserAdmin) {
 					createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				}
 		
-				// Botões de Inadimplentes
 				createButton(inadimplentesSortContainer, 'days-desc', 'Mais Antigas', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				createButton(inadimplentesSortContainer, 'name-asc', 'Nome (A-Z)', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				if (this.isUserAdmin) {
 					createButton(inadimplentesSortContainer, 'value-desc', 'Maior Valor', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
 				}
 		
-				// Botões de Serviços
 				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 			}
@@ -2160,7 +2193,7 @@
 			changeContractPage(pageIndex) {
 				this.contractListPage = pageIndex;
 				this.renderContractList();
-				document.getElementById('contractListContainer').scrollIntoView({ behavior: 'smooth' });
+				document.getElementById('main-content').scrollTop = 0; // [REVOLUÇÃO] Sobe o scroll do main, não do body
 			}
 			
 			resetAndRenderContractList() {
@@ -2179,9 +2212,9 @@
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 					document.getElementById('user-display-name').textContent = name;
 					this.closeModal('modalDisplayName');
-					this.appContainer.style.display = 'block';
+					this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
 					this.setupUIAccess();
-					this.firebaseService.startSnapshotListener('contracts'); // Inicia listener após salvar nome
+					this.firebaseService.startSnapshotListener('contracts');
 				}
 			}
 		
@@ -2212,7 +2245,6 @@
 				}
 		
 				if (!contractId) {
-					// --- Lógica de NOVO Contrato ---
 					Object.assign(contractData, {
 						successFeeValueReceived: 0,
 						successFeePaymentDate: null,
@@ -2250,17 +2282,14 @@
 						this.closeModal('modalContrato');
 					}
 				} else {
-					// --- Lógica de EDITAR Contrato ---
 					const existingContract = this.database.contracts.find(c => c.id === contractId);
 					if (!this.isUserAdmin && existingContract) {
-						// Não-admin só pode editar campos não-financeiros
 						contractData.totalValue = existingContract.totalValue;
 						contractData.successFee = existingContract.successFee;
 						contractData.parcels = existingContract.parcels;
 						contractData.successFeeValueReceived = existingContract.successFeeValueReceived;
 						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
 					} else if (this.isUserAdmin && existingContract) {
-						// Admin editando mantém parcelas e pagamentos de êxito existentes
 						contractData.parcels = existingContract.parcels;
 						contractData.successFeeValueReceived = existingContract.successFeeValueReceived;
 						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
@@ -2368,16 +2397,13 @@
 				const ok = await Utils.confirm(`EXCLUSÃO PERMANENTE: Tem a certeza? Esta ação não pode ser desfeita.`);
 				if (!ok) return;
 				await this.firebaseService.deleteContract(contractId);
-				// O Toast já é mostrado pelo firebaseService
 			}
 		
 			// --- 6. LÓGICA DE MODAIS (com Acessibilidade) ---
 		
 			openModal(modalId) {
-				// Guarda o foco atual
 				this.lastFocusedElement = document.activeElement;
 		
-				// Fecha outros modais
 				const modals = document.querySelectorAll('.modal');
 				modals.forEach(m => { if (m && m.style.display === 'block' && m.id !== modalId) m.style.display = 'none'; });
 				
@@ -2389,7 +2415,6 @@
 				this.appContainer.setAttribute('aria-hidden', 'true');
 				this.openModalId = modalId;
 		
-				// Foca no primeiro elemento interativo dentro do modal
 				const firstFocusableEl = modal.querySelector('button, [href], input, select, textarea');
 				if (firstFocusableEl) firstFocusableEl.focus();
 			}
@@ -2406,12 +2431,9 @@
 					this.backdrop.style.display = 'none';
 					document.body.style.overflow = '';
 					this.appContainer.setAttribute('aria-hidden', 'false');
-					
-					// Restaura o foco para o elemento que abriu o modal
 					if (this.lastFocusedElement) this.lastFocusedElement.focus();
 				}
 				
-				// Limpa gráficos se for o modal de relatório
 				if (modalId === 'modalRelatorio') {
 					this.analyticsHandler.destroyAllCharts();
 				}
@@ -2427,7 +2449,6 @@
 					const jaQuitadoCheckbox = document.getElementById('contratoJaQuitado');
 		
 					if (contractId) {
-						// Modo de Edição
 						const contract = this.database.contracts.find(c => c.id === contractId);
 						if (!contract) { Utils.showToast('Contrato não encontrado.', 'error'); return; }
 						title.textContent = "Editar Contrato";
@@ -2448,7 +2469,6 @@
 							}
 						}
 					} else {
-						// Modo de Criação
 						title.textContent = "Registar Novo Contrato";
 						document.getElementById('contractId').value = '';
 						advogadoSelect.value = this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName;
@@ -2535,7 +2555,7 @@
 					contractHtml += `</div>`;
 					
 					const el = this.domBuilder.buildElement('div');
-					el.innerHTML = contractHtml; // innerHTML usado aqui para conteúdo complexo, mas dados do BD (obs) são sanitizados
+					el.innerHTML = contractHtml;
 					fragment.append(el);
 				});
 		
@@ -2570,7 +2590,7 @@
 			_populateDateSelectors() {
 				const monthSelect = document.getElementById('reportMonth');
 				const yearSelect = document.getElementById('reportYear');
-				if (monthSelect.options.length > 0) return; // Já populado
+				if (monthSelect.options.length > 0) return;
 				const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 				const anoAtual = new Date().getFullYear();
 				meses.forEach((mes, index) => { monthSelect.add(new Option(mes, index)); });
@@ -2719,7 +2739,6 @@
 				this._downloadCSV(csvRows.join('\n'), `relatorio_${monthName}_${year}.csv`);
 			}
 			
-			// (Função de Recálculo - mantida se necessária para admin)
 			async recalculateAllDebts(referenceDate = new Date()) {
 				if (!this.isUserAdmin) { Utils.showToast('Ação não permitida.', 'error'); return; }
 				Utils.showToast('A iniciar recálculo... Isto pode demorar um momento.', 'info');
@@ -2733,27 +2752,24 @@
 						}
 						return p;
 					}));
-					// Esta operação é pesada e pode ser otimizada, mas segue a lógica original
 					await this.firebaseService.updateContractField(contract.id, { parcels: updatedParcels });
 				}
 				Utils.showToast('Recálculo concluído.', 'success');
 			}
 		
-			// --- 8. [NOVO] HELPERS DE ACESSIBILIDADE ---
+			// --- 8. HELPERS DE ACESSIBILIDADE E LAYOUT ---
 			
 			_setupModalAccessibility() {
 				document.addEventListener('keydown', this._handleKeyDown.bind(this));
 			}
 		
 			_handleKeyDown(event) {
-				// Fecha modal com 'Esc'
 				if (event.key === 'Escape' && this.openModalId) {
-					if (this.openModalId !== 'modalDisplayName') { // Não permite fechar o modal de nome
+					if (this.openModalId !== 'modalDisplayName') {
 						this.closeModal(this.openModalId);
 					}
 				}
 		
-				// Trava de Foco com 'Tab'
 				if (event.key === 'Tab' && this.openModalId) {
 					this._trapFocus(event);
 				}
@@ -2766,24 +2782,23 @@
 				const focusableElements = modal.querySelectorAll(
 					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 				);
-				if (focusableElements.length === 0) return; // Se não há nada focável, não faz nada
+				if (focusableElements.length === 0) return;
 				
 				const firstElement = focusableElements[0];
 				const lastElement = focusableElements[focusableElements.length - 1];
 		
-				if (event.shiftKey) { // Shift + Tab
+				if (event.shiftKey) {
 					if (document.activeElement === firstElement) {
 						lastElement.focus();
 						event.preventDefault();
 					}
-				} else { // Tab
+				} else {
 					if (document.activeElement === lastElement) {
 						firstElement.focus();
 						event.preventDefault();
 					}
 				}
 				
-				// Cobre o caso do foco tentar sair do modal
 				if (!modal.contains(document.activeElement)) {
 					firstElement.focus();
 				}
@@ -2792,8 +2807,6 @@
 		
 		// --- INICIALIZAÇÃO DA APLICAÇÃO ---
 		document.addEventListener('DOMContentLoaded', () => {
-			// Expõe a instância da classe no objeto window para que
-			// os `onclick` do HTML (onclick="window.App.showPage(...)") funcionem.
 			window.App = new App();
 			window.App.initialize();
 		});
