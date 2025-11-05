@@ -216,8 +216,6 @@
 			animation: blob 7s infinite;
 		}
 	</style>
-
-	
 </head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
@@ -376,7 +374,7 @@
 							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
 						</div>
 					</div>
-	<div class="mb-4 border-b border-gray-700">
+					<div class="mb-4 border-b border-gray-700">
 						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
 					</div>
 
@@ -476,7 +474,7 @@
 					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
 			</div> <!-- Fim do wrapper da página -->
-			</main> <!-- Fim do <main id="main-content"> -->
+</main> <!-- Fim do <main id="main-content"> -->
 
 		<!-- [REVOLUÇÃO] Navbar Mobile (Fica no fundo em ecrãs pequenos) -->
 		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
@@ -1223,6 +1221,8 @@
 			}
 		}
 		
+
+
 		/**
 		 * @class DOMBuilder
 		 */
@@ -1841,8 +1841,10 @@
 							}
 						}
 					}
-					// Lógica de Êxito
-					if (contract.successFee && !contract.successFeePaymentDate && (contract.parcels || []).every(p => p.status === 'Paga')) {
+					
+					// [MUDANÇA v3] Lógica de status de êxito atualizada
+					const statusInfo = this.getContractStatus(contract);
+					if (statusInfo.statusText === 'Aguardando Êxito') {
 						fragExito.append(this.domBuilder.createExitoCard(contract));
 						exitoPendente++;
 					}
@@ -1869,8 +1871,13 @@
 		
 				const allContracts = this.getFilteredContracts(true);
 				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
+				
 				// [MUDANÇA v3] Passa 4 stats para o renderDashboard
-				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
+				// Filtra contratos 'Ativos' para a contagem (exclui concluídos e lixeira)
+				const totalContratosAtivos = this.getFilteredContracts(false)
+					.filter(c => this.getContractStatus(c).statusText !== 'Concluído')
+					.length;
+				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, totalContratosAtivos);
 			}
 		
 			// [MUDANÇA v3] Stats de volta para 4
@@ -2063,16 +2070,16 @@
 					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
 					card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
-					card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
+					card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
 					
-					const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
+					const footer = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
 					
-					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
+					const restoreBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
 					restoreBtn.onclick = () => this.restoreContract(contract.id);
 					footer.append(restoreBtn);
 		
 					if (this.isUserAdmin) {
-						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+						const deleteBtn = this.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
 						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
 						footer.append(deleteBtn);
 					}
