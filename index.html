@@ -96,7 +96,7 @@
 			color: #6366f1; /* text-indigo-500 */
 			background-color: rgba(79, 70, 229, 0.1); /* indigo-600/10 */
 		}
-	.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
+		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
 		
 		.dark-card { 
@@ -305,6 +305,20 @@
 			font-weight: 500;
 			color: #f59e0b; /* amber-500 */
 		}
+
+		/* [NOVO v5.6] Estilos para o Card de Parcela (para diferenciar Vencida/A Vencer) */
+		.parcel-card-vencida {
+			border-left-color: #ef4444; /* red-500 */
+		}
+		.parcel-card-vencida .parcel-value {
+			color: #f87171; /* red-400 */
+		}
+		.parcel-card-avencer {
+			border-left-color: #f59e0b; /* amber-500 */
+		}
+		.parcel-card-avencer .parcel-value {
+			color: #fbbf24; /* amber-400 */
+		}
 	</style>
 </head>
 <body class="text-gray-300">
@@ -386,10 +400,12 @@
 					<i class="fas fa-tachometer-alt w-5 text-center"></i>
 					<span>Painel Principal</span>
 				</a>
-				<a onclick="window.App.showPage('page-inadimplentes')" id="tab-inadimplentes" class="sidebar-nav-item">
-					<i class="fas fa-exclamation-triangle w-5 text-center"></i>
-					<span>Inadimplentes</span>
+
+				<a onclick="window.App.showPage('page-parcelas')" id="tab-parcelas" class="sidebar-nav-item">
+					<i class="fas fa-file-invoice-dollar w-5 text-center"></i>
+					<span>Parcelas</span>
 				</a>
+				
 				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
 					<i class="fas fa-tasks w-5 text-center"></i>
 					<span>Serviços</span>
@@ -542,18 +558,18 @@
 						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
 						</div>
 					</div>
-				</div> <div id="page-inadimplentes" class="hidden">
+				</div> <div id="page-parcelas" class="hidden">
 					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-						<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
+						<h2 class="text-2xl font-semibold text-white">Controle de Parcelas Pendentes (Meus Contratos)</h2>
 						<div class="flex flex-wrap items-center gap-4">
-							<input type="text" id="inadimplentesSearchInput" placeholder="🔎 Pesquisar por cliente..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+							<input type="text" id="parcelasSearchInput" placeholder="🔎 Pesquisar por cliente..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
 							<div class="flex items-center gap-2">
 								<span class="text-sm text-gray-400">Ordenar por:</span>
-								<div id="inadimplentesSortButtons" class="flex gap-1"></div>
+								<div id="parcelasSortButtons" class="flex gap-1"></div>
 							</div>
 						</div>
 					</div>
-					<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+					<div id="parcelasListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
 
 				<div id="page-servicos" class="hidden">
@@ -697,10 +713,12 @@
 				<i class="fas fa-tachometer-alt text-xl"></i>
 				<span class="text-xs mt-1">Painel</span>
 			</a>
-			<a onclick="window.App.showPage('page-inadimplentes')" id="mobile-tab-inadimplentes" class="mobile-nav-item">
-				<i class="fas fa-exclamation-triangle text-xl"></i>
-				<span class="text-xs mt-1">Pendentes</span>
+			
+			<a onclick="window.App.showPage('page-parcelas')" id="mobile-tab-parcelas" class="mobile-nav-item">
+				<i class="fas fa-file-invoice-dollar text-xl"></i>
+				<span class="text-xs mt-1">Parcelas</span>
 			</a>
+
 			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item">
 				<i class="fas fa-tasks text-xl"></i>
 				<span class="text-xs mt-1">Serviços</span>
@@ -747,6 +765,8 @@
 		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
 			<div class="p-6 space-y-4 overflow-y-auto modal-body">
 				<input type="hidden" id="contractId">
+				<input type="hidden" id="financialDataChanged" value="false">
+				
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
@@ -783,28 +803,34 @@
 				</div>
 				
 				<div class="admin-only space-y-4">
+					<div id="financial-warning" class="hidden p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-300 text-sm">
+						<i class="fas fa-exclamation-triangle mr-2"></i> Os campos financeiros estão bloqueados pois este contrato já possui parcelas pagas. Para alterá-los, é necessário um novo contrato.
+					</div>
+					
 					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros</h3>
 					
-					<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
-						<label for="contratoJaQuitado" class="flex items-center">
-							<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
-							<span class="ml-2 text-sm font-medium text-gray-300">Marcar valor fixo como já quitado (contrato antigo)</span>
-						</label>
-						<p class="text-xs text-gray-500 ml-6 mt-1">Isto criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
-					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div>
-							<label for="valorTotal" class="block text-sm font-medium text-gray-400 mb-1">Valor Fixo Total (R$)</label>
-							<input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
+					<div id="financial-fields" class="space-y-4">
+						<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+							<label for="contratoJaQuitado" class="flex items-center">
+								<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
+								<span class="ml-2 text-sm font-medium text-gray-300">Marcar valor fixo como já quitado (contrato antigo)</span>
+							</label>
+							<p class="text-xs text-gray-500 ml-6 mt-1">Isto criará 1 parcela única já "Paga" com o Valor Total. Deixe o N° de Parcelas como 1.</p>
+						</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<label for="valorTotal" class="block text-sm font-medium text-gray-400 mb-1">Valor Fixo Total (R$)</label>
+								<input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
+							</div>
+							<div>
+								<label for="numParcelas" class="block text-sm font-medium text-gray-400 mb-1">N° de Parcelas</label>
+								<input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" value="1">
+							</div>
 						</div>
 						<div>
-							<label for="numParcelas" class="block text-sm font-medium text-gray-400 mb-1">N° de Parcelas</label>
-							<input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" value="1">
+							<label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400 mb-1">Vencimento da 1ª Parcela</label>
+							<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;">
 						</div>
-					</div>
-					<div>
-						<label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400 mb-1">Vencimento da 1ª Parcela</label>
-						<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;">
 					</div>
 					<div>
 						<label for="taxaExito" class="block text-sm font-medium text-gray-400 mb-1">Taxa de Êxito (Bonificação)</label>
@@ -855,7 +881,7 @@
 		</div>
 		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
 	</div>
-<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
+	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal</h2>
 			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
@@ -935,7 +961,6 @@
 		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-		// [CORREÇÃO CRÍTICA v5.5] Corrigido o erro de digitação "httpsD://" para "https://"
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
@@ -1830,19 +1855,24 @@
 				return card;
 			}
 			
-			createInadimplenteCard({ contract, parcel, index, diffDays, valorCorrigido }) {
+			// [MUDANÇA v5.6] Renomeado de 'createInadimplenteCard' para 'createParcelaCard' (para a nova aba)
+			createParcelaCard({ contract, parcel, index, diffDays, valorCorrigido, isVencida }) {
 				const valorOriginalDisplay = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
 				const valorCorrigidoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
 		
-				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-red-500 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl' });
+				// [NOVO v5.6] Adiciona classes dinâmicas para Vencida / A Vencer
+				const cardClasses = isVencida ? 'parcel-card-vencida' : 'parcel-card-avencer';
+				const card = this.buildElement('div', { className: `dark-card shadow-lg p-5 rounded-lg border-l-4 ${cardClasses} transition-all duration-200 hover:-translate-y-1 hover:shadow-xl` });
+				
 				card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
 				
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
-				card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
+				card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: `${services} - Parcela ${parcel.number}/${contract.parcels.length || 1}` }));
 				
 				const details = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 space-y-2' });
 				
-				if (this.app.isUserAdmin) {
+				if (isVencida && this.app.isUserAdmin) {
+					// Card de VENCIDA (mostra original e corrigido)
 					details.innerHTML = `
 					<div class="flex justify-between items-center text-sm">
 						<span class="text-gray-400">Valor Original:</span>
@@ -1850,28 +1880,58 @@
 					</div>
 					<div class="flex justify-between items-center">
 						<span class="text-sm text-white">Valor Corrigido:</span>
-						<span class="font-semibold text-lg text-red-400">${valorCorrigidoDisplay}</span>
+						<span class="font-semibold text-lg parcel-value">${valorCorrigidoDisplay}</span>
+					</div>`;
+				} else if (this.app.isUserAdmin) {
+					// Card de A VENCER (mostra só o valor normal)
+					details.innerHTML = `
+					<div class="flex justify-between items-center">
+						<span class="text-sm text-white">Valor:</span>
+						<span class="font-semibold text-lg parcel-value">${valorOriginalDisplay}</span>
 					</div>`;
 				}
 				
 				details.innerHTML += `
 				<div class="flex justify-between items-center text-sm">
-					<span class="text-gray-400">Venceu em:</span>
+					<span class="text-gray-400">Vence em:</span>
 					<span class="font-medium text-gray-300">${Utils.formatDate(parcel.dueDate)}</span>
-				</div>
-				<div class="flex justify-between items-center text-red-400 font-bold text-sm bg-red-900/30 px-2 py-1 rounded">
-					<span>Atrasado há:</span>
-					<span>${diffDays} dia(s)</span>
 				</div>`;
+
+				// [NOVO v5.6] Mostra "Atrasado há" ou "Faltam X dias"
+				if (isVencida) {
+					details.innerHTML += `
+					<div class="flex justify-between items-center text-red-400 font-bold text-sm bg-red-900/30 px-2 py-1 rounded">
+						<span>Atrasado há:</span>
+						<span>${diffDays} dia(s)</span>
+					</div>`;
+				} else {
+					details.innerHTML += `
+					<div class="flex justify-between items-center text-yellow-400 font-bold text-sm bg-yellow-900/30 px-2 py-1 rounded">
+						<span>Faltam:</span>
+						<span>${diffDays * -1} dia(s)</span>
+					</div>`;
+				}
 				
 				card.append(details);
 		
-				const button = this.buildElement('button', {
-					className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
-					html: '<i class="fas fa-check"></i> Registar Pagamento'
+				// [NOVO v5.6] Adiciona botões de Ação (Pagar e Editar Contrato)
+				const footer = this.buildElement('div', { className: 'mt-4 flex gap-2' });
+
+				const payBtn = this.buildElement('button', {
+					className: 'flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
+					html: '<i class="fas fa-check"></i> Pagar'
 				});
-				button.onclick = () => window.App.openPaymentModal(contract.id, index);
-				card.append(button);
+				payBtn.onclick = () => window.App.openPaymentModal(contract.id, index);
+				
+				const editBtn = this.buildElement('button', {
+					className: 'flex-shrink-0 bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
+					html: '<i class="fas fa-pencil-alt"></i>'
+				});
+				editBtn.title = "Editar Contrato";
+				editBtn.onclick = () => window.App.openContractModal(contract.id);
+
+				footer.append(payBtn, editBtn);
+				card.append(footer);
 				
 				return card;
 			}
@@ -2097,7 +2157,7 @@
 				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
-				this.currentInadimplentesSort = 'days-desc';
+				this.currentParcelasSort = 'days-asc'; // [MUDANÇA v5.6] Renomeado e mudou o padrão
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
 				this.contractStatusFilter = 'ativos';
@@ -2185,9 +2245,9 @@
 				const debouncedServicos = Utils.debounce(() => this.renderServicosPage(), 300);
 				document.getElementById('servicosSearchInput').addEventListener('input', debouncedServicos);
 		
-				// [NOVO v5.4] Listener da busca de inadimplentes
-				const debouncedInadimplentes = Utils.debounce(() => this.renderInadimplentesPage(), 300);
-				document.getElementById('inadimplentesSearchInput').addEventListener('input', debouncedInadimplentes);
+				// [MUDANÇA v5.6] Listener da busca de parcelas
+				const debouncedParcelas = Utils.debounce(() => this.renderParcelasPage(), 300);
+				document.getElementById('parcelasSearchInput').addEventListener('input', debouncedParcelas);
 		
 				// [REVOLUÇÃO] Listener do menu mobile
 				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
@@ -2245,6 +2305,14 @@
 				if (pdfBtn) {
 					pdfBtn.addEventListener('click', () => this.exportReportPDF());
 				}
+
+				// [NOVO v5.6] Listeners para o modal de contrato
+				const financialInputs = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'contratoJaQuitado'];
+				financialInputs.forEach(id => {
+					document.getElementById(id)?.addEventListener('change', () => {
+						document.getElementById('financialDataChanged').value = 'true';
+					});
+				});
 			}
 		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
@@ -2335,8 +2403,8 @@
 				if (pageId === 'page-dashboard') {
 					this.renderKanban(); // Não é mais async
 					this.renderContractList();
-				} else if (pageId === 'page-inadimplentes') {
-					this.renderInadimplentesPage(); // Não é mais async
+				} else if (pageId === 'page-parcelas') { // [MUDANÇA v5.6]
+					this.renderParcelasPage(); // [MUDANÇA v5.6]
 				} else if (pageId === 'page-servicos') {
 					this.renderServicosPage();
 				} else if (pageId === 'page-lixeira') {
@@ -2496,48 +2564,52 @@
 				this.domBuilder.renderPaginationControls(paginationContainer, totalItems, totalPages, this.contractListPage);
 			}
 		
-			// [NOVO v5.5] Refatorado para ser SÍNCRONO (não usa await)
-			renderInadimplentesPage() {
+			// [MUDANÇA v5.6] Renomeada de 'renderInadimplentesPage' para 'renderParcelasPage'
+			renderParcelasPage() {
 				const contractsToRender = this.getFilteredContracts(false);
-				const container = document.getElementById('inadimplentesListContainer');
-				const searchTerm = (document.getElementById('inadimplentesSearchInput').value || '').toLowerCase();
+				const container = document.getElementById('parcelasListContainer');
+				const searchTerm = (document.getElementById('parcelasSearchInput').value || '').toLowerCase();
 		
 				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 		
-				let inadimplentesList = [];
+				let parcelasList = [];
 				contractsToRender.forEach(contract => {
 					if (!contract.clientName.toLowerCase().includes(searchTerm)) return;
 					if (!contract.parcels) return;
 					
 					for (let i = 0; i < contract.parcels.length; i++) {
 						const parcel = contract.parcels[i];
-						const vencimento = new Date(parcel.dueDate);
-						if (parcel.status === 'Pendente' && vencimento < hoje) {
-							const diffDays = Math.ceil((hoje - vencimento) / 86400000);
-							const valorCorrigido = this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
-							inadimplentesList.push({ contract, parcel, index: i, diffDays, valorCorrigido });
+						// [NOVO v5.6] Mostra TODAS as parcelas pendentes
+						if (parcel.status === 'Pendente') { 
+							const vencimento = new Date(parcel.dueDate);
+							const diffDays = Math.ceil((vencimento - hoje) / 86400000);
+							const isVencida = vencimento < hoje;
+							const valorCorrigido = isVencida ? this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate) : parcel.value;
+							
+							parcelasList.push({ contract, parcel, index: i, diffDays, valorCorrigido, isVencida });
 						}
 					}
 				});
 		
-				if (this.currentInadimplentesSort === 'days-desc') {
-					inadimplentesList.sort((a, b) => b.diffDays - a.diffDays);
-				} else if (this.currentInadimplentesSort === 'value-desc' && this.isUserAdmin) {
-					inadimplentesList.sort((a, b) => b.valorCorrigido - a.valorCorrigido);
-				} else if (this.currentInadimplentesSort === 'name-asc') {
-					inadimplentesList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
+				// [MUDANÇA v5.6] Nova ordenação
+				if (this.currentParcelasSort === 'days-asc') {
+					parcelasList.sort((a, b) => a.diffDays - b.diffDays); // Mais próximas primeiro
+				} else if (this.currentParcelasSort === 'value-desc' && this.isUserAdmin) {
+					parcelasList.sort((a, b) => b.valorCorrigido - a.valorCorrigido); // Mais caras primeiro
+				} else if (this.currentParcelasSort === 'name-asc') {
+					parcelasList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
 				}
 		
 				container.innerHTML = '';
-				if (inadimplentesList.length === 0) {
-					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block bg-gray-800 border border-gray-700 text-green-400 p-6 rounded-lg shadow-md"><i class="fas fa-check-circle fa-3x mb-3"></i><p class="font-bold text-xl">Nenhuma pendência encontrada!</p><p class="text-sm text-gray-400">Todos os pagamentos estão em dia.</p></div></div>`;
+				if (parcelasList.length === 0) {
+					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block bg-gray-800 border border-gray-700 text-green-400 p-6 rounded-lg shadow-md"><i class="fas fa-check-circle fa-3x mb-3"></i><p class="font-bold text-xl">Nenhuma parcela pendente!</p><p class="text-sm text-gray-400">Todos os pagamentos estão em dia.</p></div></div>`;
 					return;
 				}
 				
 				const fragment = document.createDocumentFragment();
-				inadimplentesList.forEach(item => {
-					fragment.append(this.domBuilder.createInadimplenteCard(item));
+				parcelasList.forEach(item => {
+					fragment.append(this.domBuilder.createParcelaCard(item)); // [MUDANÇA v5.6]
 				});
 				container.append(fragment);
 			}
@@ -2639,7 +2711,6 @@
 				});
 				container.append(fragment);
 			}
-
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
 				// Define datas padrão (início do mês até hoje)
@@ -2708,9 +2779,9 @@
 			showPage(pageId) {
 				const pageTitles = {
 					'page-dashboard': 'Painel Principal',
-					'page-inadimplentes': 'Inadimplentes',
+					'page-parcelas': 'Controle de Parcelas', // [MUDANÇA v5.6]
 					'page-servicos': 'Produção de Serviços',
-					'page-performance': 'Performance Gerencial', // [NOVO v5.5]
+					'page-performance': 'Performance Gerencial',
 					'page-relatorios': 'Relatórios Avançados',
 					'page-lixeira': 'Lixeira'
 				};
@@ -2728,7 +2799,7 @@
 				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
 		
 				// Esconde todas as páginas
-				['page-dashboard', 'page-inadimplentes', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance'].forEach(id => {
+				['page-dashboard', 'page-parcelas', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance'].forEach(id => {
 					const el = document.getElementById(id);
 					if (el) el.classList.add('hidden');
 				});
@@ -2774,7 +2845,8 @@
 					}
 				});
 		
-				const financialFields = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito'];
+				// [MUDANÇA v5.6] IDs dos campos financeiros
+				const financialFields = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito', 'contratoJaQuitado'];
 				financialFields.forEach(id => {
 					const field = document.getElementById(id);
 					if (field) field.disabled = !isAdmin;
@@ -2816,13 +2888,13 @@
 				return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
 			}
 		
-			// [MUDANÇA v3] Renderiza os novos botões de filtro (Ativos/Concluídos)
+			// [MUDANÇA v5.6] Renomeado 'inadimplentesSortContainer' para 'parcelasSortContainer'
 			renderSortButtons() {
 				const contractSortContainer = document.getElementById('contractSortButtons');
-				const inadimplentesSortContainer = document.getElementById('inadimplentesSortButtons');
+				const parcelasSortContainer = document.getElementById('parcelasSortButtons');
 				const servicosSortContainer = document.getElementById('servicosSortButtons');
 				const contractStatusFilterContainer = document.getElementById('contractStatusFilterButtons');
-				if (!contractSortContainer || !inadimplentesSortContainer || !servicosSortContainer || !contractStatusFilterContainer) return;
+				if (!contractSortContainer || !parcelasSortContainer || !servicosSortContainer || !contractStatusFilterContainer) return;
 				
 				const createButton = (container, sortKey, sortLabel, currentSort, callback) => {
 					const button = this.domBuilder.buildElement('button', { text: sortLabel, className: 'sort-button' });
@@ -2837,7 +2909,7 @@
 
 				// Limpa
 				contractSortContainer.innerHTML = '';
-				inadimplentesSortContainer.innerHTML = '';
+				parcelasSortContainer.innerHTML = '';
 				servicosSortContainer.innerHTML = '';
 				contractStatusFilterContainer.innerHTML = '';
 
@@ -2851,11 +2923,11 @@
 					createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				}
 		
-				// Botões de Inadimplentes
-				createButton(inadimplentesSortContainer, 'days-desc', 'Mais Antigas', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
-				createButton(inadimplentesSortContainer, 'name-asc', 'Nome (A-Z)', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
+				// [MUDANÇA v5.6] Botões de Parcelas (substitui Inadimplentes)
+				createButton(parcelasSortContainer, 'days-asc', 'Venc. Próximo', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
+				createButton(parcelasSortContainer, 'name-asc', 'Nome (A-Z)', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
 				if (this.isUserAdmin) {
-					createButton(inadimplentesSortContainer, 'value-desc', 'Maior Valor', this.currentInadimplentesSort, (key) => { this.currentInadimplentesSort = key; });
+					createButton(parcelasSortContainer, 'value-desc', 'Maior Valor', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
 				}
 		
 				// Botões de Serviços
@@ -2926,9 +2998,12 @@
 				}
 			}
 		
+			// [MUDANÇA v5.6] Lógica de SUBMIT de contrato ATUALIZADA
 			async handleContractSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('contractId').value;
+				const financialDataChanged = document.getElementById('financialDataChanged').value === 'true';
+				
 				const serviceTags = document.querySelectorAll('#servicosContainer .service-tag');
 				const serviceTypes = Array.from(serviceTags).map(tag => ({
 					name: Utils.sanitizeText(tag.dataset.name),
@@ -2944,7 +3019,37 @@
 					paymentType: Utils.sanitizeText(document.getElementById('contratoTipoPagamento').value),
 					observations: Utils.sanitizeText(document.getElementById('contratoObservacoes').value),
 				};
-		
+				
+				// Função helper para gerar parcelas
+				const generateParcels = () => {
+					const parcels = [];
+					const totalValue = Utils.parseNumber(document.getElementById('valorTotal').value);
+					const numParcels = parseInt(document.getElementById('numParcelas').value) || 1;
+					const firstDueDate = document.getElementById('vencimentoPrimeiraParcela').value;
+					const jaQuitado = document.getElementById('contratoJaQuitado').checked;
+					
+					if (numParcels > 0 && totalValue > 0) {
+						if (!firstDueDate && !jaQuitado) {
+							Utils.showToast('Informe data da 1ª parcela.', 'error');
+							return null; // Indica falha
+						}
+						const parcelValue = totalValue / numParcels;
+						let currentDueDate = new Date((firstDueDate || new Date().toISOString().split('T')[0]) + 'T12:00:00Z');
+						for (let i = 0; i < numParcels; i++) {
+							const isPaid = jaQuitado && numParcels === 1;
+							parcels.push({
+								number: i + 1, value: parcelValue,
+								dueDate: new Date(currentDueDate).toISOString(),
+								status: isPaid ? 'Paga' : 'Pendente',
+								valuePaid: isPaid ? parcelValue : 0,
+								paymentDate: isPaid ? new Date().toISOString() : null
+							});
+							currentDueDate.setMonth(currentDueDate.getMonth() + 1);
+						}
+					}
+					return parcels;
+				};
+
 				if (this.isUserAdmin) {
 					Object.assign(contractData, {
 						totalValue: Utils.parseNumber(document.getElementById('valorTotal').value),
@@ -2954,40 +3059,17 @@
 		
 				if (!contractId) {
 					// --- CRIAÇÃO DE NOVO CONTRATO ---
+					const newParcels = this.isUserAdmin ? generateParcels() : [];
+					if (newParcels === null) return; // Falha na validação do generateParcels
+
 					Object.assign(contractData, {
 						successFeeValueReceived: 0,
 						successFeePaymentDate: null,
 						isDeleted: false,
-						parcels: [],
-						createdAt: new Date().toISOString() // [MUDANÇA v5]
+						parcels: newParcels,
+						createdAt: new Date().toISOString()
 					});
-		
-					if (this.isUserAdmin) {
-						const jaQuitado = document.getElementById('contratoJaQuitado').checked;
-						const totalValue = contractData.totalValue;
-						const numParcels = parseInt(document.getElementById('numParcelas').value) || 1;
-						const firstDueDate = document.getElementById('vencimentoPrimeiraParcela').value;
-		
-						if (numParcels > 0 && totalValue > 0) {
-							if (!firstDueDate && !jaQuitado) {
-								Utils.showToast('Informe data da 1ª parcela.', 'error');
-								return;
-							}
-							const parcelValue = totalValue / numParcels;
-							let currentDueDate = new Date((firstDueDate || new Date().toISOString().split('T')[0]) + 'T12:00:00Z');
-							for (let i = 0; i < numParcels; i++) {
-								const isPaid = jaQuitado && numParcels === 1;
-								contractData.parcels.push({
-									number: i + 1, value: parcelValue,
-									dueDate: new Date(currentDueDate).toISOString(),
-									status: isPaid ? 'Paga' : 'Pendente',
-									valuePaid: isPaid ? parcelValue : 0,
-									paymentDate: isPaid ? new Date().toISOString() : null
-								});
-								currentDueDate.setMonth(currentDueDate.getMonth() + 1);
-							}
-						}
-					}
+					
 					if (await this.firebaseService.addContract(contractData)) {
 						this.closeModal('modalContrato');
 						// [NOVO v5.4] Notifica admins sobre novo contrato
@@ -2999,19 +3081,30 @@
 				} else {
 					// --- ATUALIZAÇÃO DE CONTRATO EXISTENTE ---
 					const existingContract = this.database.contracts.find(c => c.id === contractId);
+					
+					// Preserva dados financeiros se não for admin
 					if (!this.isUserAdmin && existingContract) {
 						contractData.totalValue = existingContract.totalValue;
 						contractData.successFee = existingContract.successFee;
 						contractData.parcels = existingContract.parcels;
-						contractData.successFeeValueReceived = existingContract.successFeeValueReceived;
-						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
-					} else if (this.isUserAdmin && existingContract) {
-						contractData.parcels = existingContract.parcels;
-						contractData.successFeeValueReceived = existingContract.successFeeValueReceived;
-						contractData.successFeePaymentDate = existingContract.successFeePaymentDate;
 					}
+					
+					// [CORREÇÃO BUG EDIÇÃO] Se for admin e os dados financeiros mudaram
+					if (this.isUserAdmin && financialDataChanged) {
+						const newParcels = generateParcels();
+						if (newParcels === null) return; // Falha na validação
+						contractData.parcels = newParcels; // Sobrescreve as parcelas antigas
+						Utils.showToast('Parcelas recalculadas com sucesso!', 'info');
+					} else if (existingContract) {
+						// Mantém as parcelas existentes se nada mudou
+						contractData.parcels = existingContract.parcels;
+					}
+					
+					// Preserva outros campos importantes
+					contractData.successFeeValueReceived = existingContract?.successFeeValueReceived || 0;
+					contractData.successFeePaymentDate = existingContract?.successFeePaymentDate || null;
 					contractData.isDeleted = existingContract?.isDeleted || false;
-					contractData.createdAt = existingContract?.createdAt || new Date().toISOString(); // Preserva o createdAt
+					contractData.createdAt = existingContract?.createdAt || new Date().toISOString(); 
 					
 					if (await this.firebaseService.updateContract(contractId, contractData)) {
 						this.closeModal('modalContrato');
@@ -3235,16 +3328,23 @@
 				}
 			}
 		
+			// [MUDANÇA v5.6] Lógica de Edição de Contrato ATUALIZADA
 			openContractModal(contractId = null) {
 				try {
 					const form = document.getElementById('formContrato'); form.reset();
+					document.getElementById('financialDataChanged').value = 'false';
 					const title = document.getElementById('modalContratoTitle');
 					const servicosContainer = document.getElementById('servicosContainer'); servicosContainer.innerHTML = '';
 					this.populateAdvogadoSelectModal();
 					const advogadoSelect = document.getElementById('advogadoResponsavel');
-					const jaQuitadoCheckbox = document.getElementById('contratoJaQuitado');
-		
+					
+					// [NOVO v5.6] Referências aos campos financeiros e aviso
+					const financialWarning = document.getElementById('financial-warning');
+					const financialFieldsDiv = document.getElementById('financial-fields');
+					const financialInputs = financialFieldsDiv.querySelectorAll('input, select');
+					
 					if (contractId) {
+						// --- MODO DE EDIÇÃO ---
 						const contract = this.database.contracts.find(c => c.id === contractId);
 						if (!contract) { Utils.showToast('Contrato não encontrado.', 'error'); return; }
 						title.textContent = "Editar Contrato";
@@ -3254,8 +3354,23 @@
 						(contract.serviceTypes || []).forEach(service => this.createServiceTag(service.name, service.deadline, service.status));
 						document.getElementById('contratoTipoPagamento').value = contract.paymentType || 'Parcelado';
 						document.getElementById('contratoObservacoes').value = contract.observations || '';
-						jaQuitadoCheckbox.checked = false;
-						jaQuitadoCheckbox.disabled = true;
+						
+						// [CORREÇÃO BUG EDIÇÃO] Verifica se alguma parcela foi paga
+						const hasPaidParcels = (contract.parcels || []).some(p => p.status === 'Paga');
+						
+						if (hasPaidParcels && this.isUserAdmin) {
+							// Se já pagou, BLOQUEIA os campos financeiros
+							financialWarning.classList.remove('hidden');
+							financialFieldsDiv.classList.add('hidden'); // Esconde os campos
+							financialInputs.forEach(input => input.disabled = true);
+						} else {
+							// Se não pagou, permite a edição (e reseta os campos)
+							financialWarning.classList.add('hidden');
+							financialFieldsDiv.classList.remove('hidden');
+							financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
+						}
+
+						// Preenche os campos financeiros (mesmo que estejam escondidos/bloqueados)
 						if (this.isUserAdmin) {
 							document.getElementById('valorTotal').value = contract.totalValue || '';
 							document.getElementById('numParcelas').value = (contract.parcels || []).length || 1;
@@ -3264,14 +3379,22 @@
 								document.getElementById('vencimentoPrimeiraParcela').value = contract.parcels[0].dueDate.split('T')[0];
 							}
 						}
+						document.getElementById('contratoJaQuitado').checked = false;
+						document.getElementById('contratoJaQuitado').disabled = hasPaidParcels;
+
 					} else {
+						// --- MODO DE CRIAÇÃO ---
 						title.textContent = "Registar Novo Contrato";
 						document.getElementById('contractId').value = '';
 						advogadoSelect.value = this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName;
-						jaQuitadoCheckbox.checked = false;
-						jaQuitadoCheckbox.disabled = false;
+						
+						// Garante que os campos estão visíveis e habilitados
+						financialWarning.classList.add('hidden');
+						financialFieldsDiv.classList.remove('hidden');
+						financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
+						document.getElementById('contratoJaQuitado').checked = false;
 					}
-					this.setupUIAccess();
+					
 					this.openModal('modalContrato');
 				} catch (e) {
 					console.error('Erro em openContractModal:', e);
