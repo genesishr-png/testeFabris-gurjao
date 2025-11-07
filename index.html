@@ -498,16 +498,20 @@
 						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8">
 						</div>
 					</div>
-				</div> <div id="page-inadimplentes" class="hidden">
-					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-						<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
-						<div class="flex items-center gap-2">
-							<span class="text-sm text-gray-400">Ordenar por:</span>
-							<div id="inadimplentesSortButtons" class="flex gap-1"></div>
-						</div>
-					</div>
-					<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-				</div>
+				</div> 
+				<div id="page-inadimplentes" class="hidden">
+	<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+		<h2 class="text-2xl font-semibold text-white">Controlo de Inadimplentes (Meus Contratos)</h2>
+		<div class="flex flex-wrap items-center gap-4">
+			<input type="text" id="inadimplentesSearchInput" placeholder="🔎 Pesquisar por cliente..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+			<div class="flex items-center gap-2">
+				<span class="text-sm text-gray-400">Ordenar por:</span>
+				<div id="inadimplentesSortButtons" class="flex gap-1"></div>
+			</div>
+		</div>
+	</div>
+	<div id="inadimplentesListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+</div>
 
 				<div id="page-servicos" class="hidden">
 					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
@@ -831,6 +835,7 @@
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
+		// [CORREÇÃO LIXEIRA] Nomes em minúsculo para verificação
 		const ADMIN_USERS = ["dra. renata fabris", "dr. felipe gurjão", "lilian"];
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
 		
@@ -1011,7 +1016,8 @@
 						this.ipcaErrorToastShown = true;
 						setTimeout(() => { this.ipcaErrorToastShown = false; }, 60000); 
 					}
-					return 1;
+					// [CORREÇÃO] Lança o erro para ser pego pelo .catch() no renderKanban
+					throw new Error("Falha ao buscar IPCA"); 
 				}
 			}
 			
@@ -1037,13 +1043,13 @@
 				this.auth = null;
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-                    authDomain: "fabrisgurjao.firebaseapp.com",
-                    projectId: "fabrisgurjao",
-                    storageBucket: "fabrisgurjao.firebasestorage.app",
-                    messagingSenderId: "466702265991",
-                    appId: "1:466702265991:web:78c4d98b47cab537921222",
-                    measurementId: "G-E99R5TFMQK"
+					apiKey: "SUA_API_KEY",
+					authDomain: "SEU_AUTH_DOMAIN",
+					projectId: "SEU_PROJECT_ID",
+					storageBucket: "SEU_STORAGE_BUCKET",
+					messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+					appId: "SEU_APP_ID",
+					measurementId: "SEU_MEASUREMENT_ID"
 				};
 			}
 		
@@ -1051,7 +1057,7 @@
 				try {
 					const firebaseApp = initializeApp(this.firebaseConfig);
 					this.auth = getAuth(firebaseApp);
-					setLogLevel('debug'); // 'error' em produção
+					setLogLevel('error'); // 'error' em produção, 'debug' para testar
 					const db = getFirestore(firebaseApp);
 					this.app.firebaseService.setDB(db);
 					this.setupAuthListener();
@@ -1146,7 +1152,7 @@
 					const contracts = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 					this.app.handleSnapshotUpdate(contracts);
 				}, (error) => {
-					console.error("Erro ao buscar dados:", error);
+					console.error("Erro ao buscar dados (contracts):", error);
 					Utils.showToast('Erro de conexão. Não foi possível atualizar os dados.', 'error');
 				});
 			}
@@ -1170,8 +1176,9 @@
 					const notifications = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 					this.app.handleNotificationUpdate(notifications);
 				}, (error) => {
+					// [MUDANÇA v5.4] Silencia o toast de erro daqui, pois já corrigimos as regras
 					console.error("Erro ao buscar notificações:", error);
-					Utils.showToast('Erro ao buscar notificações.', 'error');
+					// Utils.showToast('Erro ao buscar notificações.', 'error');
 				});
 			}
 
@@ -1192,7 +1199,7 @@
 					});
 					return true;
 				} catch (error) {
-					console.error("Erro ao enviar notificação:", error);
+					console.error(`Erro ao enviar notificação para ${safeRecipientName}:`, error);
 					return false;
 				}
 			}
@@ -1583,12 +1590,11 @@
 				return card;
 			}
 			
-			// [MUDANÇA v5] Correção de Bug: Adicionado w-80 e flex-shrink-0
+			// [CORREÇÃO ALONGAMENTO] Adicionado 'self-start' para o card não esticar verticalmente
 			createExitoCard(contract) {
 				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
 				
-				// AQUI A CORREÇÃO: w-80 e flex-shrink-0
-				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 w-80 flex-shrink-0' });
+				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 w-80 flex-shrink-0 self-start' });
 				card.append(this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName }));
 				
 				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
@@ -1919,6 +1925,9 @@
 				this.currentAdvancedReportData = null; // [MUDANÇA v5]
 				this.currentPageId = null; // [CORREÇÃO v5.1]
 				
+				// [NOVO v5.4] Estado para controlar notificações de vencimento
+				this.lastOverdueCheck = null; 
+				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
 				this.currentInadimplentesSort = 'days-desc';
@@ -2009,6 +2018,10 @@
 				const debouncedServicos = Utils.debounce(() => this.renderServicosPage(), 300);
 				document.getElementById('servicosSearchInput').addEventListener('input', debouncedServicos);
 		
+				// [NOVO v5.4] Listener da busca de inadimplentes
+				const debouncedInadimplentes = Utils.debounce(() => this.renderInadimplentesPage(), 300);
+				document.getElementById('inadimplentesSearchInput').addEventListener('input', debouncedInadimplentes);
+		
 				// [REVOLUÇÃO] Listener do menu mobile
 				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
 					const sidebar = document.getElementById('sidebar');
@@ -2071,31 +2084,26 @@
 		
 			handleAuthStateChange(user) {
 				if (user) {
-        // --- INÍCIO DO BLOCO DE TESTE ---
-        // Cole todo este bloco para debug
-        const nomeDoFirebase = user.displayName;
-        const nomeEmMinusculas = nomeDoFirebase ? nomeDoFirebase.toLowerCase() : '';
-        const listaDeAdmins = ["dra. renata fabris", "dr. felipe gurjão", "lilian"]; // A lista que está na Parte 6
-        const euSouAdmin = listaDeAdmins.includes(nomeEmMinusculas);
+					// --- INÍCIO DO BLOCO DE TESTE ---
+					// Cole todo este bloco para debug
+					const nomeDoFirebase = user.displayName;
+					const nomeEmMinusculas = nomeDoFirebase ? nomeDoFirebase.toLowerCase() : '';
+					const listaDeAdmins = ADMIN_USERS; // A lista global já está em minúsculas
+					const euSouAdmin = listaDeAdmins.includes(nomeEmMinusculas);
 
-        console.log("===============================");
-        console.log("TESTE DE PERMISSÃO DA LIXEIRA");
-        console.log("Nome lido do Firebase:", nomeDoFirebase);
-        console.log("Nome convertido p/ minúsculas:", nomeEmMinusculas);
-        console.log("Lista de Admins (minúsculas):", listaDeAdmins);
-        console.log("O sistema me considera Admin?", euSouAdmin);
-        console.log("===============================");
-        // --- FIM DO BLOCO DE TESTE ---
+					console.log("===============================");
+					console.log("TESTE DE PERMISSÃO DA LIXEIRA");
+					console.log("Nome lido do Firebase:", nomeDoFirebase);
+					console.log("Nome convertido p/ minúsculas:", nomeEmMinusculas);
+					console.log("Lista de Admins (minúsculas):", listaDeAdmins);
+					console.log("O sistema me considera Admin?", euSouAdmin);
+					console.log("===============================");
+					// --- FIM DO BLOCO DE TESTE ---
 
-        // O resto do seu código continua aqui
-        
-// ... (o resto da função) ...
 					this.currentUserDisplayName = user.displayName;
-this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); // [MUDANÇA v5]
-
-// [CORREÇÃO LIXEIRA] Compara em minúsculas para evitar erros (ex: "Lilian" vs "lilian")
-const displayNameLower = this.currentUserDisplayName ? this.currentUserDisplayName.toLowerCase() : '';
-this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
+					this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName);
+					this.isUserAdmin = euSouAdmin; // Usa o resultado do nosso teste!
+					
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 		
 					if (!user.displayName) {
@@ -2119,6 +2127,7 @@ this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 					this.currentUserDisplayName = null;
 					this.currentSafeName = null;
 					this.isUserAdmin = false;
+					this.lastOverdueCheck = null; // [NOVO v5.4] Reseta o cheque de vencidos
 					document.body.classList.remove('is-admin');
 					this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
 					this.appContainer.style.display = 'none';
@@ -2129,7 +2138,12 @@ this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 			}
 		
 			handleSnapshotUpdate(contracts) {
+				const oldContracts = this.database.contracts || [];
 				this.database.contracts = contracts;
+				
+				// [NOVO v5.4] Checa por parcelas vencidas ao receber dados
+				this.checkAndNotifyOverdue(oldContracts, contracts);
+				
 				this.contractListPage = 0;
 				this.render();
 			}
@@ -2175,12 +2189,12 @@ this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
 				const kanbanAVencer = document.getElementById('kanban-a-vencer');
 				const kanbanPagas = document.getElementById('kanban-pagas');
-				const kanbanExito = document.getElementById('kanban-exito-wrapper'); // Container da nova secção
-		
+				const kanbanExitoWrapper = document.getElementById('kanban-exito-wrapper'); // [CORREÇÃO ÊXITO]
+				
 				const fragVencidas = document.createDocumentFragment();
 				const fragAVencer = document.createDocumentFragment();
 				const fragPagas = document.createDocumentFragment();
-				const fragExito = document.createDocumentFragment();
+				const fragExito = document.createDocumentFragment(); // [CORREÇÃO ÊXITO]
 		
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 				const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -2208,21 +2222,19 @@ this.isUserAdmin = ADMIN_USERS.includes(displayNameLower);
 							}
 						} else {
 							if (vencimento < hoje) {
-								// [Substitua pelo bloco abaixo]
-vencidasPromises.push(
-    this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate)
-        .then(valorCorrigido => {
-            if (this.isUserAdmin) totalVencido += valorCorrigido;
-            return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido);
-        })
-        .catch(err => {
-            // [NOVA CORREÇÃO] Se o IPCA falhar (erro 429), não trava o app.
-            console.error("Falha ao calcular IPCA para o card. Usando valor original.", err);
-            // Usa o valor original (sem correção) como fallback
-            if (this.isUserAdmin) totalVencido += parcel.value; 
-            return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, parcel.value); 
-        })
-);
+								vencidasPromises.push(
+									this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate)
+										.then(valorCorrigido => {
+											if (this.isUserAdmin) totalVencido += valorCorrigido;
+											return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido);
+										})
+										.catch(err => {
+											// [CORREÇÃO IPCA] Se o IPCA falhar (erro 429), não trava o app.
+											console.error("Falha ao calcular IPCA para o card. Usando valor original.", err);
+											if (this.isUserAdmin) totalVencido += parcel.value; 
+											return this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, parcel.value); 
+										})
+								);
 							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) {
 								fragAVencer.append(this.domBuilder.createParcelCard(contract, parcel, i, 'a-vencer', remainingValue));
 								if (this.isUserAdmin) totalAVencer30dias += parcel.value;
@@ -2231,7 +2243,7 @@ vencidasPromises.push(
 					}
 					// Lógica de Êxito
 					if (contract.successFee && !contract.successFeePaymentDate && (contract.parcels || []).every(p => p.status === 'Paga')) {
-						fragExito.append(this.domBuilder.createExitoCard(contract));
+						fragExito.append(this.domBuilder.createExitoCard(contract)); // [CORREÇÃO ÊXITO]
 						exitoPendente++;
 					}
 				}
@@ -2239,7 +2251,7 @@ vencidasPromises.push(
 				kanbanVencidas.innerHTML = '';
 				kanbanAVencer.innerHTML = '';
 				kanbanPagas.innerHTML = '';
-				kanbanExito.innerHTML = '';
+				kanbanExitoWrapper.innerHTML = ''; // [CORREÇÃO ÊXITO]
 		
 				const vencidasCards = await Promise.all(vencidasPromises);
 				vencidasCards.forEach(card => fragVencidas.append(card));
@@ -2249,7 +2261,7 @@ vencidasPromises.push(
 				kanbanPagas.append(fragPagas);
 				
 				if(exitoPendente > 0) {
-					kanbanExito.append(fragExito);
+					kanbanExitoWrapper.append(fragExito); // [CORREÇÃO ÊXITO]
 					document.getElementById('exito-section').style.display = 'block';
 				} else {
 					document.getElementById('exito-section').style.display = 'none';
@@ -2336,10 +2348,16 @@ vencidasPromises.push(
 			async renderInadimplentesPage() {
 				const contractsToRender = this.getFilteredContracts(false);
 				const container = document.getElementById('inadimplentesListContainer');
+				// [NOVO v5.4] Pega o termo da nova busca
+				const searchTerm = (document.getElementById('inadimplentesSearchInput').value || '').toLowerCase();
+		
 				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 		
 				const results = await Promise.all(contractsToRender.map(async (contract) => {
+					// [NOVO v5.4] Filtra pela busca ANTES de calcular o IPCA
+					if (!contract.clientName.toLowerCase().includes(searchTerm)) return [];
+					
 					if (!contract.parcels) return [];
 					const contractInadimplencias = [];
 					for (let i = 0; i < contract.parcels.length; i++) {
@@ -2347,7 +2365,13 @@ vencidasPromises.push(
 						const vencimento = new Date(parcel.dueDate);
 						if (parcel.status === 'Pendente' && vencimento < hoje) {
 							const diffDays = Math.ceil((hoje - vencimento) / 86400000);
-							const valorCorrigido = await this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
+							// Usamos um try/catch aqui também para o IPCA
+							let valorCorrigido;
+							try {
+								valorCorrigido = await this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
+							} catch(e) {
+								valorCorrigido = parcel.value; // Usa o valor original se o IPCA falhar
+							}
 							contractInadimplencias.push({ contract, parcel, index: i, diffDays, valorCorrigido });
 						}
 					}
@@ -2437,46 +2461,45 @@ vencidasPromises.push(
 				container.append(fragment);
 			}
 			
-			// [MUDANÇA v5] Correção de Bug: Lógica da Lixeira
-		// [COLE ESTA NOVA VERSÃO NA PARTE 7]
-renderLixeiraPage() {
-    // Pega TODOS os contratos, incluindo deletados
-    const contractsToRender = this.getFilteredContracts(true); 
-    const container = document.getElementById('lixeiraListContainer');
-    container.innerHTML = '';
+			// [CORREÇÃO LIXEIRA] Esta é a lógica correta, baseada no v5.0 do usuário
+			renderLixeiraPage() {
+				// Pega TODOS os contratos, incluindo deletados
+				const contractsToRender = this.getFilteredContracts(true); 
+				const container = document.getElementById('lixeiraListContainer');
+				container.innerHTML = '';
 
-    // Filtra APENAS os deletados (Esta é a lógica do seu v5.0)
-    const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
+				// Filtra APENAS os deletados
+				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
 
-    if (deletedContracts.length === 0) {
-        container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
-        return;
-    }
+				if (deletedContracts.length === 0) {
+					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
+					return;
+				}
 
-    const fragment = document.createDocumentFragment();
-    deletedContracts.forEach(contract => {
-        const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
-        card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
-        const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
-        card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
-        
-        const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
-        
-        const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
-        restoreBtn.onclick = () => this.restoreContract(contract.id);
-        footer.append(restoreBtn);
+				const fragment = document.createDocumentFragment();
+				deletedContracts.forEach(contract => {
+					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
+					card.append(this.domBuilder.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
+					const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
+					card.append(this.domBuilder.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: services }));
+					
+					const footer = this.domBuilder.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 flex gap-2' });
+					
+					const restoreBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-undo"></i> Restaurar' });
+					restoreBtn.onclick = () => this.restoreContract(contract.id);
+					footer.append(restoreBtn);
 
-        if (this.isUserAdmin) {
-            const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
-            deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
-            footer.append(deleteBtn);
-        }
-        
-        card.append(footer);
-        fragment.append(card);
-    });
-    container.append(fragment);
-}
+					if (this.isUserAdmin) {
+						const deleteBtn = this.domBuilder.buildElement('button', { className: 'w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2', html: '<i class="fas fa-times-circle"></i> Excluir Prmt.' });
+						deleteBtn.onclick = () => this.deleteContractPermanently(contract.id);
+						footer.append(deleteBtn);
+					}
+					
+					card.append(footer);
+					fragment.append(card);
+				});
+				container.append(fragment);
+			}
 
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
@@ -2577,8 +2600,14 @@ renderLixeiraPage() {
 			
 			getFilteredContracts(includeDeleted = false) {
 				const allContracts = this.database.contracts;
-				if (this.isUserAdmin) return includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
-				return allContracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted));
+				if (this.isUserAdmin) {
+					// Admin: Se includeDeleted for true, retorna TODOS. Se for false, retorna só os NÃO deletados.
+					return includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
+				}
+				// Não-Admin: Retorna só os do usuário, respeitando a flag includeDeleted
+				return allContracts.filter(c => 
+					c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted)
+				);
 			}
 		
 			// [MUDANÇA v3] Lógica de "Concluído" atualizada
@@ -2706,16 +2735,9 @@ renderLixeiraPage() {
 				e.preventDefault();
 				const name = document.getElementById('inputDisplayName').value;
 				if (name && (await this.authService.updateUserProfile(name))) {
-					this.currentUserDisplayName = name;
-					this.currentSafeName = Utils.sanitizeForFirestoreId(name);
-					this.isUserAdmin = ADMIN_USERS.includes(name);
-					document.body.classList.toggle('is-admin', this.isUserAdmin);
-					document.getElementById('user-display-name').textContent = name;
-					this.closeModal('modalDisplayName');
-					this.appContainer.style.display = 'flex';
-					this.setupUIAccess();
-					this.firebaseService.startSnapshotListener('contracts');
-					this.firebaseService.startNotificationListener(this.currentSafeName); // [MUDANÇA v5]
+					// Recarrega a página para forçar o handleAuthStateChange a rodar
+					// com o novo nome e definir as permissões de admin corretamente.
+					window.location.reload(); 
 				}
 			}
 		
@@ -2746,6 +2768,7 @@ renderLixeiraPage() {
 				}
 		
 				if (!contractId) {
+					// --- CRIAÇÃO DE NOVO CONTRATO ---
 					Object.assign(contractData, {
 						successFeeValueReceived: 0,
 						successFeePaymentDate: null,
@@ -2782,8 +2805,14 @@ renderLixeiraPage() {
 					}
 					if (await this.firebaseService.addContract(contractData)) {
 						this.closeModal('modalContrato');
+						// [NOVO v5.4] Notifica admins sobre novo contrato
+						this.sendNotificationToAllAdmins({
+							message: `${this.currentUserDisplayName} criou um novo contrato para: ${contractData.clientName}.`,
+							sender: this.currentUserDisplayName
+						});
 					}
 				} else {
+					// --- ATUALIZAÇÃO DE CONTRATO EXISTENTE ---
 					const existingContract = this.database.contracts.find(c => c.id === contractId);
 					if (!this.isUserAdmin && existingContract) {
 						contractData.totalValue = existingContract.totalValue;
@@ -2817,14 +2846,21 @@ renderLixeiraPage() {
 		
 				if (contract && !isNaN(valuePaid)) {
 					const updatedParcels = [...(contract.parcels || [])];
-					updatedParcels[parcelIndex].status = 'Paga';
-					updatedParcels[parcelIndex].valuePaid = valuePaid;
-					updatedParcels[parcelIndex].paymentDate = new Date(paymentDate + 'T12:00:00Z').toISOString();
+					const parcel = updatedParcels[parcelIndex];
+					parcel.status = 'Paga';
+					parcel.valuePaid = valuePaid;
+					parcel.paymentDate = new Date(paymentDate + 'T12:00:00Z').toISOString();
 					
 					const success = await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels });
 					if (success) {
 						this.closeModal('modalPagamento');
 						Utils.showToast('Pagamento registado.', 'success');
+						// [NOVO v5.4] Notifica advogado sobre pagamento
+						this.sendNotification(contract.advogadoResponsavel, {
+							message: `Pagamento de ${Utils.formatCurrency(valuePaid)} (Parcela ${parcel.number}) registado para ${contract.clientName}.`,
+							contractId: contractId,
+							sender: this.currentUserDisplayName
+						});
 					}
 				} else {
 					Utils.showToast('Valor de pagamento inválido.', 'error');
@@ -2849,6 +2885,12 @@ renderLixeiraPage() {
 					if (success) {
 						this.closeModal('modalExito');
 						Utils.showToast('Êxito registado.', 'success');
+						// [NOVO v5.4] Notifica advogado sobre pagamento de êxito
+						this.sendNotification(contract.advogadoResponsavel, {
+							message: `Pagamento de Êxito (${Utils.formatCurrency(valueReceived)}) registado para ${contract.clientName}.`,
+							contractId: contractId,
+							sender: this.currentUserDisplayName
+						});
 					}
 				}
 			}
@@ -2879,26 +2921,68 @@ renderLixeiraPage() {
 					
 					const success = await this.firebaseService.updateContractField(contractId, { serviceTypes: updatedServiceTypes });
 
-					// Lógica de Notificação
+					// Lógica de Notificação (Apenas para 'Concluído')
 					if (success && newStatus === 'Concluído') {
-						const recipientName = contract.advogadoResponsavel;
-						// Só envia notificação se o utilizador atual NÃO for o advogado responsável (ex: admin atualizando)
-						if (recipientName && recipientName !== this.currentUserDisplayName) {
-							this.sendNotification(recipientName, {
-								message: `${this.currentUserDisplayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
-								contractId: contractId,
-								sender: this.currentUserDisplayName
-							});
-						}
+						this.sendNotification(contract.advogadoResponsavel, {
+							message: `${this.currentUserDisplayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
+							contractId: contractId,
+							sender: this.currentUserDisplayName
+						});
 					}
 				}
 			}
 
-			// [MUDANÇA v5] Nova função de notificação
+			// [NOVO v5.4] Função helper para enviar notificação a um usuário
 			async sendNotification(recipientName, data) {
+				// Não envia notificação para o próprio usuário
+				if (!recipientName || recipientName === this.currentUserDisplayName) return; 
+				
 				const safeRecipientName = Utils.sanitizeForFirestoreId(recipientName);
 				await this.firebaseService.sendNotification(safeRecipientName, data);
-				Utils.showToast('Notificação enviada.', 'info');
+				// Utils.showToast('Notificação enviada.', 'info'); // Opcional: bom para debug
+			}
+			
+			// [NOVO v5.4] Função helper para enviar notificação para TODOS os admins
+			async sendNotificationToAllAdmins(data) {
+				ADMIN_USERS.forEach(adminName => {
+					// Envia para todos os admins, exceto o usuário que causou a ação
+					if (adminName.toLowerCase() !== this.currentUserDisplayName?.toLowerCase()) {
+						const safeAdminName = Utils.sanitizeForFirestoreId(adminName);
+						this.firebaseService.sendNotification(safeAdminName, data);
+					}
+				});
+			}
+
+			// [NOVO v5.4] Verifica e envia notificações sobre parcelas vencidas
+			checkAndNotifyOverdue(oldContracts, newContracts) {
+				const hoje = new Date();
+				const hojeStr = hoje.toISOString().split('T')[0]; // YYYY-MM-DD
+				
+				// Roda apenas uma vez por dia
+				if (this.lastOverdueCheck === hojeStr) return; 
+				
+				const yesterday = new Date(hoje);
+				yesterday.setDate(hoje.getDate() - 1);
+				const ontemStr = yesterday.toISOString().split('T')[0];
+
+				// Itera apenas sobre os contratos do usuário atual (ou todos se for admin)
+				const contractsToCheck = this.getFilteredContracts(false); 
+				
+				contractsToCheck.forEach(contract => {
+					(contract.parcels || []).forEach(parcel => {
+						// Se a parcela estava Pendente e venceu ONTEM
+						if (parcel.status === 'Pendente' && parcel.dueDate.startsWith(ontemStr)) {
+							console.log(`[Notificação Vencida] Enviando para: ${contract.advogadoResponsavel}`);
+							this.sendNotification(contract.advogadoResponsavel, {
+								message: `Atenção: A parcela ${parcel.number} (${Utils.formatCurrency(parcel.value)}) do contrato ${contract.clientName} venceu ontem.`,
+								contractId: contract.id,
+								sender: "Sistema"
+							});
+						}
+					});
+				});
+				
+				this.lastOverdueCheck = hojeStr; // Marca como checado hoje
 			}
 		
 			async moveToLixeira(contractId) {
@@ -3018,8 +3102,12 @@ renderLixeiraPage() {
 				let valorCorrigido = parcel.value;
 				let infoCorrecao = '';
 				if (new Date(parcel.dueDate) < new Date()) {
-					valorCorrigido = await this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
-					if (this.isUserAdmin) infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> ${Utils.formatCurrency(valorCorrigido)}</p>`;
+					try {
+						valorCorrigido = await this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
+						if (this.isUserAdmin) infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> ${Utils.formatCurrency(valorCorrigido)}</p>`;
+					} catch(e) {
+						if (this.isUserAdmin) infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> (Falha ao buscar IPCA)</p>`;
+					}
 				}
 		
 				document.getElementById('pagamentoContractId').value = contractId;
