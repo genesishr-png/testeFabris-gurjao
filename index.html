@@ -639,6 +639,14 @@
 							</div>
 						</div>
 					</div>
+					
+					<div class="dark-card shadow-lg p-6 rounded-lg mt-8">
+						<h3 class="text-lg font-semibold text-gray-300 mb-4">Projeção de Fluxo de Caixa (Próximos 12 Meses)</h3>
+						<p class="text-sm text-gray-400 mb-4 -mt-3">(Baseado em todas as parcelas pendentes do escritório)</p>
+						<div class="relative" style="height: 350px;">
+							<canvas id="adminChartFluxoCaixa"></canvas>
+						</div>
+					</div>
 				</div>
 
 				<div id="page-relatorios" class="hidden admin-only">
@@ -1169,13 +1177,13 @@
 				this.auth = null;
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-  authDomain: "fabrisgurjao.firebaseapp.com",
-  projectId: "fabrisgurjao",
-  storageBucket: "fabrisgurjao.firebasestorage.app",
-  messagingSenderId: "466702265991",
-  appId: "1:466702265991:web:78c4d98b47cab537921222",
-  measurementId: "G-E99R5TFMQK"
+					apiKey: "SUA_API_KEY",
+					authDomain: "SEU_AUTH_DOMAIN",
+					projectId: "SEU_PROJECT_ID",
+					storageBucket: "SEU_STORAGE_BUCKET",
+					messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+					appId: "SEU_APP_ID",
+					measurementId: "SEU_MEASUREMENT_ID"
 				};
 			}
 		
@@ -1397,7 +1405,7 @@
 		
 		/**
 		 * @class AnalyticsHandler
-		 * [NOVO v5.5] Adicionadas funções para os novos gráficos de admin
+		 * [NOVO v5.7] Adicionado 'adminChartFluxoCaixa'
 		 */
 		class AnalyticsHandler {
 			constructor() {
@@ -1410,6 +1418,7 @@
 				// [NOVO v5.5] Gráficos da Página de Performance
 				this.adminChartContratos = null;
 				this.adminChartFaturamento = null;
+				this.adminChartFluxoCaixa = null; // [NOVO v5.7]
 			}
 			
 			getChartConfig(type, labels, datasets) {
@@ -1490,6 +1499,14 @@
 					'bar', labels, [{ label: 'Faturação (Ano)', data, backgroundColor: 'rgba(74, 222, 128, 0.6)', borderColor: 'rgba(74, 222, 128, 1)', borderWidth: 1 }]
 				));
 			}
+			
+			// [NOVO v5.7] Gráfico de Fluxo de Caixa
+			renderAdminFluxoCaixaChart(ctx, labels, data) {
+				if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy();
+				this.adminChartFluxoCaixa = new Chart(ctx, this.getChartConfig(
+					'bar', labels, [{ label: 'Projeção (Parcelas)', data, backgroundColor: 'rgba(139, 92, 246, 0.6)', borderColor: 'rgba(139, 92, 246, 1)', borderWidth: 1 }]
+				));
+			}
 		
 			// [CORREÇÃO v5.2] Força a remoção de tooltips "fantasmas"
 			_forceRemoveTooltips() {
@@ -1511,8 +1528,10 @@
 				if (pageId === 'page-performance') {
 					if (this.adminChartContratos) this.adminChartContratos.destroy();
 					if (this.adminChartFaturamento) this.adminChartFaturamento.destroy();
+					if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy(); // [NOVO v5.7]
 					this.adminChartContratos = null;
 					this.adminChartFaturamento = null;
+					this.adminChartFluxoCaixa = null; // [NOVO v5.7]
 				}
 				
 				this._forceRemoveTooltips();
@@ -1618,7 +1637,10 @@
 
 				const faturamentoPorAdvogado = faturamentoAno.byAdvogado;
 				
-				return { contratosPorAdvogado, faturamentoPorAdvogado };
+				// [NOVO v5.7] Adiciona cálculo de fluxo de caixa
+				const fluxoCaixa = this.getProjectedIncomeData(contractsToRender);
+				
+				return { contratosPorAdvogado, faturamentoPorAdvogado, fluxoCaixa };
 			}
 
 			// Função legada (ainda usada pelo modal antigo)
@@ -1643,6 +1665,7 @@
 				return { labels, data };
 			}
 		
+			// [MUDANÇA v5.7] Esta função agora é usada tanto pelo modal quanto pelo painel de admin
 			getProjectedIncomeData(contractsToRender) {
 				const labels = [];
 				const data = new Array(12).fill(0);
@@ -1654,6 +1677,7 @@
 					labels.push(date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }));
 				}
 		
+				// [MUDANÇA v5.7] Usa todos os contratos (admin) ou filtrados (usuário)
 				const filteredContracts = contractsToRender.filter(c => !c.isDeleted);
 				for (const contract of filteredContracts) {
 					if (!contract.parcels) continue;
@@ -2711,6 +2735,7 @@
 				});
 				container.append(fragment);
 			}
+
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
 				// Define datas padrão (início do mês até hoje)
@@ -2741,7 +2766,7 @@
 				
 				// Pega todos os contratos (incluindo da lixeira, para cálculos históricos)
 				const allContracts = this.getFilteredContracts(true);
-				const { contratosPorAdvogado, faturamentoPorAdvogado } = this.reportHandler.calculateAdminPerformanceData(allContracts);
+				const { contratosPorAdvogado, faturamentoPorAdvogado, fluxoCaixa } = this.reportHandler.calculateAdminPerformanceData(allContracts);
 				
 				// 1. Renderiza Gráfico 1 (Contratos Ativos por Advogado)
 				const contratosLabels = Object.keys(contratosPorAdvogado);
@@ -2772,6 +2797,10 @@
 				contRanking.forEach(([label, value], index) => {
 					contTableBody.append(this.domBuilder.createRankingRow(index + 1, label, `${value} contrato(s)`));
 				});
+
+				// 5. [NOVO v5.7] Renderiza Gráfico 3 (Fluxo de Caixa)
+				const fluxoCaixaCtx = document.getElementById('adminChartFluxoCaixa').getContext('2d');
+				this.analyticsHandler.renderAdminFluxoCaixaChart(fluxoCaixaCtx, fluxoCaixa.labels, fluxoCaixa.data);
 			}
 		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
@@ -2781,7 +2810,7 @@
 					'page-dashboard': 'Painel Principal',
 					'page-parcelas': 'Controle de Parcelas', // [MUDANÇA v5.6]
 					'page-servicos': 'Produção de Serviços',
-					'page-performance': 'Performance Gerencial',
+					'page-performance': 'Performance Gerencial', // [NOVO v5.5]
 					'page-relatorios': 'Relatórios Avançados',
 					'page-lixeira': 'Lixeira'
 				};
@@ -3699,7 +3728,6 @@
 					</div>
 				`;
 			}
-
 			renderAdvancedReportCharts(data) {
 				// 1. Gráfico de Linha (Faturação no Tempo)
 				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
