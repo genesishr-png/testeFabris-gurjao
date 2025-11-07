@@ -124,6 +124,23 @@
 		}
 		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
 		
+		/* [NOVO v5.8] Estilo para os inputs da página de Configurações */
+		.settings-input {
+			background-color: #1f2937;
+			border: 1px solid #4b5563;
+			color: #d1d5db;
+			padding: 8px 12px;
+			border-radius: 6px;
+			font-size: 14px;
+			width: 100%;
+			transition: all 0.2s ease-in-out;
+		}
+		.settings-input:focus {
+			border-color: #6366f1;
+			box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+			outline: none;
+		}
+		
 		#loading-overlay { 
 			position: fixed; 
 			top: 0; left: 0; 
@@ -424,6 +441,11 @@
 					<i class="fas fa-trash-alt w-5 text-center"></i>
 					<span>Lixeira</span>
 				</a>
+
+				<a onclick="window.App.showPage('page-settings')" id="tab-settings" class="sidebar-nav-item admin-only">
+					<i class="fas fa-cog w-5 text-center"></i>
+					<span>Configurações</span>
+				</a>
 			</nav>
 
 			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
@@ -714,7 +736,49 @@
 					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente (apenas admins).</p>
 					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
-			</div> 
+
+				<div id="page-settings" class="hidden admin-only">
+					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
+						<h2 class="text-2xl font-semibold text-white">Configurações do Sistema</h2>
+						<p class="text-gray-400 -mt-4">Gestão de listas, índices e utilizadores.</p>
+					</div>
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+						<div class="dark-card shadow-lg p-6 rounded-lg">
+							<h3 class="text-lg font-semibold text-gray-300 mb-4">Gerir Lista de Advogados</h3>
+							<p class="text-sm text-gray-400 mb-4">Esta lista preenche os campos "Advogado Responsável" nos formulários.</p>
+							<div class="space-y-2 mb-4" id="settingsAdvogadosList">
+								</div>
+							<form id="formAddAdvogado" class="flex gap-2">
+								<input type="text" id="inputNewAdvogadoName" class="settings-input flex-1" placeholder="Nome do(a) novo(a) advogado(a)..." required>
+								<button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Adicionar</button>
+							</form>
+						</div>
+
+						<div class="dark-card shadow-lg p-6 rounded-lg">
+							<h3 class="text-lg font-semibold text-gray-300 mb-4">Atualizar Índice IPCA</h3>
+							<p class="text-sm text-gray-400 mb-4">Adicione o valor mais recente do IPCA para manter os cálculos de juros corretos.</p>
+							<form id="formUpdateIPCA" class="space-y-3">
+								<div class="flex gap-4">
+									<div class="flex-1">
+										<label for="inputIPCAMonth" class="block text-sm font-medium text-gray-400 mb-1">Mês/Ano (Ex: 2025-11)</label>
+										<input type="text" id="inputIPCAMonth" pattern="[0-9]{4}-[0-9]{2}" class="settings-input" placeholder="AAAA-MM" required>
+									</div>
+									<div class="flex-1">
+										<label for="inputIPCAValue" class="block text-sm font-medium text-gray-400 mb-1">Valor (Ex: 0.42)</label>
+										<input type="number" step="0.01" id="inputIPCAValue" class="settings-input" placeholder="0.00" required>
+									</div>
+								</div>
+								<button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg">Salvar Novo Índice</button>
+							</form>
+							<div class="mt-4">
+								<p class="text-sm text-gray-400">Último índice registado:</p>
+								<p id="settingsLastIPCA" class="font-bold text-gray-200">Carregando...</p>
+							</div>
+						</div>
+					</div>
+					
+				</div> </div> 
 		</main>
 		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
 			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
@@ -737,13 +801,14 @@
 				<span class="text-xs mt-1">Perf.</span>
 			</a>
 			
-			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only">
-				<i class="fas fa-chart-pie text-xl"></i>
-				<span class="text-xs mt-1">Relat.</span>
-			</a>
 			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item">
 				<i class="fas fa-trash-alt text-xl"></i>
 				<span class="text-xs mt-1">Lixeira</span>
+			</a>
+
+			<a onclick="window.App.showPage('page-settings')" id="mobile-tab-settings" class="mobile-nav-item admin-only">
+				<i class="fas fa-cog text-xl"></i>
+				<span class="text-xs mt-1">Config.</span>
 			</a>
 		</nav>
 
@@ -969,11 +1034,10 @@
 		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
-		// [CORREÇÃO LIXEIRA] Nomes em minúsculo para verificação
-		const ADMIN_USERS = ["dra. renata fabris", "dr. felipe gurjão", "lilian"];
+		// [MUDANÇA v5.8] Lista de Admins foi removida daqui. Agora é lida do banco de dados (coleção 'users').
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
 		
 		// Objeto de Utilitários
@@ -1092,27 +1156,12 @@
 
 		/**
 		 * @class CorrectionCalculator
-		 * [NOVO v5.5] Esta classe foi totalmente refatorada.
-		 * Ela não busca mais na internet (removendo o bug 429).
-		 * Ela usa uma tabela interna (IPCA_TABLE) para cálculos.
-		 * Isso torna o app mais rápido e 100% confiável.
+		 * [MUDANÇA v5.8] Esta classe agora depende do SettingsHandler
+		 * para obter a tabela IPCA do banco de dados, em vez de tê-la "chumbada" aqui.
 		 */
 		class CorrectionCalculator {
-			constructor() {
-				// Valores do IPCA (em %) - https://www.bcb.gov.br/pec/Indeco/IEP/ipedida.asp?id=433
-				// Você deve atualizar esta tabela manualmente a cada novo mês para manter a precisão.
-				this.IPCA_TABLE = {
-					"2023-01": 0.53, "2023-02": 0.84, "2023-03": 0.71, "2023-04": 0.61,
-					"2023-05": 0.23, "2023-06": -0.08, "2023-07": 0.12, "2023-08": 0.23,
-					"2023-09": 0.26, "2023-10": 0.24, "2023-11": 0.28, "2023-12": 0.56,
-					"2024-01": 0.42, "2024-02": 0.83, "2024-03": 0.16, "2024-04": 0.38,
-					"2024-05": 0.46, "2024-06": 0.36, "2024-07": 0.16, "2024-08": 0.24,
-					"2024-09": 0.26, "2024-10": 0.42, "2024-11": 0.53, "2024-12": 0.48,
-					"2025-01": 0.55, "2025-02": 0.78, "2025-03": 0.21, "2025-04": 0.35,
-					"2025-05": 0.40, "2025-06": 0.26, "2025-07": 0.22, "2025-08": 0.31,
-					"2025-09": 0.33, "2025-10": 0.40, 
-					// TODO: Adicionar "2025-11" quando o índice for divulgado
-				};
+			constructor(settingsHandler) {
+				this.settingsHandler = settingsHandler;
 			}
 		
 			toUTCDate(y, m, d) { const dt = new Date(Date.UTC(y, m, d)); dt.setUTCHours(0,0,0,0); return dt; }
@@ -1126,10 +1175,9 @@
 			}
 		
 			getIPCAAccumulatedFactor(vencDate, refDate) {
+				const IPCA_TABLE = this.settingsHandler.getIpcaTable(); // Pega a tabela do banco
 				let factor = 1.0;
-				// Começa no mês de vencimento
 				let currentDate = new Date(Date.UTC(vencDate.getUTCFullYear(), vencDate.getUTCMonth(), 1));
-				// Para no mês *anterior* ao da data de referência
 				const endDate = new Date(Date.UTC(refDate.getUTCFullYear(), refDate.getUTCMonth(), 1));
 		
 				while (currentDate < endDate) {
@@ -1137,7 +1185,7 @@
 					const month = String(currentDate.getUTCMonth() + 1).padStart(2, '0');
 					const key = `${year}-${month}`;
 					
-					const ipcaPercent = this.IPCA_TABLE[key];
+					const ipcaPercent = IPCA_TABLE[key];
 					if (ipcaPercent !== undefined) {
 						factor *= (1 + ipcaPercent / 100);
 					} else {
@@ -1149,7 +1197,6 @@
 				return factor;
 			}
 			
-			// A função agora é síncrona (não usa 'async')
 			calcularValorCorrigido(valorOriginal, dataVencimento, dataReferencia = new Date()) {
 				const ref = this.toUTCDate(dataReferencia.getUTCFullYear(), dataReferencia.getUTCMonth(), dataReferencia.getUTCDate());
 				const vRaw = new Date(dataVencimento);
@@ -1157,10 +1204,7 @@
 				
 				if (ref <= venc) return valorOriginal;
 		
-				// 1. Correção (IPCA) da tabela interna
 				const ipcaFactor = this.getIPCAAccumulatedFactor(venc, ref);
-				
-				// 2. Juros (1% a.m. simples)
 				const meses = this.diffMonths_30_360(venc, ref);
 				const jurosSimplesFactor = 1 + 0.01 * meses;
 				
@@ -1177,13 +1221,13 @@
 				this.auth = null;
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					 apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-  authDomain: "fabrisgurjao.firebaseapp.com",
-  projectId: "fabrisgurjao",
-  storageBucket: "fabrisgurjao.firebasestorage.app",
-  messagingSenderId: "466702265991",
-  appId: "1:466702265991:web:78c4d98b47cab537921222",
-  measurementId: "G-E99R5TFMQK"
+					apiKey: "SUA_API_KEY",
+					authDomain: "SEU_AUTH_DOMAIN",
+					projectId: "SEU_PROJECT_ID",
+					storageBucket: "SEU_STORAGE_BUCKET",
+					messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+					appId: "SEU_APP_ID",
+					measurementId: "SEU_MEASUREMENT_ID"
 				};
 			}
 		
@@ -1194,6 +1238,7 @@
 					setLogLevel('error'); // 'error' em produção, 'debug' para testar
 					const db = getFirestore(firebaseApp);
 					this.app.firebaseService.setDB(db);
+					this.app.settingsHandler.setDB(db); // [NOVO v5.8] Dá o DB para o SettingsHandler
 					this.setupAuthListener();
 				} catch (error) {
 					console.error("Erro na inicialização do Firebase:", error);
@@ -1223,7 +1268,6 @@
 					await signInWithEmailAndPassword(this.auth, email, password);
 				} catch (error) {
 					const showAuthError = (m) => { authError.textContent = m; authError.classList.remove('hidden'); };
-					// [POLIMENTO] 'auth/invalid-credential' é o erro moderno que cobre (user-not-found, wrong-password, etc)
 					if (error.code === 'auth/invalid-credential') {
 						showAuthError('Email ou senha inválidos.');
 					} else {
@@ -1250,6 +1294,11 @@
 				if (!this.auth.currentUser) return false;
 				try {
 					await updateProfile(this.auth.currentUser, { displayName });
+					
+					// [NOVO v5.8] Atualiza também o 'displayName' no documento 'users'
+					const userDocRef = doc(this.app.firebaseService.db, 'users', this.auth.currentUser.uid);
+					await setDoc(userDocRef, { displayName: displayName }, { merge: true });
+					
 					return true;
 				} catch (error) {
 					console.error("Erro ao guardar nome:", error);
@@ -1268,7 +1317,6 @@
 				this.db = null;
 				this.contractsCollection = null;
 				this.snapshotListenerUnsubscribe = null;
-				// [MUDANÇA v5] Listeners de Notificação
 				this.notificationListenerUnsubscribe = null;
 				this.notificationCollection = null;
 			}
@@ -1298,7 +1346,6 @@
 				}
 			}
 
-			// [MUDANÇA v5] Lógica de Notificações
 			startNotificationListener(safeName) {
 				if (this.notificationListenerUnsubscribe) {
 					this.notificationListenerUnsubscribe();
@@ -1310,9 +1357,7 @@
 					const notifications = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
 					this.app.handleNotificationUpdate(notifications);
 				}, (error) => {
-					// [MUDANÇA v5.4] Silencia o toast de erro daqui, pois já corrigimos as regras
 					console.error("Erro ao buscar notificações:", error);
-					// Utils.showToast('Erro ao buscar notificações.', 'error');
 				});
 			}
 
@@ -1351,7 +1396,6 @@
 					Utils.showToast('Erro ao atualizar notificações.', 'error');
 				}
 			}
-			// [FIM MUDANÇA v5]
 		
 			async addContract(contractData) {
 				try {
@@ -2156,6 +2200,128 @@
 				`;
 				return tr;
 			}
+
+			// [NOVO v5.8] Cria item da lista de advogados (para a pág. de Configurações)
+			createAdvogadoListItem(name) {
+				const item = this.buildElement('div', { className: 'flex items-center justify-between p-2 bg-gray-700/50 rounded-md' });
+				item.innerHTML = `<span class="text-gray-300">${name}</span>`;
+				
+				const removeBtn = this.buildElement('button', {
+					className: 'text-red-400 hover:text-red-300 transition-colors',
+					html: '<i class="fas fa-times-circle"></i>'
+				});
+				removeBtn.title = "Remover Advogado";
+				removeBtn.onclick = () => this.app.handleRemoveAdvogado(name);
+				
+				item.append(removeBtn);
+				return item;
+			}
+		}
+		
+		
+		/**
+		 * @class SettingsHandler
+		 * [NOVO v5.8] Esta classe gerencia o carregamento e a
+		 * atualização das configurações do sistema (IPCA, Advogados)
+		 * que agora vivem no banco de dados.
+		 */
+		class SettingsHandler {
+			constructor() {
+				this.db = null;
+				this.settings = {
+					advogados: [],
+					ipcaTable: {}
+				};
+				this.settingsLoaded = false;
+				this.onSettingsLoadCallbacks = [];
+			}
+			
+			setDB(dbInstance) {
+				this.db = dbInstance;
+			}
+			
+			getAdvogadosList() {
+				return this.settings.advogados;
+			}
+			
+			getIpcaTable() {
+				return this.settings.ipcaTable;
+			}
+			
+			// Espera as configurações serem carregadas
+			async onSettingsLoaded() {
+				if (this.settingsLoaded) return true;
+				return new Promise(resolve => {
+					this.onSettingsLoadCallbacks.push(resolve);
+				});
+			}
+
+			// Carrega todas as configurações do Firestore
+			async loadSettings() {
+				try {
+					// 1. Carrega a lista de advogados
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					const advDocSnap = await getDoc(advDocRef);
+					if (advDocSnap.exists()) {
+						this.settings.advogados = advDocSnap.data().list || [];
+					} else {
+						console.warn("Documento 'advogados' não encontrado em 'systemSettings'. Usando lista vazia.");
+						this.settings.advogados = [];
+					}
+					
+					// 2. Carrega a tabela do IPCA
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					const ipcaDocSnap = await getDoc(ipcaDocRef);
+					if (ipcaDocSnap.exists()) {
+						this.settings.ipcaTable = ipcaDocSnap.data().table || {};
+					} else {
+						console.warn("Documento 'ipca' não encontrado em 'systemSettings'. Cálculos de juros podem falhar.");
+						this.settings.ipcaTable = {};
+					}
+					
+					// 3. Avisa ao app que tudo foi carregado
+					this.settingsLoaded = true;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(true));
+					this.onSettingsLoadCallbacks = []; // Limpa a fila
+					
+				} catch (error) {
+					console.error("ERRO CRÍTICO AO CARREGAR CONFIGURAÇÕES:", error);
+					Utils.showToast("Falha ao carregar configurações do sistema. O app pode não funcionar.", "error");
+					this.settingsLoaded = false;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(false));
+					this.onSettingsLoadCallbacks = [];
+				}
+			}
+
+			// Salva a lista de advogados no Firebase
+			async saveAdvogadosList(newList) {
+				try {
+					this.settings.advogados = newList;
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					await setDoc(advDocRef, { list: newList });
+					Utils.showToast("Lista de advogados atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar lista de advogados:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
+			
+			// Salva a tabela do IPCA no Firebase
+			async saveIpcaTable(newTable) {
+				try {
+					this.settings.ipcaTable = newTable;
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					await setDoc(ipcaDocRef, { table: newTable });
+					Utils.showToast("Tabela IPCA atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar tabela IPCA:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
 		}
 		
 		
@@ -2170,8 +2336,8 @@
 					contracts: [],
 					notifications: [] // [MUDANÇA v5]
 				};
-				this.currentUserDisplayName = null;
-				this.currentSafeName = null; // [MUDANÇA v5]
+				this.currentUser = null; // [MUDANÇA v5.8] Armazena o usuário (uid, nome)
+				this.userRole = 'user'; // [MUDANÇA v5.8] (user ou admin)
 				this.isUserAdmin = false;
 				this.currentAdvancedReportData = null; // [MUDANÇA v5]
 				this.currentPageId = null; // [CORREÇÃO v5.1]
@@ -2203,12 +2369,13 @@
 				this.lastFocusedElement = null;
 		
 				// Serviços Injetados
+				this.settingsHandler = new SettingsHandler(this); // [NOVO v5.8]
 				this.authService = new AuthService(this);
 				this.firebaseService = new FirebaseService(this);
 				this.domBuilder = new DOMBuilder(this);
 				this.reportHandler = new ReportHandler(this);
 				this.analyticsHandler = new AnalyticsHandler(this);
-				this.correctionCalculator = new CorrectionCalculator(this);
+				this.correctionCalculator = new CorrectionCalculator(this.settingsHandler); // [MUDANÇA v5.8]
 			}
 		
 			// --- 1. INICIALIZAÇÃO E EVENT LISTENERS ---
@@ -2337,53 +2504,66 @@
 						document.getElementById('financialDataChanged').value = 'true';
 					});
 				});
+
+				// [NOVO v5.8] Listeners da página de Configurações
+				document.getElementById('formAddAdvogado')?.addEventListener('submit', this.handleAddAdvogado.bind(this));
+				document.getElementById('formUpdateIPCA')?.addEventListener('submit', this.handleUpdateIPCA.bind(this));
 			}
 		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
 		
-			handleAuthStateChange(user) {
+			// [MUDANÇA v5.8] Lógica de autenticação totalmente refatorada
+			async handleAuthStateChange(user) {
 				if (user) {
-					// --- INÍCIO DO BLOCO DE TESTE ---
-					const nomeDoFirebase = user.displayName;
-					const nomeEmMinusculas = nomeDoFirebase ? nomeDoFirebase.toLowerCase() : '';
-					const listaDeAdmins = ADMIN_USERS; // A lista global já está em minúsculas
-					const euSouAdmin = listaDeAdmins.includes(nomeEmMinusculas);
-
-					console.log("===============================");
-					console.log("TESTE DE PERMISSÃO DA LIXEIRA");
-					console.log("Nome lido do Firebase:", nomeDoFirebase);
-					console.log("Nome convertido p/ minúsculas:", nomeEmMinusculas);
-					console.log("Lista de Admins (minúsculas):", listaDeAdmins);
-					console.log("O sistema me considera Admin?", euSouAdmin);
-					console.log("===============================");
-					// --- FIM DO BLOCO DE TESTE ---
-
-					this.currentUserDisplayName = user.displayName;
-					this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName);
-					this.isUserAdmin = euSouAdmin; // Usa o resultado do nosso teste!
+					// 1. Carrega as configurações do sistema (IPCA, Advogados)
+					await this.settingsHandler.loadSettings();
+					
+					// 2. Busca o perfil do usuário no Firestore (para saber o 'role')
+					const userDocRef = doc(this.firebaseService.db, 'users', user.uid);
+					const userDocSnap = await getDoc(userDocRef);
+					
+					if (userDocSnap.exists()) {
+						this.userRole = userDocSnap.data().role || 'user';
+					} else {
+						// Se é o primeiro login, cria o perfil básico
+						this.userRole = 'user'; // Padrão
+						await setDoc(userDocRef, {
+							displayName: user.displayName,
+							email: user.email,
+							role: this.userRole
+						}, { merge: true });
+					}
+					
+					this.isUserAdmin = (this.userRole === 'admin');
+					this.currentUser = {
+						uid: user.uid,
+						displayName: user.displayName,
+						safeName: Utils.sanitizeForFirestoreId(user.displayName)
+					};
 					
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 		
 					if (!user.displayName) {
-						// Primeiro login, pedir nome
+						// Se o perfil do Firebase não tem nome, pede
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'flex'; // Mostra o novo ecrã de login
+						this.authOverlay.style.display = 'flex'; 
 						this.appContainer.style.display = 'none';
 						this.openModal('modalDisplayName');
 					} else {
-						// Utilizador logado
+						// Utilizador logado e com nome
 						document.getElementById('user-display-name').textContent = user.displayName;
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'none';
+...
+					this.authOverlay.style.display = 'none';
 						this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
 						this.setupUIAccess();
 						this.firebaseService.startSnapshotListener('contracts');
-						this.firebaseService.startNotificationListener(this.currentSafeName); // [MUDANÇA v5]
+						this.firebaseService.startNotificationListener(this.currentUser.safeName); // [MUDANÇA v5.8]
 					}
 				} else {
 					// Utilizador deslogado
-					this.currentUserDisplayName = null;
-					this.currentSafeName = null;
+					this.currentUser = null;
+					this.userRole = 'user';
 					this.isUserAdmin = false;
 					this.lastOverdueCheck = null; // [NOVO v5.4] Reseta o cheque de vencidos
 					document.body.classList.remove('is-admin');
@@ -2437,6 +2617,8 @@
 					this.renderAdvancedReportPage();
 				} else if (pageId === 'page-performance') {
 					this.renderPerformancePage(); // [NOVO v5.5]
+				} else if (pageId === 'page-settings') {
+					this.renderSettingsPage(); // [NOVO v5.8]
 				}
 		
 				this.renderSortButtons();
@@ -2532,7 +2714,7 @@
 				const advogadoFilterEl = document.getElementById('advogadoFilter');
 				
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
-				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
+				if (!this.isUserAdmin) advogadoFilter = this.currentUser.displayName;
 		
 				// 1. Filtra os contratos (incluindo o novo filtro de status)
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
@@ -2644,7 +2826,7 @@
 				const searchTerm = (document.getElementById('servicosSearchInput').value || '').toLowerCase();
 				const advogadoFilterEl = document.getElementById('servicosAdvogadoFilter');
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
-				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
+				if (!this.isUserAdmin) advogadoFilter = this.currentUser.displayName;
 		
 				container.innerHTML = '';
 		
@@ -2802,6 +2984,28 @@
 				const fluxoCaixaCtx = document.getElementById('adminChartFluxoCaixa').getContext('2d');
 				this.analyticsHandler.renderAdminFluxoCaixaChart(fluxoCaixaCtx, fluxoCaixa.labels, fluxoCaixa.data);
 			}
+
+			// [NOVO v5.8] Página de Configurações
+			renderSettingsPage() {
+				if (!this.isUserAdmin) return;
+				
+				// 1. Renderiza lista de Advogados
+				const advListContainer = document.getElementById('settingsAdvogadosList');
+				advListContainer.innerHTML = '';
+				const advogados = this.settingsHandler.getAdvogadosList();
+				advogados.forEach(name => {
+					advListContainer.append(this.domBuilder.createAdvogadoListItem(name));
+				});
+				
+				// 2. Renderiza último IPCA
+				const ipcaTable = this.settingsHandler.getIpcaTable();
+				const lastIpcaEntry = Object.entries(ipcaTable).pop(); // Pega o último
+				if (lastIpcaEntry) {
+					document.getElementById('settingsLastIPCA').textContent = `Mês: ${lastIpcaEntry[0]} | Valor: ${lastIpcaEntry[1]}%`;
+				} else {
+					document.getElementById('settingsLastIPCA').textContent = "Nenhum índice cadastrado.";
+				}
+			}
 		
 			// --- 4. LÓGICA DE UI (Filtros, Abas, Helpers) ---
 		
@@ -2812,7 +3016,8 @@
 					'page-servicos': 'Produção de Serviços',
 					'page-performance': 'Performance Gerencial', // [NOVO v5.5]
 					'page-relatorios': 'Relatórios Avançados',
-					'page-lixeira': 'Lixeira'
+					'page-lixeira': 'Lixeira',
+					'page-settings': 'Configurações do Sistema' // [NOVO v5.8]
 				};
 				
 				// [NOVO v5.5] Destrói gráficos se ESTIVERMOS a SAIR da página de relatórios OU performance
@@ -2828,7 +3033,7 @@
 				document.getElementById('page-title').textContent = pageTitles[pageId] || 'Painel';
 		
 				// Esconde todas as páginas
-				['page-dashboard', 'page-parcelas', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance'].forEach(id => {
+				['page-dashboard', 'page-parcelas', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance', 'page-settings'].forEach(id => {
 					const el = document.getElementById(id);
 					if (el) el.classList.add('hidden');
 				});
@@ -2870,7 +3075,7 @@
 				advogadoFilters.forEach(select => {
 					if (select) {
 						select.disabled = !isAdmin;
-						select.value = isAdmin ? 'Todos' : this.currentUserDisplayName;
+						select.value = isAdmin ? 'Todos' : this.currentUser.displayName;
 					}
 				});
 		
@@ -2892,7 +3097,7 @@
 				}
 				// Não-Admin: Retorna só os do usuário, respeitando a flag includeDeleted
 				return allContracts.filter(c => 
-					c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted)
+					c.advogadoResponsavel === this.currentUser.displayName && (includeDeleted ? true : !c.isDeleted)
 				);
 			}
 		
@@ -2964,27 +3169,27 @@
 				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 			}
 			
+			// [MUDANÇA v5.8] Popula os filtros lendo do SettingsHandler
 			renderAdvogadoFilters() {
-				const advogados = [...new Set(this.database.contracts.map(c => c.advogadoResponsavel))].sort();
+				const advogados = this.settingsHandler.getAdvogadosList();
 				const filterSelects = [document.getElementById('advogadoFilter'), document.getElementById('servicosAdvogadoFilter')];
-				const fixedNames = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Dr. Glaison", "Dr. Bruno D'Lucas", "Dra. Danielle Guimarães", "Dr. Joaquim Océlio", "Dra. Larissa Mendes"];
-				const allNames = new Set([...fixedNames, ...advogados]);
-		
+				
 				filterSelects.forEach(select => {
 					if (!select) return;
 					const currentValue = select.value;
 					select.innerHTML = '<option value="Todos">Todos</option>';
 					select.add(new Option("Não Informado", "Não Informado"));
 		
-					[...allNames].filter(adv => adv && adv !== "Não Informado" && adv !== "Todos").sort().forEach(adv => {
+					advogados.forEach(adv => {
 						select.add(new Option(adv, adv));
 					});
 		
-					select.value = this.isUserAdmin ? (currentValue || 'Todos') : this.currentUserDisplayName;
+					select.value = this.isUserAdmin ? (currentValue || 'Todos') : this.currentUser.displayName;
 					select.disabled = !this.isUserAdmin;
 				});
 			}
 		
+			// [MUDANÇA v5.8] Popula o modal lendo do SettingsHandler
 			populateAdvogadoSelectModal() {
 				const select = document.getElementById('advogadoResponsavel');
 				if (!select) return;
@@ -2992,16 +3197,13 @@
 				select.innerHTML = '';
 				select.add(new Option("Não Informado", "Não Informado"));
 		
-				const advogados = [...new Set(this.database.contracts.map(c => c.advogadoResponsavel))].sort();
-				const fixedNames = ["Dra. Renata Fabris", "Dr. Felipe Gurjão", "Dr. Glaison", "Dr. Bruno D'Lucas", "Dra. Danielle Guimarães", "Dr. Joaquim Océlio", "Dra. Larissa Mendes"];
-				const allNames = new Set([...fixedNames, ...advogados]);
-		
-				[...allNames].filter(adv => adv && adv !== "Não Informado").sort().forEach(adv => {
+				const advogados = this.settingsHandler.getAdvogadosList();
+				advogados.forEach(adv => {
 					select.add(new Option(adv, adv));
 				});
 		
-				select.value = currentValue && currentValue !== 'Não Informado' ? currentValue : (this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName);
-				select.disabled = !this.isUserAdmin && !!this.currentUserDisplayName;
+				select.value = currentValue && currentValue !== 'Não Informado' ? currentValue : (this.isUserAdmin ? 'Não Informado' : this.currentUser.displayName);
+				select.disabled = !this.isUserAdmin && !!this.currentUser.displayName;
 			}
 			
 			changeContractPage(pageIndex) {
@@ -3103,8 +3305,8 @@
 						this.closeModal('modalContrato');
 						// [NOVO v5.4] Notifica admins sobre novo contrato
 						this.sendNotificationToAllAdmins({
-							message: `${this.currentUserDisplayName} criou um novo contrato para: ${contractData.clientName}.`,
-							sender: this.currentUserDisplayName
+							message: `${this.currentUser.displayName} criou um novo contrato para: ${contractData.clientName}.`,
+							sender: this.currentUser.displayName
 						});
 					}
 				} else {
@@ -3166,14 +3368,13 @@
 						this.sendNotification(contract.advogadoResponsavel, {
 							message: `Pagamento de ${Utils.formatCurrency(valuePaid)} (Parcela ${parcel.number}) registado para ${contract.clientName}.`,
 							contractId: contractId,
-							sender: this.currentUserDisplayName
+							sender: this.currentUser.displayName
 						});
 					}
 				} else {
 					Utils.showToast('Valor de pagamento inválido.', 'error');
 				}
 			}
-		
 			async handleExitoSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('exitoContractId').value;
@@ -3196,7 +3397,7 @@
 						this.sendNotification(contract.advogadoResponsavel, {
 							message: `Pagamento de Êxito (${Utils.formatCurrency(valueReceived)}) registado para ${contract.clientName}.`,
 							contractId: contractId,
-							sender: this.currentUserDisplayName
+							sender: this.currentUser.displayName
 						});
 					}
 				}
@@ -3231,9 +3432,9 @@
 					// Lógica de Notificação (Apenas para 'Concluído')
 					if (success && newStatus === 'Concluído') {
 						this.sendNotification(contract.advogadoResponsavel, {
-							message: `${this.currentUserDisplayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
+							message: `${this.currentUser.displayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
 							contractId: contractId,
-							sender: this.currentUserDisplayName
+							sender: this.currentUser.displayName
 						});
 					}
 				}
@@ -3242,7 +3443,7 @@
 			// [NOVO v5.4] Função helper para enviar notificação a um usuário
 			async sendNotification(recipientName, data) {
 				// Não envia notificação para o próprio usuário
-				if (!recipientName || recipientName === this.currentUserDisplayName) return; 
+				if (!recipientName || recipientName === this.currentUser.displayName) return; 
 				
 				const safeRecipientName = Utils.sanitizeForFirestoreId(recipientName);
 				await this.firebaseService.sendNotification(safeRecipientName, data);
@@ -3251,10 +3452,13 @@
 			
 			// [NOVO v5.4] Função helper para enviar notificação para TODOS os admins
 			async sendNotificationToAllAdmins(data) {
-				ADMIN_USERS.forEach(adminName => {
+				// [MUDANÇA v5.8] Lê a lista de admins do banco de dados
+				const userDocsSnap = await getDocs(query(collection(this.firebaseService.db, 'users'), where('role', '==', 'admin')));
+				userDocsSnap.forEach(doc => {
+					const admin = doc.data();
 					// Envia para todos os admins, exceto o usuário que causou a ação
-					if (adminName.toLowerCase() !== this.currentUserDisplayName?.toLowerCase()) {
-						const safeAdminName = Utils.sanitizeForFirestoreId(adminName);
+					if (admin.displayName !== this.currentUser.displayName) {
+						const safeAdminName = Utils.sanitizeForFirestoreId(admin.displayName);
 						this.firebaseService.sendNotification(safeAdminName, data);
 					}
 				});
@@ -3290,6 +3494,65 @@
 				});
 				
 				this.lastOverdueCheck = hojeStr; // Marca como checado hoje
+			}
+			
+			// [NOVO v5.8] Handlers da página de Configurações
+			async handleAddAdvogado(e) {
+				e.preventDefault();
+				if (!this.isUserAdmin) return;
+				
+				const nameInput = document.getElementById('inputNewAdvogadoName');
+				const newName = Utils.sanitizeText(nameInput.value);
+				if (!newName) return;
+				
+				const currentList = this.settingsHandler.getAdvogadosList();
+				if (currentList.includes(newName)) {
+					Utils.showToast('Este advogado já está na lista.', 'error');
+					return;
+				}
+				
+				const newList = [...currentList, newName].sort();
+				if (await this.settingsHandler.saveAdvogadosList(newList)) {
+					nameInput.value = '';
+					this.renderSettingsPage(); // Re-renderiza a página de config
+					this.populateAdvogadoSelectModal(); // Atualiza os modais
+				}
+			}
+			
+			async handleRemoveAdvogado(nameToRemove) {
+				if (!this.isUserAdmin) return;
+				
+				const ok = await Utils.confirm(`Tem a certeza que deseja remover "${nameToRemove}" da lista de advogados?`);
+				if (!ok) return;
+				
+				const currentList = this.settingsHandler.getAdvogadosList();
+				const newList = currentList.filter(name => name !== nameToRemove);
+				
+				if (await this.settingsHandler.saveAdvogadosList(newList)) {
+					this.renderSettingsPage(); // Re-renderiza a página de config
+					this.populateAdvogadoSelectModal(); // Atualiza os modais
+				}
+			}
+			
+			async handleUpdateIPCA(e) {
+				e.preventDefault();
+				if (!this.isUserAdmin) return;
+				
+				const monthKey = document.getElementById('inputIPCAMonth').value; // Ex: "2025-11"
+				const value = Utils.parseNumber(document.getElementById('inputIPCAValue').value);
+				
+				if (!/^\d{4}-\d{2}$/.test(monthKey)) {
+					Utils.showToast('Formato de Mês/Ano inválido. Use AAAA-MM.', 'error');
+					return;
+				}
+				
+				const currentTable = this.settingsHandler.getIpcaTable();
+				const newTable = { ...currentTable, [monthKey]: value };
+				
+				if (await this.settingsHandler.saveIpcaTable(newTable)) {
+					document.getElementById('formUpdateIPCA').reset();
+					this.renderSettingsPage(); // Re-renderiza a página de config
+				}
 			}
 		
 			async moveToLixeira(contractId) {
@@ -3415,7 +3678,7 @@
 						// --- MODO DE CRIAÇÃO ---
 						title.textContent = "Registar Novo Contrato";
 						document.getElementById('contractId').value = '';
-						advogadoSelect.value = this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName;
+						advogadoSelect.value = this.isUserAdmin ? 'Não Informado' : this.currentUser.displayName;
 						
 						// Garante que os campos estão visíveis e habilitados
 						financialWarning.classList.add('hidden');
@@ -3663,7 +3926,7 @@
 				const unreadIds = ids || this.database.notifications.filter(n => !n.isRead).map(n => n.id);
 				if (unreadIds.length === 0) return;
 				
-				await this.firebaseService.markNotificationsAsRead(this.currentSafeName, unreadIds);
+				await this.firebaseService.markNotificationsAsRead(this.currentUser.safeName, unreadIds);
 				// O listener vai atualizar a UI
 			}
 
@@ -3728,6 +3991,7 @@
 					</div>
 				`;
 			}
+			
 			renderAdvancedReportCharts(data) {
 				// 1. Gráfico de Linha (Faturação no Tempo)
 				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
