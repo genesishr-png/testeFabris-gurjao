@@ -1034,6 +1034,7 @@
 		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+		// [CORREÇÃO v5.8] Garantindo que 'getDoc' e 'setDoc' estão incluídos
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
@@ -1044,11 +1045,10 @@
 		const Utils = {
 			toastContainer: null,
 			initToast() {
-				// [MUDANÇA v5] Usa o div #notifications se existir, se não, cria um.
 				let el = document.getElementById('notifications');
 				if (!el) {
 					el = document.createElement('div');
-					el.id = 'toast-container-fallback'; // Nome diferente para evitar conflito
+					el.id = 'toast-container-fallback';
 					el.style.position = 'fixed';
 					el.style.bottom = '20px';
 					el.style.right = '20px';
@@ -1087,7 +1087,6 @@
 				div.textContent = str;
 				return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;').trim();
 			},
-			// [MUDANÇA v5] Helper para "sanitizar" nomes para IDs do Firestore
 			sanitizeForFirestoreId(name) {
 				if (!name) return 'unknown_user';
 				return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
@@ -1127,13 +1126,11 @@
 			formatDate(dateStr) {
 				if (!dateStr) return '';
 				const date = new Date(dateStr);
-				// [MUDANÇA v5] Corrigido para garantir UTC na formatação de datas simples
 				const d = date.getUTCDate();
 				const m = date.getUTCMonth() + 1;
 				const y = date.getUTCFullYear();
 				return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
 			},
-			// [MUDANÇA v5] Novo helper para "tempo atrás"
 			timeAgo(dateInput) {
 				if (!dateInput) return '';
 				const date = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
@@ -1157,7 +1154,7 @@
 		/**
 		 * @class CorrectionCalculator
 		 * [MUDANÇA v5.8] Esta classe agora depende do SettingsHandler
-		 * para obter a tabela IPCA do banco de dados, em vez de tê-la "chumbada" aqui.
+		 * para obter a tabela IPCA do banco de dados.
 		 */
 		class CorrectionCalculator {
 			constructor(settingsHandler) {
@@ -1221,13 +1218,13 @@
 				this.auth = null;
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-  authDomain: "fabrisgurjao.firebaseapp.com",
-  projectId: "fabrisgurjao",
-  storageBucket: "fabrisgurjao.firebasestorage.app",
-  messagingSenderId: "466702265991",
-  appId: "1:466702265991:web:78c4d98b47cab537921222",
-  measurementId: "G-E99R5TFMQK"
+					apiKey: "SUA_API_KEY",
+					authDomain: "SEU_AUTH_DOMAIN",
+					projectId: "SEU_PROJECT_ID",
+					storageBucket: "SEU_STORAGE_BUCKET",
+					messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+					appId: "SEU_APP_ID",
+					measurementId: "SEU_MEASUREMENT_ID"
 				};
 			}
 		
@@ -1235,7 +1232,7 @@
 				try {
 					const firebaseApp = initializeApp(this.firebaseConfig);
 					this.auth = getAuth(firebaseApp);
-					setLogLevel('error'); // 'error' em produção, 'debug' para testar
+					setLogLevel('error');
 					const db = getFirestore(firebaseApp);
 					this.app.firebaseService.setDB(db);
 					this.app.settingsHandler.setDB(db); // [NOVO v5.8] Dá o DB para o SettingsHandler
@@ -1455,11 +1452,9 @@
 			constructor() {
 				this.actualIncomeChartInstance = null;
 				this.projectedIncomeChartInstance = null;
-				// [MUDANÇA v5] Gráficos do Relatório Avançado
 				this.advReportTimelineChart = null;
 				this.advReportByAdvogadoChart = null;
 				this.advReportNewContractsChart = null;
-				// [NOVO v5.5] Gráficos da Página de Performance
 				this.adminChartContratos = null;
 				this.adminChartFaturamento = null;
 				this.adminChartFluxoCaixa = null; // [NOVO v5.7]
@@ -1488,7 +1483,6 @@
 				};
 			}
 
-			// Gráficos do Modal Legado
 			renderActualIncomeChart(ctx, labels, data) {
 				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
 				this.actualIncomeChartInstance = new Chart(ctx, this.getChartConfig(
@@ -1503,7 +1497,6 @@
 				));
 			}
 
-			// [MUDANÇA v5] Novos Gráficos do Relatório Avançado
 			renderTimelineChart(ctx, labels, data) {
 				if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
 				this.advReportTimelineChart = new Chart(ctx, this.getChartConfig(
@@ -1527,7 +1520,6 @@
 				));
 			}
 
-			// [NOVO v5.5] Gráficos da Página de Performance
 			renderAdminContratosChart(ctx, labels, data) {
 				if (this.adminChartContratos) this.adminChartContratos.destroy();
 				this.adminChartContratos = new Chart(ctx, this.getChartConfig(
@@ -1544,7 +1536,6 @@
 				));
 			}
 			
-			// [NOVO v5.7] Gráfico de Fluxo de Caixa
 			renderAdminFluxoCaixaChart(ctx, labels, data) {
 				if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy();
 				this.adminChartFluxoCaixa = new Chart(ctx, this.getChartConfig(
@@ -1552,13 +1543,11 @@
 				));
 			}
 		
-			// [CORREÇÃO v5.2] Força a remoção de tooltips "fantasmas"
 			_forceRemoveTooltips() {
 				const tooltips = document.querySelectorAll('div.chartjs-tooltip');
 				tooltips.forEach(tip => tip.remove());
 			}
 
-			// [CORREÇÃO v5.2] Destruição separada para Gráficos da PÁGINA
 			destroyPageCharts(pageId) {
 				if (pageId === 'page-relatorios') {
 					if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
@@ -1572,16 +1561,15 @@
 				if (pageId === 'page-performance') {
 					if (this.adminChartContratos) this.adminChartContratos.destroy();
 					if (this.adminChartFaturamento) this.adminChartFaturamento.destroy();
-					if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy(); // [NOVO v5.7]
+					if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy(); 
 					this.adminChartContratos = null;
 					this.adminChartFaturamento = null;
-					this.adminChartFluxoCaixa = null; // [NOVO v5.7]
+					this.adminChartFluxoCaixa = null; 
 				}
 				
 				this._forceRemoveTooltips();
 			}
 
-			// [CORREÇÃO v5.2] Destruição separada para Gráficos do MODAL
 			destroyModalCharts() {
 				if (this.actualIncomeChartInstance) this.actualIncomeChartInstance.destroy();
 				if (this.projectedIncomeChartInstance) this.projectedIncomeChartInstance.destroy();
@@ -1601,7 +1589,6 @@
 				this.app = appInstance;
 			}
 		
-			// [MUDANÇA v5] Lógica atualizada para usar datas (Date Objects)
 			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
 				if (!this.app.isUserAdmin) return { totalParcelas: 0, totalExito: 0, totalGeral: 0, detailedPayments: [], byAdvogado: {}, byMonth: {}, newContractsByMonth: {} };
 		
@@ -1612,16 +1599,14 @@
 				const newContractsByMonth = {};
 				const allContracts = contractsToRender.filter(c => !c.isDeleted);
 				
-				// Helper para agrupar por mês
 				const addData = (map, date, value) => {
 					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
 					map[monthKey] = (map[monthKey] || 0) + value;
 				};
 
 				allContracts.forEach(contract => {
-					const advogado = contract.advogadoResponsavel || 'Não Informado'; // [NOVO v5.5] Agrupa "Não Informado"
+					const advogado = contract.advogadoResponsavel || 'Não Informado'; 
 					
-					// 1. Processa novos contratos
 					if (contract.createdAt) {
 						const d = new Date(contract.createdAt);
 						if (d >= startDate && d <= endDate) {
@@ -1629,7 +1614,6 @@
 						}
 					}
 					
-					// 2. Processa pagamentos de parcelas
 					(contract.parcels || []).forEach(parcel => {
 						if (parcel.status === 'Paga' && parcel.paymentDate) {
 							const d = new Date(parcel.paymentDate);
@@ -1643,7 +1627,6 @@
 						}
 					});
 					
-					// 3. Processa pagamentos de êxito
 					if (contract.successFeePaymentDate) {
 						const d = new Date(contract.successFeePaymentDate);
 						if (d >= startDate && d <= endDate) {
@@ -1664,7 +1647,6 @@
 				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
 			}
 			
-			// [NOVO v5.5] Agrega dados para o Painel de Admin
 			calculateAdminPerformanceData(contractsToRender) {
 				const hoje = new Date();
 				const inicioAno = new Date(hoje.getFullYear(), 0, 1);
@@ -1681,13 +1663,11 @@
 
 				const faturamentoPorAdvogado = faturamentoAno.byAdvogado;
 				
-				// [NOVO v5.7] Adiciona cálculo de fluxo de caixa
 				const fluxoCaixa = this.getProjectedIncomeData(contractsToRender);
 				
 				return { contratosPorAdvogado, faturamentoPorAdvogado, fluxoCaixa };
 			}
 
-			// Função legada (ainda usada pelo modal antigo)
 			calculateMonthlyIncome(year, month, contractsToRender) {
 				const startDate = new Date(year, month, 1);
 				const endDate = new Date(year, month + 1, 0, 23, 59, 59); // Fim do mês
@@ -1709,7 +1689,6 @@
 				return { labels, data };
 			}
 		
-			// [MUDANÇA v5.7] Esta função agora é usada tanto pelo modal quanto pelo painel de admin
 			getProjectedIncomeData(contractsToRender) {
 				const labels = [];
 				const data = new Array(12).fill(0);
@@ -1721,7 +1700,6 @@
 					labels.push(date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }));
 				}
 		
-				// [MUDANÇA v5.7] Usa todos os contratos (admin) ou filtrados (usuário)
 				const filteredContracts = contractsToRender.filter(c => !c.isDeleted);
 				for (const contract of filteredContracts) {
 					if (!contract.parcels) continue;
@@ -1738,7 +1716,110 @@
 			}
 		}
 		
-		// [O script continua na Parte 7...]
+		/**
+		 * @class SettingsHandler
+		 * [NOVO v5.8] Esta classe gerencia o carregamento e a
+		 * atualização das configurações do sistema (IPCA, Advogados)
+		 * que agora vivem no banco de dados.
+		 */
+		class SettingsHandler {
+			constructor() {
+				this.db = null;
+				this.settings = {
+					advogados: [],
+					ipcaTable: {}
+				};
+				this.settingsLoaded = false;
+				this.onSettingsLoadCallbacks = [];
+			}
+			
+			setDB(dbInstance) {
+				this.db = dbInstance;
+			}
+			
+			getAdvogadosList() {
+				return this.settings.advogados;
+			}
+			
+			getIpcaTable() {
+				return this.settings.ipcaTable;
+			}
+			
+			// Espera as configurações serem carregadas
+			async onSettingsLoaded() {
+				if (this.settingsLoaded) return true;
+				return new Promise(resolve => {
+					this.onSettingsLoadCallbacks.push(resolve);
+				});
+			}
+
+			// Carrega todas as configurações do Firestore
+			async loadSettings() {
+				try {
+					// 1. Carrega a lista de advogados
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					const advDocSnap = await getDoc(advDocRef);
+					if (advDocSnap.exists()) {
+						this.settings.advogados = advDocSnap.data().list || [];
+					} else {
+						console.warn("Documento 'advogados' não encontrado em 'systemSettings'. Usando lista vazia.");
+						this.settings.advogados = [];
+					}
+					
+					// 2. Carrega a tabela do IPCA
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					const ipcaDocSnap = await getDoc(ipcaDocRef);
+					if (ipcaDocSnap.exists()) {
+						this.settings.ipcaTable = ipcaDocSnap.data().table || {};
+					} else {
+						console.warn("Documento 'ipca' não encontrado em 'systemSettings'. Cálculos de juros podem falhar.");
+						this.settings.ipcaTable = {};
+					}
+					
+					// 3. Avisa ao app que tudo foi carregado
+					this.settingsLoaded = true;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(true));
+					this.onSettingsLoadCallbacks = []; // Limpa a fila
+					
+				} catch (error) {
+					console.error("ERRO CRÍTICO AO CARREGAR CONFIGURAÇÕES:", error);
+					Utils.showToast("Falha ao carregar configurações do sistema. O app pode não funcionar.", "error");
+					this.settingsLoaded = false;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(false));
+					this.onSettingsLoadCallbacks = [];
+				}
+			}
+
+			// Salva a lista de advogados no Firebase
+			async saveAdvogadosList(newList) {
+				try {
+					this.settings.advogados = newList;
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					await setDoc(advDocRef, { list: newList });
+					Utils.showToast("Lista de advogados atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar lista de advogados:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
+			
+			// Salva a tabela do IPCA no Firebase
+			async saveIpcaTable(newTable) {
+				try {
+					this.settings.ipcaTable = newTable;
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					await setDoc(ipcaDocRef, { table: newTable });
+					Utils.showToast("Tabela IPCA atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar tabela IPCA:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
+		}
 		/**
 		 * @class DOMBuilder
 		 */
@@ -2516,7 +2597,7 @@
 			async handleAuthStateChange(user) {
 				if (user) {
 					// 1. Carrega as configurações do sistema (IPCA, Advogados)
-					await this.settingsHandler.loadSettings();
+					// [CORREÇÃO v5.8.1] Move o loadSettings para DEPOIS de verificar o displayName
 					
 					// 2. Busca o perfil do usuário no Firestore (para saber o 'role')
 					const userDocRef = doc(this.firebaseService.db, 'users', user.uid);
@@ -2527,11 +2608,7 @@
 					} else {
 						// Se é o primeiro login, cria o perfil básico
 						this.userRole = 'user'; // Padrão
-						await setDoc(userDocRef, {
-							displayName: user.displayName,
-							email: user.email,
-							role: this.userRole
-						}, { merge: true });
+						// Não podemos criar o perfil aqui se o displayName for nulo.
 					}
 					
 					this.isUserAdmin = (this.userRole === 'admin');
@@ -2551,10 +2628,12 @@
 						this.openModal('modalDisplayName');
 					} else {
 						// Utilizador logado e com nome
+						// [CORREÇÃO v5.8.1] Carrega as settings AGORA
+						await this.settingsHandler.loadSettings();
+						
 						document.getElementById('user-display-name').textContent = user.displayName;
 						this.loadingOverlay.style.display = 'none';
-...
-					this.authOverlay.style.display = 'none';
+						this.authOverlay.style.display = 'none';
 						this.appContainer.style.display = 'flex'; // [REVOLUÇÃO] Mudou para 'flex'
 						this.setupUIAccess();
 						this.firebaseService.startSnapshotListener('contracts');
@@ -2917,7 +2996,6 @@
 				});
 				container.append(fragment);
 			}
-
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
 				// Define datas padrão (início do mês até hoje)
@@ -2999,7 +3077,7 @@
 				
 				// 2. Renderiza último IPCA
 				const ipcaTable = this.settingsHandler.getIpcaTable();
-				const lastIpcaEntry = Object.entries(ipcaTable).pop(); // Pega o último
+				const lastIpcaEntry = Object.entries(ipcaTable).sort().pop(); // Pega o último
 				if (lastIpcaEntry) {
 					document.getElementById('settingsLastIPCA').textContent = `Mês: ${lastIpcaEntry[0]} | Valor: ${lastIpcaEntry[1]}%`;
 				} else {
@@ -3222,10 +3300,28 @@
 			async handleDisplayNameSubmit(e) {
 				e.preventDefault();
 				const name = document.getElementById('inputDisplayName').value;
-				if (name && (await this.authService.updateUserProfile(name))) {
-					// Recarrega a página para forçar o handleAuthStateChange a rodar
-					// com o novo nome e definir as permissões de admin corretamente.
-					window.location.reload(); 
+				
+				// [MUDANÇA v5.8] Cria o documento 'users' no primeiro login
+				if (name && this.authService.auth.currentUser) {
+					try {
+						const user = this.authService.auth.currentUser;
+						await updateProfile(user, { displayName: name });
+						
+						// Cria o perfil no Firestore
+						const userDocRef = doc(this.firebaseService.db, 'users', user.uid);
+						await setDoc(userDocRef, {
+							displayName: name,
+							email: user.email,
+							role: 'user' // Padrão para novos usuários
+						});
+						
+						// Recarrega para o handleAuthStateChange ler o novo perfil
+						window.location.reload(); 
+						
+					} catch (error) {
+						console.error("Erro ao guardar nome:", error);
+						Utils.showToast('Erro ao guardar o seu nome.', 'error');
+					}
 				}
 			}
 		
