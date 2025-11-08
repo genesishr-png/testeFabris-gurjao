@@ -17,7 +17,7 @@
 			background-color: #0f172a;
 			color: #d1d5db;
 			/* [REVOLUÇÃO] Trava o scroll do body, o main content que vai rolar */
-			overflow-y: hidden; 
+			overflow-y: hidden; 
 		}
 		body::after {
 			content: '';
@@ -32,13 +32,13 @@
 		}
 		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
 		
-		.modal { 
-			display: none; 
-			position: fixed; 
-			top: 50%; left: 50%; 
-			transform: translate(-50%, -50%); 
-			z-index: 9001; 
-			max-height: 90vh; 
+		.modal { 
+			display: none; 
+			position: fixed; 
+			top: 50%; left: 50%; 
+			transform: translate(-50%, -50%); 
+			z-index: 9001; 
+			max-height: 90vh; 
 			border: 1px solid #374151;
 			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
 		}
@@ -99,7 +99,7 @@
 		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
 		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
 		
-		.dark-card { 
+		.dark-card { 
 			background-color: #1f2937;
 		}
 		
@@ -107,12 +107,12 @@
 		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
 		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
 		
-		.filter-select { 
+		.filter-select { 
 			background-color: #1f2937;
-			border: 1px solid #4b5563; 
-			color: #9ca3af; 
-			padding: 8px 12px; 
-			border-radius: 6px; 
+			border: 1px solid #4b5563; 
+			color: #9ca3af; 
+			padding: 8px 12px; 
+			border-radius: 6px; 
 			font-size: 14px;
 			transition: all 0.2s ease-in-out;
 			color-scheme: dark; /* Garante que o date picker é dark */
@@ -141,36 +141,36 @@
 			outline: none;
 		}
 		
-		#loading-overlay { 
-			position: fixed; 
-			top: 0; left: 0; 
-			width: 100%; height: 100%; 
-			background-color: rgba(17, 24, 39, 0.9); 
-			display: flex; 
-			justify-content: center; 
-			align-items: center; 
-			z-index: 10000; 
-			color: white; 
-			font-size: 1.2rem; 
-			transition: opacity 0.3s; 
+		#loading-overlay { 
+			position: fixed; 
+			top: 0; left: 0; 
+			width: 100%; height: 100%; 
+			background-color: rgba(17, 24, 39, 0.9); 
+			display: flex; 
+			justify-content: center; 
+			align-items: center; 
+			z-index: 10000; 
+			color: white; 
+			font-size: 1.2rem; 
+			transition: opacity 0.3s; 
 		}
 		/* [MUDANÇA v5] O App Container é flex, não display: none */
 		#app-container { display: none; }
 		
 		.admin-only { display: none; }
 
-		/* [CORREÇÃO DO BUG DAS ABAS] 
-		  Usamos :not(.hidden) para garantir que a classe 'hidden' (controlada pelo JavaScript) 
-		  tenha prioridade sobre as regras de 'admin-only'.
+		/* [CORREÇÃO DO BUG DAS ABAS] 
+		  Usamos :not(.hidden) para garantir que a classe 'hidden' (controlada pelo JavaScript) 
+		  tenha prioridade sobre as regras de 'admin-only'.
 		*/
-		body.is-admin .admin-only:not(.hidden) { 
-			display: block; 
+		body.is-admin .admin-only:not(.hidden) { 
+			display: block; 
 		}
-		body.is-admin .flex.admin-only:not(.hidden) { 
-			display: flex; 
+		body.is-admin .flex.admin-only:not(.hidden) { 
+			display: flex; 
 		}
-		body.is-admin .grid.admin-only:not(.hidden) { 
-			display: grid; 
+		body.is-admin .grid.admin-only:not(.hidden) { 
+			display: grid; 
 		}
 		
 		/* Esta regra para o menu mobile (que eu já tinha corrigido) está correta */
@@ -370,10 +370,10 @@
 						<div class="relative">
 							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="email"
-								   id="login-email"
-								   placeholder="seu@email.com"
-								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-								   required />
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
 					<div>
@@ -383,10 +383,10 @@
 						<div class="relative">
 							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
 							<input type="password"
-								   id="login-password"
-								   placeholder="••••••••"
-								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
-								   required />
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
 					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
@@ -778,7 +778,7 @@
 						</div>
 					</div>
 					
-				</div> </div> 
+				</div> </div> 
 		</main>
 		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
 			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
@@ -1217,13 +1217,13 @@
 				this.auth = null;
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
-					  apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
-  authDomain: "fabrisgurjao.firebaseapp.com",
-  projectId: "fabrisgurjao",
-  storageBucket: "fabrisgurjao.firebasestorage.app",
-  messagingSenderId: "466702265991",
-  appId: "1:466702265991:web:78c4d98b47cab537921222",
-  measurementId: "G-E99R5TFMQK"
+					  apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4",
+  authDomain: "fabrisgurjao.firebaseapp.com",
+  projectId: "fabrisgurjao",
+  storageBucket: "fabrisgurjao.firebasestorage.app",
+  messagingSenderId: "466702265991",
+  appId: "1:466702265991:web:78c4d98b47cab537921222",
+  measurementId: "G-E99R5TFMQK"
 				};
 			}
 		
@@ -1506,7 +1506,7 @@
 			renderByAdvogadoChart(ctx, labels, data) {
 				if (this.advReportByAdvogadoChart) this.advReportByAdvogadoChart.destroy();
 				this.advReportByAdvogadoChart = new Chart(ctx, this.getChartConfig(
-					'pie', labels, [{ label: 'Faturação', data, 
+					'pie', labels, [{ label: 'Faturação', data, 
 						backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#0ea5e9', '#22c55e', '#eab308', '#dc2626'],
 						borderWidth: 0 }]
 				));
@@ -1560,10 +1560,10 @@
 				if (pageId === 'page-performance') {
 					if (this.adminChartContratos) this.adminChartContratos.destroy();
 					if (this.adminChartFaturamento) this.adminChartFaturamento.destroy();
-					if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy(); 
+					if (this.adminChartFluxoCaixa) this.adminChartFluxoCaixa.destroy(); 
 					this.adminChartContratos = null;
 					this.adminChartFaturamento = null;
-					this.adminChartFluxoCaixa = null; 
+					this.adminChartFluxoCaixa = null; 
 				}
 				
 				this._forceRemoveTooltips();
@@ -1604,7 +1604,7 @@
 				};
 
 				allContracts.forEach(contract => {
-					const advogado = contract.advogadoResponsavel || 'Não Informado'; 
+					const advogado = contract.advogadoResponsavel || 'Não Informado'; 
 					
 					if (contract.createdAt) {
 						const d = new Date(contract.createdAt);
@@ -1715,6 +1715,110 @@
 			}
 		}
 		
+		/**
+		 * @class SettingsHandler
+		 * [NOVO v5.8] Esta classe gerencia o carregamento e a
+		 * atualização das configurações do sistema (IPCA, Advogados)
+		 * que agora vivem no banco de dados.
+		 */
+		class SettingsHandler {
+			constructor() {
+				this.db = null;
+				this.settings = {
+					advogados: [],
+					ipcaTable: {}
+				};
+				this.settingsLoaded = false;
+				this.onSettingsLoadCallbacks = [];
+			}
+			
+			setDB(dbInstance) {
+				this.db = dbInstance;
+			}
+			
+			getAdvogadosList() {
+				return this.settings.advogados;
+			}
+			
+			getIpcaTable() {
+				return this.settings.ipcaTable;
+			}
+			
+			// Espera as configurações serem carregadas
+			async onSettingsLoaded() {
+				if (this.settingsLoaded) return true;
+				return new Promise(resolve => {
+					this.onSettingsLoadCallbacks.push(resolve);
+				});
+			}
+
+			// Carrega todas as configurações do Firestore
+			async loadSettings() {
+				try {
+					// 1. Carrega a lista de advogados
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					const advDocSnap = await getDoc(advDocRef);
+					if (advDocSnap.exists()) {
+						this.settings.advogados = advDocSnap.data().list || [];
+					} else {
+						console.warn("Documento 'advogados' não encontrado em 'systemSettings'. Usando lista vazia.");
+						this.settings.advogados = [];
+					}
+					
+					// 2. Carrega a tabela do IPCA
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					const ipcaDocSnap = await getDoc(ipcaDocRef);
+					if (ipcaDocSnap.exists()) {
+						this.settings.ipcaTable = ipcaDocSnap.data().table || {};
+					} else {
+						console.warn("Documento 'ipca' não encontrado em 'systemSettings'. Cálculos de juros podem falhar.");
+						this.settings.ipcaTable = {};
+					}
+					
+					// 3. Avisa ao app que tudo foi carregado
+					this.settingsLoaded = true;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(true));
+					this.onSettingsLoadCallbacks = []; // Limpa a fila
+					
+				} catch (error) {
+					console.error("ERRO CRÍTICO AO CARREGAR CONFIGURAÇÕES:", error);
+					Utils.showToast("Falha ao carregar configurações do sistema. O app pode não funcionar.", "error");
+					this.settingsLoaded = false;
+					this.onSettingsLoadCallbacks.forEach(cb => cb(false));
+					this.onSettingsLoadCallbacks = [];
+				}
+			}
+
+			// Salva a lista de advogados no Firebase
+			async saveAdvogadosList(newList) {
+				try {
+					this.settings.advogados = newList;
+					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
+					await setDoc(advDocRef, { list: newList });
+					Utils.showToast("Lista de advogados atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar lista de advogados:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
+			
+			// Salva a tabela do IPCA no Firebase
+			async saveIpcaTable(newTable) {
+				try {
+					this.settings.ipcaTable = newTable;
+					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
+					await setDoc(ipcaDocRef, { table: newTable });
+					Utils.showToast("Tabela IPCA atualizada.", "success");
+					return true;
+				} catch (error) {
+					console.error("Erro ao salvar tabela IPCA:", error);
+					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
+					return false;
+				}
+			}
+		}
 		
 		/**
 		 * @class DOMBuilder
@@ -1778,7 +1882,7 @@
 					if (this.app.isUserAdmin) {
 						details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
 					}
-					actionButton = this.buildElement('div', { 
+					actionButton = this.buildElement('div', { 
 						className: 'mt-4 text-center text-sm bg-green-900/50 text-green-300 p-2 rounded-md font-medium',
 						text: `Pago ${this.app.isUserAdmin ? formattedPaidValue : ''} em ${paymentDate}`
 					});
@@ -1800,7 +1904,7 @@
 				}
 		
 				if (type !== 'paga') {
-					actionButton = this.buildElement('button', { 
+					actionButton = this.buildElement('button', { 
 						className: 'mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg text-sm shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
 						html: '<i class="fas fa-check"></i> Registar Pagamento'
 					});
@@ -2197,119 +2301,13 @@
 		
 		
 		/**
-		 * @class SettingsHandler
-		 * [NOVO v5.8] Esta classe gerencia o carregamento e a
-		 * atualização das configurações do sistema (IPCA, Advogados)
-		 * que agora vivem no banco de dados.
-		 */
-		class SettingsHandler {
-			constructor() {
-				this.db = null;
-				this.settings = {
-					advogados: [],
-					ipcaTable: {}
-				};
-				this.settingsLoaded = false;
-				this.onSettingsLoadCallbacks = [];
-			}
-			
-			setDB(dbInstance) {
-				this.db = dbInstance;
-			}
-			
-			getAdvogadosList() {
-				return this.settings.advogados;
-			}
-			
-			getIpcaTable() {
-				return this.settings.ipcaTable;
-			}
-			
-			// Espera as configurações serem carregadas
-			async onSettingsLoaded() {
-				if (this.settingsLoaded) return true;
-				return new Promise(resolve => {
-					this.onSettingsLoadCallbacks.push(resolve);
-				});
-			}
-
-			// Carrega todas as configurações do Firestore
-			async loadSettings() {
-				try {
-					// 1. Carrega a lista de advogados
-					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
-					const advDocSnap = await getDoc(advDocRef);
-					if (advDocSnap.exists()) {
-						this.settings.advogados = advDocSnap.data().list || [];
-					} else {
-						console.warn("Documento 'advogados' não encontrado em 'systemSettings'. Usando lista vazia.");
-						this.settings.advogados = [];
-					}
-					
-					// 2. Carrega a tabela do IPCA
-					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
-					const ipcaDocSnap = await getDoc(ipcaDocRef);
-					if (ipcaDocSnap.exists()) {
-						this.settings.ipcaTable = ipcaDocSnap.data().table || {};
-					} else {
-						console.warn("Documento 'ipca' não encontrado em 'systemSettings'. Cálculos de juros podem falhar.");
-						this.settings.ipcaTable = {};
-					}
-					
-					// 3. Avisa ao app que tudo foi carregado
-					this.settingsLoaded = true;
-					this.onSettingsLoadCallbacks.forEach(cb => cb(true));
-					this.onSettingsLoadCallbacks = []; // Limpa a fila
-					
-				} catch (error) {
-					console.error("ERRO CRÍTICO AO CARREGAR CONFIGURAÇÕES:", error);
-					Utils.showToast("Falha ao carregar configurações do sistema. O app pode não funcionar.", "error");
-					this.settingsLoaded = false;
-					this.onSettingsLoadCallbacks.forEach(cb => cb(false));
-					this.onSettingsLoadCallbacks = [];
-				}
-			}
-
-			// Salva a lista de advogados no Firebase
-			async saveAdvogadosList(newList) {
-				try {
-					this.settings.advogados = newList;
-					const advDocRef = doc(this.db, 'systemSettings', 'advogados');
-					await setDoc(advDocRef, { list: newList });
-					Utils.showToast("Lista de advogados atualizada.", "success");
-					return true;
-				} catch (error) {
-					console.error("Erro ao salvar lista de advogados:", error);
-					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
-					return false;
-				}
-			}
-			
-			// Salva a tabela do IPCA no Firebase
-			async saveIpcaTable(newTable) {
-				try {
-					this.settings.ipcaTable = newTable;
-					const ipcaDocRef = doc(this.db, 'systemSettings', 'ipca');
-					await setDoc(ipcaDocRef, { table: newTable });
-					Utils.showToast("Tabela IPCA atualizada.", "success");
-					return true;
-				} catch (error) {
-					console.error("Erro ao salvar tabela IPCA:", error);
-					Utils.showToast("Falha ao salvar. Verifique suas Regras de Segurança.", "error");
-					return false;
-				}
-			}
-		}
-		
-		
-		/**
 		 * @class App
 		 * @description Classe principal que gere o estado e a lógica do dashboard
 		 */
 		class App {
 			constructor() {
 				// Estado da Aplicação
-				this.database = { 
+				this.database = { 
 					contracts: [],
 					notifications: [] // [MUDANÇA v5]
 				};
@@ -2320,7 +2318,7 @@
 				this.currentPageId = null; // [CORREÇÃO v5.1]
 				
 				// [NOVO v5.4] Estado para controlar notificações de vencimento
-				this.lastOverdueCheck = null; 
+				this.lastOverdueCheck = null; 
 				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
@@ -2519,7 +2517,7 @@
 					if (!user.displayName) {
 						// Se o perfil do Firebase não tem nome, pede
 						this.loadingOverlay.style.display = 'none';
-						this.authOverlay.style.display = 'flex'; 
+						this.authOverlay.style.display = 'flex'; 
 						this.appContainer.style.display = 'none';
 						this.openModal('modalDisplayName');
 					} else {
@@ -2762,7 +2760,7 @@
 					for (let i = 0; i < contract.parcels.length; i++) {
 						const parcel = contract.parcels[i];
 						// [NOVO v5.6] Mostra TODAS as parcelas pendentes
-						if (parcel.status === 'Pendente') { 
+						if (parcel.status === 'Pendente') { 
 							const vencimento = new Date(parcel.dueDate);
 							const diffDays = Math.ceil((vencimento - hoje) / 86400000);
 							const isVencida = vencimento < hoje;
@@ -2856,12 +2854,12 @@
 			// [CORREÇÃO LIXEIRA] Esta é a lógica correta, baseada no v5.0 do usuário
 			renderLixeiraPage() {
 				// Pega TODOS os contratos, incluindo deletados
-				const contractsToRender = this.getFilteredContracts(true); 
+				const contractsToRender = this.getFilteredContracts(true); 
 				const container = document.getElementById('lixeiraListContainer');
 				container.innerHTML = '';
 
 				// Filtra APENAS os deletados
-				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
+				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
 
 				if (deletedContracts.length === 0) {
 					container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato foi excluído.</p></div></div>`;
@@ -3070,7 +3068,7 @@
 					return includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
 				}
 				// Não-Admin: Retorna só os do usuário, respeitando a flag includeDeleted
-				return allContracts.filter(c => 
+				return allContracts.filter(c => 
 					c.advogadoResponsavel === this.currentUser.displayName && (includeDeleted ? true : !c.isDeleted)
 				);
 			}
@@ -3212,7 +3210,7 @@
 						}, { merge: true });
 						
 						// Recarrega para o handleAuthStateChange ler o novo perfil
-						window.location.reload(); 
+						window.location.reload(); 
 						
 					} catch (error) {
 						console.error("Erro ao guardar nome:", error);
@@ -3327,7 +3325,7 @@
 					contractData.successFeeValueReceived = existingContract?.successFeeValueReceived || 0;
 					contractData.successFeePaymentDate = existingContract?.successFeePaymentDate || null;
 					contractData.isDeleted = existingContract?.isDeleted || false;
-					contractData.createdAt = existingContract?.createdAt || new Date().toISOString(); 
+					contractData.createdAt = existingContract?.createdAt || new Date().toISOString(); 
 					
 					if (await this.firebaseService.updateContract(contractId, contractData)) {
 						this.closeModal('modalContrato');
@@ -3435,7 +3433,7 @@
 			// [NOVO v5.4] Função helper para enviar notificação a um usuário
 			async sendNotification(recipientName, data) {
 				// Não envia notificação para o próprio usuário
-				if (!recipientName || recipientName === this.currentUser.displayName) return; 
+				if (!recipientName || recipientName === this.currentUser.displayName) return; 
 				
 				const safeRecipientName = Utils.sanitizeForFirestoreId(recipientName);
 				await this.firebaseService.sendNotification(safeRecipientName, data);
@@ -3462,14 +3460,14 @@
 				const hojeStr = hoje.toISOString().split('T')[0]; // YYYY-MM-DD
 				
 				// Roda apenas uma vez por dia
-				if (this.lastOverdueCheck === hojeStr) return; 
+				if (this.lastOverdueCheck === hojeStr) return; 
 				
 				const yesterday = new Date(hoje);
 				yesterday.setDate(hoje.getDate() - 1);
 				const ontemStr = yesterday.toISOString().split('T')[0];
 
 				// Itera apenas sobre os contratos do usuário atual (ou todos se for admin)
-				const contractsToCheck = this.getFilteredContracts(false); 
+				const contractsToCheck = this.getFilteredContracts(false); 
 				
 				contractsToCheck.forEach(contract => {
 					(contract.parcels || []).forEach(parcel => {
