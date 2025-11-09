@@ -389,6 +389,39 @@
 		.form-button:hover {
 			background-color: #4338ca; /* indigo-700 */
 		}
+		
+		/* [NOVO - CONTRATO ESPECIAL] Estilos para a lista de parcelas manuais */
+		.parcel-list-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background-color: #374151;
+			padding: 6px 10px;
+			border-radius: 6px;
+			font-size: 14px;
+			color: #d1d5db;
+		}
+		.parcel-list-item span {
+			font-weight: 500;
+		}
+		.parcel-list-remove-btn {
+			background-color: #ef4444; /* red-500 */
+			color: white;
+			border: none;
+			border-radius: 9999px;
+			width: 20px;
+			height: 20px;
+			font-weight: bold;
+			font-size: 10px;
+			cursor: pointer;
+			transition: background-color 0.2s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.parcel-list-remove-btn:hover {
+			background-color: #dc2626; /* red-600 */
+		}
 
 	</style>
 </head>
@@ -502,7 +535,8 @@
 						<span>Oficina</span>
 					</a>
 				</div>
-				</nav>
+
+			</nav>
 
 			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
 				<div class="flex items-center gap-3 p-2 rounded-lg">
@@ -562,15 +596,15 @@
 					</div>
 
 					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
 							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
 						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
 							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
 						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg admin-only transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
 							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
 							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
 						</div>
@@ -816,7 +850,8 @@
 						</div>
 					</div>
 				</div>
-				</div> 
+
+			</div> 
 		</main>
 		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
 			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active">
@@ -852,8 +887,8 @@
 				<i class="fas fa-cogs text-xl"></i>
 				<span class="text-xs mt-1">Oficina</span>
 			</a>
-			</nav>
-			</div> 
+		</nav>
+		</div> 
 	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
 		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
@@ -924,7 +959,15 @@
 					
 					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros</h3>
 					
-					<div id="financial-fields" class="space-y-4">
+					<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+						<label for="contratoEspecial" class="flex items-center">
+							<input type="checkbox" id="contratoEspecial" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
+							<span class="ml-2 text-sm font-medium text-gray-300">Contrato Especial (Inserir parcelas manualmente)</span>
+						</label>
+						<p class="text-xs text-gray-500 ml-6 mt-1">Use para parcelas com valores e vencimentos diferentes.</p>
+					</div>
+
+					<div id="financial-fields-standard" class="space-y-4">
 						<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
 							<label for="contratoJaQuitado" class="flex items-center">
 								<input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500">
@@ -947,6 +990,24 @@
 							<input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;">
 						</div>
 					</div>
+					
+					<div id="financial-fields-special" class="hidden space-y-4">
+						<p class="text-sm text-gray-400">Insira as parcelas uma a uma.</p>
+						<div class="flex flex-col md:flex-row gap-2">
+							<div class="flex-1">
+								<label for="parcelaValorManual" class="block text-xs font-medium text-gray-400 mb-1">Valor da Parcela (R$)</label>
+								<input type="number" step="0.01" id="parcelaValorManual" placeholder="1500.00" class="form-input">
+							</div>
+							<div class="flex-1">
+								<label for="parcelaVencimentoManual" class="block text-xs font-medium text-gray-400 mb-1">Vencimento</label>
+								<input type="date" id="parcelaVencimentoManual" class="form-input" style="color-scheme: dark;">
+							</div>
+							<button type="button" id="addManualParcelButton" class="form-button self-end mt-4 md:mt-0">Adicionar</button>
+						</div>
+						<div id="manualParcelList" class="space-y-1 max-h-40 overflow-y-auto p-2 bg-gray-900/50 rounded-md border border-gray-700">
+							</div>
+					</div>
+
 					<div>
 						<label for="taxaExito" class="block text-sm font-medium text-gray-400 mb-1">Taxa de Êxito (Bonificação)</label>
 						<input type="text" id="taxaExito" placeholder="Ex: 20%, 10000, 5 SALARIOS" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200">
@@ -960,7 +1021,6 @@
 			</div>
 		</form>
 	</div>
-
 	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
 		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
@@ -1560,7 +1620,6 @@
 		
 		/**
 		 * @class AnalyticsHandler
-		 * [NOVO v5.5] Adicionadas funções para os novos gráficos de admin
 		 */
 		class AnalyticsHandler {
 			constructor() {
@@ -1677,12 +1736,10 @@
 					this.adminChartContratos = null;
 					this.adminChartFaturamento = null;
 				}
-
-				// [INÍCIO DA ALTERAÇÃO - OFICINA]
+				
 				if (pageId === 'page-oficina') {
 					// Lógica de destruição de gráficos da Oficina (se houver)
 				}
-				// [FIM DA ALTERAÇÃO - OFICINA]
 				
 				this._forceRemoveTooltips();
 			}
@@ -1707,10 +1764,10 @@
 				this.app = appInstance;
 			}
 		
-			// [MUDANÇA v5] Lógica atualizada para usar datas (Date Objects)
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin', pois os 'contractsToRender'
+			// já vêm pré-filtrados pela classe App.
 			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
-				if (!this.app.isUserAdmin) return { totalParcelas: 0, totalExito: 0, totalGeral: 0, detailedPayments: [], byAdvogado: {}, byMonth: {}, newContractsByMonth: {} };
-		
 				let totalParcelas = 0, totalExito = 0;
 				const detailedPayments = [];
 				const byAdvogado = {};
@@ -1725,7 +1782,7 @@
 				};
 
 				allContracts.forEach(contract => {
-					const advogado = contract.advogadoResponsavel || 'Não Informado'; // [NOVO v5.5] Agrupa "Não Informado"
+					const advogado = contract.advogadoResponsavel || 'Não Informado';
 					
 					// 1. Processa novos contratos
 					if (contract.createdAt) {
@@ -1769,6 +1826,7 @@
 				
 				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
 			}
+			// [FIM DA ALTERAÇÃO]
 			
 			// [NOVO v5.5] Agrega dados para o Painel de Admin
 			calculateAdminPerformanceData(contractsToRender) {
@@ -1862,11 +1920,13 @@
 				return el;
 			}
 		
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removidas as verificações 'isUserAdmin' para exibir valores
 			createParcelCard(contract, parcel, index, type, remainingValue, valorCorrigido = null) {
 				const formattedDate = Utils.formatDate(parcel.dueDate);
-				const formattedValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
-				const formattedRemaining = this.app.isUserAdmin ? Utils.formatCurrency(remainingValue) : '[Restrito]';
-				const formattedCorrigido = this.app.isUserAdmin && valorCorrigido ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
+				const formattedValue = Utils.formatCurrency(parcel.value);
+				const formattedRemaining = Utils.formatCurrency(remainingValue);
+				const formattedCorrigido = valorCorrigido ? Utils.formatCurrency(valorCorrigido) : '';
 		
 				let borderColor = '';
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1' });
@@ -1880,30 +1940,20 @@
 		
 				if (type === 'vencida') {
 					borderColor = 'border-red-500';
-					if (this.app.isUserAdmin) {
-						details.innerHTML = `
-						<div class="flex items-center text-gray-400 text-xs"><strong>Original:</strong><span class="ml-auto font-medium line-through">${formattedValue}</span></div>
-						<div class="flex items-center text-red-400"><strong>Corrigido:</strong><span class="ml-auto font-semibold text-lg">${formattedCorrigido}</span></div>`;
-					} else {
-						details.append(this.buildElement('div', { className: 'text-red-400 font-semibold', text: 'Vencida' }));
-					}
+					details.innerHTML = `
+					<div class="flex items-center text-gray-400 text-xs"><strong>Original:</strong><span class="ml-auto font-medium line-through">${formattedValue}</span></div>
+					<div class="flex items-center text-red-400"><strong>Corrigido:</strong><span class="ml-auto font-semibold text-lg">${formattedCorrigido}</span></div>`;
 				} else if (type === 'a-vencer') {
 					borderColor = 'border-yellow-500';
-					if (this.app.isUserAdmin) {
-						details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
-					} else {
-						details.append(this.buildElement('div', { className: 'text-yellow-400 font-semibold', text: 'A vencer' }));
-					}
+					details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
 				} else {
 					borderColor = 'border-gray-700';
-					const formattedPaidValue = this.app.isUserAdmin ? Utils.formatCurrency(parcel.valuePaid || 0) : '[Restrito]';
+					const formattedPaidValue = Utils.formatCurrency(parcel.valuePaid || 0);
 					const paymentDate = Utils.formatDate(parcel.paymentDate);
-					if (this.app.isUserAdmin) {
-						details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
-					}
+					details.innerHTML = `<div class="flex items-center text-gray-300"><i class="fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500"></i><strong>Valor:</strong><span class="ml-auto font-semibold text-lg text-white">${formattedValue}</span></div>`;
 					actionButton = this.buildElement('div', { 
 						className: 'mt-4 text-center text-sm bg-green-900/50 text-green-300 p-2 rounded-md font-medium',
-						text: `Pago ${this.app.isUserAdmin ? formattedPaidValue : ''} em ${paymentDate}`
+						text: `Pago ${formattedPaidValue} em ${paymentDate}`
 					});
 				}
 				card.classList.add('border-l-4', borderColor);
@@ -1916,11 +1966,9 @@
 		
 				card.append(title, subtitle, details);
 		
-				if (this.app.isUserAdmin) {
-					const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-500 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
-					extraInfo.innerHTML = `<span>Contrato: <strong>${Utils.formatCurrency(contract.totalValue || 0)}</strong></span> <span>Restante: <strong>${formattedRemaining}</strong></span>`;
-					card.append(extraInfo);
-				}
+				const extraInfo = this.buildElement('div', { className: 'text-xs text-gray-500 border-t border-gray-700 pt-2 mt-3 flex justify-between' });
+				extraInfo.innerHTML = `<span>Contrato: <strong>${Utils.formatCurrency(contract.totalValue || 0)}</strong></span> <span>Restante: <strong>${formattedRemaining}</strong></span>`;
+				card.append(extraInfo);
 		
 				if (type !== 'paga') {
 					actionButton = this.buildElement('button', { 
@@ -1934,9 +1982,10 @@
 				return card;
 			}
 			
-			// [CORREÇÃO ALONGAMENTO] Adicionado 'self-start' para o card não esticar verticalmente
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valor
 			createExitoCard(contract) {
-				const taxaExitoDisplay = this.app.isUserAdmin ? contract.successFee : '[Restrito]';
+				const taxaExitoDisplay = contract.successFee || '[Não definido]';
 				
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg transition-all duration-200 hover:-translate-y-1 border-l-4 border-indigo-500 w-80 flex-shrink-0 self-start' });
 				card.append(this.buildElement('p', { className: 'font-bold text-white', text: contract.clientName }));
@@ -1959,6 +2008,8 @@
 				return card;
 			}
 		
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			createContractCard(contract, statusInfo) {
 				const { statusText, statusColor, borderColor } = statusInfo;
 				
@@ -1982,8 +2033,8 @@
 				cardBody.append(servicesContainer);
 		
 				const financialInfo = this.buildElement('div', { className: 'border-t border-gray-700 pt-4 space-y-3 text-sm' });
-				const valorFixoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(contract.totalValue) : '[Restrito]';
-				const exitoDisplay = this.app.isUserAdmin && contract.successFee ? contract.successFee : (contract.successFee ? '[Restrito]' : '');
+				const valorFixoDisplay = Utils.formatCurrency(contract.totalValue);
+				const exitoDisplay = contract.successFee || '';
 		
 				const fixedValueDiv = this.buildElement('div', { className: 'flex items-center text-gray-400' });
 				fixedValueDiv.append(this.buildIcon('fas fa-file-invoice-dollar w-5 text-center mr-2 text-gray-500'));
@@ -2023,10 +2074,11 @@
 				return card;
 			}
 			
-			// [MUDANÇA v5.6] Renomeado de 'createInadimplenteCard' para 'createParcelaCard' (para a nova aba)
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			createParcelaCard({ contract, parcel, index, diffDays, valorCorrigido, isVencida }) {
-				const valorOriginalDisplay = this.app.isUserAdmin ? Utils.formatCurrency(parcel.value) : '[Restrito]';
-				const valorCorrigidoDisplay = this.app.isUserAdmin ? Utils.formatCurrency(valorCorrigido) : '[Restrito]';
+				const valorOriginalDisplay = Utils.formatCurrency(parcel.value);
+				const valorCorrigidoDisplay = Utils.formatCurrency(valorCorrigido);
 		
 				// [NOVO v5.6] Adiciona classes dinâmicas para Vencida / A Vencer
 				const cardClasses = isVencida ? 'parcel-card-vencida' : 'parcel-card-avencer';
@@ -2039,7 +2091,7 @@
 				
 				const details = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 space-y-2' });
 				
-				if (isVencida && this.app.isUserAdmin) {
+				if (isVencida) {
 					// Card de VENCIDA (mostra original e corrigido)
 					details.innerHTML = `
 					<div class="flex justify-between items-center text-sm">
@@ -2050,7 +2102,7 @@
 						<span class="text-sm text-white">Valor Corrigido:</span>
 						<span class="font-semibold text-lg parcel-value">${valorCorrigidoDisplay}</span>
 					</div>`;
-				} else if (this.app.isUserAdmin) {
+				} else {
 					// Card de A VENCER (mostra só o valor normal)
 					details.innerHTML = `
 					<div class="flex justify-between items-center">
@@ -2104,6 +2156,8 @@
 				return card;
 			}
 			
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir progresso financeiro
 			createServicoCard(contract, serviceProgress, financialProgress) {
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg transition-all duration-200 hover:-translate-y-1' });
 				
@@ -2113,13 +2167,11 @@
 				card.append(header);
 		
 				const progressBars = this.buildElement('div', { className: 'space-y-4 mb-4' });
-				if (this.app.isUserAdmin) {
-					const financialProgressDiv = this.buildElement('div');
-					financialProgressDiv.innerHTML = `
-					<div class="flex justify-between text-sm mb-1 text-gray-300"><label>Progresso Financeiro</label><span class="font-medium text-teal-300">${financialProgress.toFixed(0)}%</span></div>
-					<div class="progress-bar-bg h-3 w-full"><div class="progress-bar bg-teal-500" style="width: ${financialProgress}%"></div></div>`;
-					progressBars.append(financialProgressDiv);
-				}
+				const financialProgressDiv = this.buildElement('div');
+				financialProgressDiv.innerHTML = `
+				<div class="flex justify-between text-sm mb-1 text-gray-300"><label>Progresso Financeiro</label><span class="font-medium text-teal-300">${financialProgress.toFixed(0)}%</span></div>
+				<div class="progress-bar-bg h-3 w-full"><div class="progress-bar bg-teal-500" style="width: ${financialProgress}%"></div></div>`;
+				progressBars.append(financialProgressDiv);
 				
 				const serviceProgressDiv = this.buildElement('div');
 				serviceProgressDiv.innerHTML = `
@@ -2316,6 +2368,24 @@
 				return item;
 			}
 			// [FIM DA ALTERAÇÃO - OFICINA]
+
+			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// Novo: Cria item da lista de parcelas manuais no modal
+			createManualParcelListItem(value, date, index) {
+				const item = this.buildElement('div', { className: 'parcel-list-item' });
+				item.dataset.index = index;
+				item.innerHTML = `
+					<span>${Utils.formatCurrency(value)}</span>
+					<span>Vence: ${Utils.formatDate(date)}</span>
+					<button type="button" class="parcel-list-remove-btn" title="Remover Parcela">&times;</button>
+				`;
+				
+				item.querySelector('.parcel-list-remove-btn').onclick = () => {
+					window.App.handleRemoveManualParcel(index);
+				};
+				return item;
+			}
+			// [FIM DA ALTERAÇÃO]
 		}
 		/**
 		 * @class App
@@ -2343,6 +2413,10 @@
 				
 				// [NOVO v5.4] Estado para controlar notificações de vencimento
 				this.lastOverdueCheck = null; 
+
+				// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+				this.manualParcels = []; // Array temporário para guardar parcelas manuais
+				// [FIM DA ALTERAÇÃO]
 				
 				// Estado de UI
 				this.currentContractSort = 'name-asc';
@@ -2432,6 +2506,13 @@
 				// Botão de Adicionar Serviço
 				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
 		
+				// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+				// Listener para a checkbox de Contrato Especial
+				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
+				// Listener para o botão de adicionar parcela manual
+				document.getElementById('addManualParcelButton').addEventListener('click', this.handleAddManualParcel.bind(this));
+				// [FIM DA ALTERAÇÃO]
+
 				// Inputs de Busca
 				const debouncedContracts = Utils.debounce(() => this.resetAndRenderContractList(), 300);
 				document.getElementById('searchInput').addEventListener('input', debouncedContracts);
@@ -2646,9 +2727,11 @@
 				// [FIM DA ALTERAÇÃO - OFICINA]
 			}
 		
-			// [NOVO v5.5] Refatorado para ser SÍNCRONO (não usa await)
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Lógica de renderização do Kanban e Dashboard atualizada
 			renderKanban() {
-				const contractsToRender = this.getFilteredContracts(false);
+				// 'contractsToRender' agora são apenas os contratos do usuário logado (não-deletados)
+				const contractsToRender = this.getFilteredContracts(false); 
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
 				const kanbanAVencer = document.getElementById('kanban-a-vencer');
 				const kanbanPagas = document.getElementById('kanban-pagas');
@@ -2669,9 +2752,8 @@
 		
 				for (const contract of contractsToRender) {
 					if (!contract.parcels) contract.parcels = [];
-					let remainingValue = this.isUserAdmin
-						? contract.parcels.reduce((sum, p) => p.status === 'Pendente' ? sum + p.value : sum, 0)
-						: 0;
+					// O 'remainingValue' agora é calculado para todos
+					let remainingValue = contract.parcels.reduce((sum, p) => p.status === 'Pendente' ? sum + p.value : sum, 0);
 		
 					for (let i = 0; i < contract.parcels.length; i++) {
 						const parcel = contract.parcels[i];
@@ -2684,13 +2766,12 @@
 							}
 						} else {
 							if (vencimento < hoje) {
-								// [NOVO v5.5] Cálculo síncrono, sem promise ou catch
 								const valorCorrigido = this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
-								if (this.isUserAdmin) totalVencido += valorCorrigido;
+								totalVencido += valorCorrigido; // Agora calculado para todos
 								fragVencidas.append(this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido));
 							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) {
 								fragAVencer.append(this.domBuilder.createParcelCard(contract, parcel, i, 'a-vencer', remainingValue));
-								if (this.isUserAdmin) totalAVencer30dias += parcel.value;
+								totalAVencer30dias += parcel.value; // Agora calculado para todos
 							}
 						}
 					}
@@ -2717,8 +2798,10 @@
 					document.getElementById('exito-section').style.display = 'none';
 				}
 		
-				const allContracts = this.getFilteredContracts(true);
-				const totalPagoMes = this.isUserAdmin ? this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral : 0;
+				// 'allContracts' agora inclui deletados para o cálculo do 'totalPagoMes'
+				const allContracts = this.getFilteredContracts(true); 
+				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral;
+				
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
 		
@@ -2728,6 +2811,7 @@
 				document.getElementById('dash-recebido').textContent = Utils.formatCurrency(pago);
 				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
+			// [FIM DA ALTERAÇÃO]
 		
 			renderContractList() {
 				const listContainer = document.getElementById('contractListContainer');
@@ -2753,9 +2837,9 @@
 				// 2. Ordena os contratos
 				if (this.currentContractSort === 'name-asc') {
 					filteredContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
-				} else if (this.currentContractSort === 'value-desc' && this.isUserAdmin) {
+				} else if (this.currentContractSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin' da condição de ordenação
 					filteredContracts.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
-				}
+				} // [FIM DA ALTERAÇÃO]
 		
 				// 3. Calcula paginação
 				const totalItems = filteredContracts.length;
@@ -2822,7 +2906,7 @@
 				// [MUDANÇA v5.6] Nova ordenação
 				if (this.currentParcelasSort === 'days-asc') {
 					parcelasList.sort((a, b) => a.diffDays - b.diffDays); // Mais próximas primeiro
-				} else if (this.currentParcelasSort === 'value-desc' && this.isUserAdmin) {
+				} else if (this.currentParcelasSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
 					parcelasList.sort((a, b) => b.valorCorrigido - a.valorCorrigido); // Mais caras primeiro
 				} else if (this.currentParcelasSort === 'name-asc') {
 					parcelasList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
@@ -3177,16 +3261,16 @@
 		
 				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
-				if (this.isUserAdmin) {
-					createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
-				}
+				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
+				createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
+				// [FIM DA ALTERAÇÃO]
 		
 				// [MUDANÇA v5.6] Botões de Parcelas (substitui Inadimplentes)
 				createButton(parcelasSortContainer, 'days-asc', 'Venc. Próximo', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
 				createButton(parcelasSortContainer, 'name-asc', 'Nome (A-Z)', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
-				if (this.isUserAdmin) {
-					createButton(parcelasSortContainer, 'value-desc', 'Maior Valor', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
-				}
+				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
+				createButton(parcelasSortContainer, 'value-desc', 'Maior Valor', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
+				// [FIM DA ALTERAÇÃO]
 		
 				// Botões de Serviços
 				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
@@ -3261,11 +3345,13 @@
 				}
 			}
 		
-			// [MUDANÇA v5.6] Lógica de SUBMIT de contrato ATUALIZADA
+			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// Lógica de SUBMIT de contrato ATUALIZADA
 			async handleContractSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('contractId').value;
 				const financialDataChanged = document.getElementById('financialDataChanged').value === 'true';
+				const isSpecialContract = document.getElementById('contratoEspecial').checked;
 				
 				const serviceTags = document.querySelectorAll('#servicosContainer .service-tag');
 				const serviceTypes = Array.from(serviceTags).map(tag => ({
@@ -3281,10 +3367,11 @@
 					serviceTypes,
 					paymentType: Utils.sanitizeText(document.getElementById('contratoTipoPagamento').value),
 					observations: Utils.sanitizeText(document.getElementById('contratoObservacoes').value),
+					isSpecialContract: isSpecialContract // Salva o tipo de contrato
 				};
 				
-				// Função helper para gerar parcelas
-				const generateParcels = () => {
+				// Função helper para gerar parcelas PADRÃO
+				const generateStandardParcels = () => {
 					const parcels = [];
 					const totalValue = Utils.parseNumber(document.getElementById('valorTotal').value);
 					const numParcels = parseInt(document.getElementById('numParcelas').value) || 1;
@@ -3310,26 +3397,64 @@
 							currentDueDate.setMonth(currentDueDate.getMonth() + 1);
 						}
 					}
-					return parcels;
+					return { parcels, totalValue };
 				};
 
+				// Função helper para gerar parcelas ESPECIAIS
+				const generateManualParcels = () => {
+					if (this.manualParcels.length === 0) {
+						Utils.showToast('Adicione pelo menos uma parcela manual.', 'error');
+						return null; // Indica falha
+					}
+					let totalValue = 0;
+					const parcels = this.manualParcels.map((p, i) => {
+						totalValue += p.value;
+						return {
+							number: i + 1,
+							value: p.value,
+							dueDate: new Date(p.dueDate + 'T12:00:00Z').toISOString(),
+							status: 'Pendente',
+							valuePaid: 0,
+							paymentDate: null
+						};
+					});
+					return { parcels, totalValue };
+				};
+
+
 				if (this.isUserAdmin) {
+					let generatedData;
+					
+					if (isSpecialContract) {
+						// Lógica de Contrato Especial
+						generatedData = generateManualParcels();
+					} else {
+						// Lógica de Contrato Padrão
+						generatedData = generateStandardParcels();
+					}
+
+					if (generatedData === null) return; // Falha na validação
+
 					Object.assign(contractData, {
-						totalValue: Utils.parseNumber(document.getElementById('valorTotal').value),
+						totalValue: generatedData.totalValue,
+						parcels: generatedData.parcels,
 						successFee: Utils.sanitizeText(document.getElementById('taxaExito').value) || null,
 					});
 				}
 		
 				if (!contractId) {
 					// --- CRIAÇÃO DE NOVO CONTRATO ---
-					const newParcels = this.isUserAdmin ? generateParcels() : [];
-					if (newParcels === null) return; // Falha na validação do generateParcels
+					if (!this.isUserAdmin) {
+						// Se não for admin, cria contrato sem dados financeiros
+						contractData.parcels = [];
+						contractData.totalValue = 0;
+						contractData.successFee = null;
+					}
 
 					Object.assign(contractData, {
 						successFeeValueReceived: 0,
 						successFeePaymentDate: null,
 						isDeleted: false,
-						parcels: newParcels,
 						createdAt: new Date().toISOString()
 					});
 					
@@ -3354,13 +3479,22 @@
 					
 					// [CORREÇÃO BUG EDIÇÃO] Se for admin e os dados financeiros mudaram
 					if (this.isUserAdmin && financialDataChanged) {
-						const newParcels = generateParcels();
-						if (newParcels === null) return; // Falha na validação
-						contractData.parcels = newParcels; // Sobrescreve as parcelas antigas
+						let generatedData;
+						if (isSpecialContract) {
+							generatedData = generateManualParcels();
+						} else {
+							generatedData = generateStandardParcels();
+						}
+						
+						if (generatedData === null) return; // Falha na validação
+						
+						contractData.parcels = generatedData.parcels; // Sobrescreve as parcelas antigas
+						contractData.totalValue = generatedData.totalValue; // Sobrescreve o valor total
 						Utils.showToast('Parcelas recalculadas com sucesso!', 'info');
 					} else if (existingContract) {
 						// Mantém as parcelas existentes se nada mudou
 						contractData.parcels = existingContract.parcels;
+						contractData.totalValue = existingContract.totalValue; // Mantém valor total
 					}
 					
 					// Preserva outros campos importantes
@@ -3374,18 +3508,24 @@
 					}
 				}
 			}
+			// [FIM DA ALTERAÇÃO]
 			
 			async handlePaymentSubmit(e) {
 				e.preventDefault();
 				const contractId = document.getElementById('pagamentoContractId').value;
 				const parcelIndex = parseInt(document.getElementById('pagamentoParcelIndex').value);
 				const contract = this.database.contracts.find(c => c.id === contractId);
+				
+				// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+				// Se for admin, pega o valor do input. Se não for, pega o valor original da parcela.
 				const valuePaid = this.isUserAdmin
 					? Utils.parseNumber(document.getElementById('pagamentoValor').value)
 					: (contract?.parcels[parcelIndex]?.value || 0);
+				// [FIM DA ALTERAÇÃO]
+					
 				const paymentDate = document.getElementById('pagamentoData').value;
 		
-				if (contract && !isNaN(valuePaid)) {
+				if (contract && !isNaN(valuePaid) && valuePaid > 0) { // Adicionada verificação > 0
 					const updatedParcels = [...(contract.parcels || [])];
 					const parcel = updatedParcels[parcelIndex];
 					parcel.status = 'Paga';
@@ -3604,6 +3744,61 @@
 				// irá automaticamente re-renderizar a UI.
 			}
 			// [FIM DA ALTERAÇÃO - OFICINA]
+
+			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			handleAddManualParcel() {
+				const valorInput = document.getElementById('parcelaValorManual');
+				const vencimentoInput = document.getElementById('parcelaVencimentoManual');
+				const value = Utils.parseNumber(valorInput.value);
+				const dueDate = vencimentoInput.value;
+
+				if (value <= 0) {
+					Utils.showToast('Por favor, insira um valor válido para a parcela.', 'error');
+					return;
+				}
+				if (!dueDate) {
+					Utils.showToast('Por favor, selecione uma data de vencimento.', 'error');
+					return;
+				}
+
+				this.manualParcels.push({ value, dueDate });
+				this.manualParcels.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)); // Ordena por data
+				
+				this.renderManualParcelList();
+				valorInput.value = '';
+				vencimentoInput.value = '';
+				valorInput.focus();
+				document.getElementById('financialDataChanged').value = 'true';
+			}
+
+			handleRemoveManualParcel(index) {
+				this.manualParcels.splice(index, 1);
+				this.renderManualParcelList();
+				document.getElementById('financialDataChanged').value = 'true';
+			}
+
+			renderManualParcelList() {
+				const listContainer = document.getElementById('manualParcelList');
+				listContainer.innerHTML = '';
+				if (this.manualParcels.length === 0) {
+					listContainer.innerHTML = `<p class="text-xs text-gray-500 text-center p-2">Nenhuma parcela adicionada.</p>`;
+					return;
+				}
+				
+				const fragment = document.createDocumentFragment();
+				this.manualParcels.forEach((parcel, index) => {
+					fragment.append(this.domBuilder.createManualParcelListItem(parcel.value, parcel.dueDate, index));
+				});
+				listContainer.append(fragment);
+			}
+
+			toggleSpecialContractFields(event) {
+				const isChecked = event.target.checked;
+				document.getElementById('financial-fields-standard').style.display = isChecked ? 'none' : 'block';
+				document.getElementById('financial-fields-special').style.display = isChecked ? 'block' : 'none';
+				document.getElementById('financialDataChanged').value = 'true';
+			}
+			// [FIM DA ALTERAÇÃO]
 		
 			// --- 6. LÓGICA DE MODAIS (com Acessibilidade) ---
 		
@@ -3646,7 +3841,8 @@
 				}
 			}
 		
-			// [MUDANÇA v5.6] Lógica de Edição de Contrato ATUALIZADA
+			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// Lógica de Edição de Contrato ATUALIZADA
 			openContractModal(contractId = null) {
 				try {
 					const form = document.getElementById('formContrato'); form.reset();
@@ -3660,12 +3856,20 @@
 					// [FIM DA ALTERAÇÃO - OFICINA]
 					
 					const advogadoSelect = document.getElementById('advogadoResponsavel');
+
+					// Reseta o estado das parcelas manuais
+					this.manualParcels = [];
+					this.renderManualParcelList();
 					
 					// [NOVO v5.6] Referências aos campos financeiros e aviso
 					const financialWarning = document.getElementById('financial-warning');
-					const financialFieldsDiv = document.getElementById('financial-fields');
+					const financialFieldsDiv = document.getElementById('financial-fields-standard');
 					const financialInputs = financialFieldsDiv.querySelectorAll('input, select');
 					
+					const specialCheckbox = document.getElementById('contratoEspecial');
+					const standardFields = document.getElementById('financial-fields-standard');
+					const specialFields = document.getElementById('financial-fields-special');
+
 					if (contractId) {
 						// --- MODO DE EDIÇÃO ---
 						const contract = this.database.contracts.find(c => c.id === contractId);
@@ -3678,28 +3882,48 @@
 						document.getElementById('contratoTipoPagamento').value = contract.paymentType || 'Parcelado';
 						document.getElementById('contratoObservacoes').value = contract.observations || '';
 						
-						// [CORREÇÃO BUG EDIÇÃO] Verifica se alguma parcela foi paga
+						// Verifica se alguma parcela foi paga
 						const hasPaidParcels = (contract.parcels || []).some(p => p.status === 'Paga');
 						
 						if (hasPaidParcels && this.isUserAdmin) {
 							// Se já pagou, BLOQUEIA os campos financeiros
 							financialWarning.classList.remove('hidden');
-							financialFieldsDiv.classList.add('hidden'); // Esconde os campos
+							financialFieldsDiv.classList.add('hidden'); // Esconde os campos padrão
+							specialFields.classList.add('hidden'); // Esconde os campos especiais
+							specialCheckbox.disabled = true; // Desativa a checkbox
 							financialInputs.forEach(input => input.disabled = true);
 						} else {
 							// Se não pagou, permite a edição (e reseta os campos)
 							financialWarning.classList.add('hidden');
-							financialFieldsDiv.classList.remove('hidden');
+							specialCheckbox.disabled = !this.isUserAdmin;
 							financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
 						}
 
 						// Preenche os campos financeiros (mesmo que estejam escondidos/bloqueados)
 						if (this.isUserAdmin) {
-							document.getElementById('valorTotal').value = contract.totalValue || '';
-							document.getElementById('numParcelas').value = (contract.parcels || []).length || 1;
 							document.getElementById('taxaExito').value = contract.successFee || '';
-							if ((contract.parcels || []).length > 0) {
-								document.getElementById('vencimentoPrimeiraParcela').value = contract.parcels[0].dueDate.split('T')[0];
+							
+							// Define o estado do modal (Especial vs Padrão)
+							specialCheckbox.checked = contract.isSpecialContract || false;
+							
+							if (contract.isSpecialContract) {
+								// É um contrato especial, preenche a lista manual
+								standardFields.style.display = 'none';
+								specialFields.style.display = 'block';
+								this.manualParcels = (contract.parcels || []).map(p => ({
+									value: p.value,
+									dueDate: p.dueDate.split('T')[0] // Formato YYYY-MM-DD
+								}));
+								this.renderManualParcelList();
+							} else {
+								// É um contrato padrão, preenche os campos padrão
+								standardFields.style.display = 'block';
+								specialFields.style.display = 'none';
+								document.getElementById('valorTotal').value = contract.totalValue || '';
+								document.getElementById('numParcelas').value = (contract.parcels || []).length || 1;
+								if ((contract.parcels || []).length > 0) {
+									document.getElementById('vencimentoPrimeiraParcela').value = contract.parcels[0].dueDate.split('T')[0];
+								}
 							}
 						}
 						document.getElementById('contratoJaQuitado').checked = false;
@@ -3713,9 +3937,14 @@
 						
 						// Garante que os campos estão visíveis e habilitados
 						financialWarning.classList.add('hidden');
-						financialFieldsDiv.classList.remove('hidden');
 						financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
 						document.getElementById('contratoJaQuitado').checked = false;
+
+						// Reseta para o modo Padrão
+						specialCheckbox.checked = false;
+						specialCheckbox.disabled = !this.isUserAdmin;
+						standardFields.style.display = 'block';
+						specialFields.style.display = 'none';
 					}
 					
 					this.openModal('modalContrato');
@@ -3724,8 +3953,10 @@
 					Utils.showToast('Falha ao abrir o modal de contrato.', 'error');
 				}
 			}
+			// [FIM DA ALTERAÇÃO]
 			
-			// [NOVO v5.5] Refatorado para ser SÍNCRONO (não usa await)
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			openPaymentModal(contractId, parcelIndex) {
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract || !contract.parcels || !contract.parcels[parcelIndex]) return;
@@ -3736,7 +3967,7 @@
 				if (new Date(parcel.dueDate) < new Date()) {
 					// [NOVO v5.5] Cálculo síncrono
 					valorCorrigido = this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
-					if (this.isUserAdmin) infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> ${Utils.formatCurrency(valorCorrigido)}</p>`;
+					infoCorrecao = `<p class="text-red-400"><strong>Valor Corrigido:</strong> ${Utils.formatCurrency(valorCorrigido)}</p>`;
 				}
 		
 				document.getElementById('pagamentoContractId').value = contractId;
@@ -3745,17 +3976,20 @@
 				infoDiv.innerHTML = `
 					<p><strong>Cliente:</strong> ${contract.clientName}</p>
 					<p><strong>Parcela:</strong> ${parcel.number}/${contract.parcels.length}</p>
-					${this.isUserAdmin ? `<p><strong>Valor Original:</strong> ${Utils.formatCurrency(parcel.value)}</p>` : ''}
+					<p><strong>Valor Original:</strong> ${Utils.formatCurrency(parcel.value)}</p>
 					${infoCorrecao}`;
 		
 				const valorInput = document.getElementById('pagamentoValor');
-				valorInput.value = (this.isUserAdmin ? valorCorrigido : parcel.value).toFixed(2);
+				// Define o valor, mas só permite edição se for admin
+				valorInput.value = valorCorrigido.toFixed(2);
 				valorInput.disabled = !this.isUserAdmin;
 		
 				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
 				this.openModal('modalPagamento');
 			}
 		
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			openClientHistoryModal(clientName) {
 				const clientContracts = (this.isUserAdmin ? this.database.contracts : this.getFilteredContracts(true))
 					.filter(c => c.clientName === clientName);
@@ -3767,7 +4001,7 @@
 		
 				clientContracts.forEach(contract => {
 					const contractValue = contract.totalValue || 0;
-					if (this.isUserAdmin) totalContratado += contractValue;
+					totalContratado += contractValue;
 		
 					let contractHtml = `<div class="bg-gray-700 p-4 rounded-lg ${contract.isDeleted ? 'opacity-60 border-l-4 border-gray-500' : ''}">`;
 					contractHtml += `<div class="flex justify-between items-start">
@@ -3783,17 +4017,17 @@
 							const statusClass = p.status === 'Paga' ? 'text-green-400' : 'text-red-400';
 							let valorPagoDisplay = '';
 							if (p.status === 'Paga') {
-								if (this.isUserAdmin) totalPago += p.valuePaid || 0;
-								valorPagoDisplay = this.isUserAdmin ? `(pago ${Utils.formatCurrency(p.valuePaid || 0)})` : '(pago)';
+								totalPago += p.valuePaid || 0;
+								valorPagoDisplay = `(pago ${Utils.formatCurrency(p.valuePaid || 0)})`;
 							}
-							const valorParcelaDisplay = this.isUserAdmin ? Utils.formatCurrency(p.value) : '[Restrito]';
+							const valorParcelaDisplay = Utils.formatCurrency(p.value);
 							contractHtml += `<li>Parcela ${p.number} - ${valorParcelaDisplay} - <span class="${statusClass}">${p.status}</span> ${valorPagoDisplay}</li>`;
 						});
 						contractHtml += `</ul>`;
 					}
 					if (contract.successFeePaymentDate) {
-						const exitoRecebidoDisplay = this.isUserAdmin ? Utils.formatCurrency(contract.successFeeValueReceived) : '[Recebido]';
-						if (this.isUserAdmin) totalPago += contract.successFeeValueReceived || 0;
+						const exitoRecebidoDisplay = Utils.formatCurrency(contract.successFeeValueReceived);
+						totalPago += contract.successFeeValueReceived || 0;
 						contractHtml += `<p class="mt-2 text-sm text-green-400">Êxito Recebido: ${exitoRecebidoDisplay}</p>`;
 					}
 					contractHtml += `</div>`;
@@ -3803,17 +4037,16 @@
 					fragment.append(el);
 				});
 		
-				if (this.isUserAdmin) {
-					const summaryHtml = `
-					<div class="grid grid-cols-3 gap-4 text-center">
-						<div><p class="text-sm text-gray-400">Total Contratado</p><p class="font-bold text-lg text-white">${Utils.formatCurrency(totalContratado)}</p></div>
-						<div><p class="text-sm text-gray-400">Total Pago</p><p class="font-bold text-lg text-green-400">${Utils.formatCurrency(totalPago)}</p></div>
-						<div><p class="text-sm text-gray-400">Saldo Devedor</p><p class="font-bold text-lg text-red-400">${Utils.formatCurrency(totalContratado - totalPago)}</p></div>
-					</div><hr class="my-4 border-gray-700">`;
-					const summaryEl = this.domBuilder.buildElement('div');
-					summaryEl.innerHTML = summaryHtml;
-					content.append(summaryEl);
-				}
+				// O sumário agora é mostrado para todos
+				const summaryHtml = `
+				<div class="grid grid-cols-3 gap-4 text-center">
+					<div><p class="text-sm text-gray-400">Total Contratado</p><p class="font-bold text-lg text-white">${Utils.formatCurrency(totalContratado)}</p></div>
+					<div><p class="text-sm text-gray-400">Total Pago</p><p class="font-bold text-lg text-green-400">${Utils.formatCurrency(totalPago)}</p></div>
+					<div><p class="text-sm text-gray-400">Saldo Devedor</p><p class="font-bold text-lg text-red-400">${Utils.formatCurrency(totalContratado - totalPago)}</p></div>
+				</div><hr class="my-4 border-gray-700">`;
+				const summaryEl = this.domBuilder.buildElement('div');
+				summaryEl.innerHTML = summaryHtml;
+				content.append(summaryEl);
 				
 				content.append(fragment);
 				this.openModal('modalCliente');
@@ -3851,7 +4084,9 @@
 		
 				const month = parseInt(document.getElementById('reportMonth').value);
 				const year = parseInt(document.getElementById('reportYear').value);
+				// [INÍCIO DA ALTERAÇÃO] Passa os contratos filtrados para o report handler
 				const income = this.reportHandler.calculateMonthlyIncome(year, month, this.getFilteredContracts(true));
+				// [FIM DA ALTERAÇÃO]
 		
 				let detailsHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Detalhes dos Recebimentos</h4>';
 				if (income.detailedPayments.length > 0) {
@@ -3895,20 +4130,24 @@
 				}
 			}
 		
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			openExitoModal(contractId) {
 				const contract = this.database.contracts.find(c => c.id === contractId); if (!contract) return;
 				document.getElementById('exitoContractId').value = contractId;
 				const exitoInfoEl = document.getElementById('exitoInfo');
 				const valorRecebidoInput = document.getElementById('exitoValorRecebido');
 		
-				exitoInfoEl.innerHTML = `<p><strong>Cliente:</strong> ${contract.clientName}</p><p><strong>Serviço:</strong> ${(contract.serviceTypes || []).map(s => s.name).join(', ')}</p>${this.isUserAdmin ? `<p><strong>Bonificação Prevista:</strong> <span class="font-bold text-indigo-400">${contract.successFee}</span></p>` : ''}`;
+				exitoInfoEl.innerHTML = `<p><strong>Cliente:</strong> ${contract.clientName}</p><p><strong>Serviço:</strong> ${(contract.serviceTypes || []).map(s => s.name).join(', ')}</p><p><strong>Bonificação Prevista:</strong> <span class="font-bold text-indigo-400">${contract.successFee}</span></p>`;
 		
 				valorRecebidoInput.value = '';
+				// A lógica de esconder/mostrar o CAMPO DE EDIÇÃO permanece
 				valorRecebidoInput.closest('.admin-only').style.display = this.isUserAdmin ? 'block' : 'none';
 				document.querySelector('#modalExito .non-admin-hidden').style.display = this.isUserAdmin ? 'none' : 'block';
 		
 				this.openModal('modalExito');
 			}
+			// [FIM DA ALTERAÇÃO]
 		
 			createServiceTag(serviceName, deadline, status = 'Pendente') {
 				const container = document.getElementById('servicosContainer');
@@ -4152,7 +4391,9 @@
 					const services = (c.serviceTypes || []).map(s => s.name).join('; ');
 					const row = [
 						c.id, c.clientName, c.advogadoResponsavel, c.paymentType || '',
-						this.isUserAdmin ? c.totalValue : 'Restrito', this.isUserAdmin ? c.successFee : 'Restrito',
+						// [INÍCIO DA ALTERAÇÃO] Removida verificação 'isUserAdmin'
+						c.totalValue, c.successFee,
+						// [FIM DA ALTERAÇÃO]
 						status, services, c.observations || ''
 					].map(this._formatCSVCell).join(',');
 					csvRows.push(row);
