@@ -1823,7 +1823,7 @@
 				
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
-				// ⚠️ CORREÇÃO 2 CORRIGIDA: DETECTAR INADIMPLENTES
+				// ⚠️ CORREÇÃO 2 CORRIGIDA: DETECTAR INADIMPLENTES NO PERÍODO
 const defaulters = []; // Array para clientes inadimplentes
 
 allContracts.forEach(contract => {
@@ -1831,11 +1831,12 @@ allContracts.forEach(contract => {
         // Verifica se a parcela está PENDENTE (não está paga)
         if (parcel.status === 'Pendente') {
             const dueDate = new Date(parcel.dueDate);
-            const hoje = new Date();
             
-            // Se a parcela venceu (data de vencimento é menor que hoje)
-            if (dueDate < hoje) {
+            // Se a parcela VENCEU NO PERÍODO DO RELATÓRIO (entre startDate e endDate)
+            if (dueDate >= startDate && dueDate <= endDate) {
+                const hoje = new Date();
                 const daysOverdue = Math.floor((hoje - dueDate) / (1000 * 60 * 60 * 24));
+                
                 defaulters.push({
                     clientName: contract.clientName,
                     clientPhone: contract.clientPhone || 'N/A',
@@ -1844,8 +1845,8 @@ allContracts.forEach(contract => {
                     totalParcels: contract.parcels.length,
                     value: parcel.value,
                     dueDate: parcel.dueDate,
-                    daysOverdue: daysOverdue,
-                    status: 'Vencida e não paga'
+                    daysOverdue: daysOverdue > 0 ? daysOverdue : 0,
+                    status: daysOverdue > 0 ? 'Vencida' : 'A vencer'
                 });
             }
         }
