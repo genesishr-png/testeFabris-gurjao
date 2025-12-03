@@ -1826,13 +1826,19 @@
 				// ⚠️ CORREÇÃO 2: DETECTAR INADIMPLENTES
 const defaulters = []; // Array para clientes inadimplentes
 
+// ⚠️ CORREÇÃO 2 CORRIGIDA: DETECTAR INADIMPLENTES
+const defaulters = []; // Array para clientes inadimplentes
+
 allContracts.forEach(contract => {
     (contract.parcels || []).forEach(parcel => {
-        // Se a parcela NÃO foi paga e está vencida no período do relatório
-        if (parcel.status !== 'Paga') {
+        // Verifica se a parcela está PENDENTE (não está paga)
+        if (parcel.status === 'Pendente') {
             const dueDate = new Date(parcel.dueDate);
-            if (dueDate >= startDate && dueDate <= endDate) {
-                const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
+            const hoje = new Date();
+            
+            // Se a parcela venceu (data de vencimento é menor que hoje)
+            if (dueDate < hoje) {
+                const daysOverdue = Math.floor((hoje - dueDate) / (1000 * 60 * 60 * 24));
                 defaulters.push({
                     clientName: contract.clientName,
                     clientPhone: contract.clientPhone || 'N/A',
@@ -1841,10 +1847,9 @@ allContracts.forEach(contract => {
                     totalParcels: contract.parcels.length,
                     value: parcel.value,
                     dueDate: parcel.dueDate,
-                    daysOverdue: daysOverdue > 0 ? daysOverdue : 0,
-                    status: daysOverdue > 0 ? 'Vencida' : 'A vencer'
+                    daysOverdue: daysOverdue,
+                    status: 'Vencida e não paga'
                 });
-            }
         }
     });
 });
