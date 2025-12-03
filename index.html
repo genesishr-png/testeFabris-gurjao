@@ -16,22 +16,34 @@
 			position: relative;
 			background-color: #0f172a;
 			color: #d1d5db;
-			overflow-y: hidden; 
+			overflow-y: hidden; /* Evita scroll na página principal */
 		}
+		/* Efeito de fundo com imagem */
 		body::after {
 			content: '';
 			position: fixed;
-			z-index: -2;
+			z-index: -2; /* Garante que fique atrás de todo o conteúdo */
 			top: 0; left: 0; right: 0; bottom: 0;
 			background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg');
 			background-repeat: no-repeat;
 			background-size: cover;
 			background-position: center center;
-			opacity: 0.12;
+			opacity: 0.12; /* Ajuste a opacidade conforme desejado */
 		}
-		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
+		/* Estilos para modais */
+		.modal-backdrop {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0,0,0,0.7);
+			z-index: 9000;
 		}
-		.modal-backdrop.active { display: block; }
+		.modal-backdrop.active {
+			display: block;
+		}
 		.modal-container {
 			display: none;
 			position: fixed;
@@ -44,25 +56,50 @@
 			z-index: 9001;
 			max-width: 600px;
 			width: 90%;
-			max-height: 85vh;
-			overflow-y: auto;
+			max-height: 85vh; /* Limita a altura do modal */
+			overflow-y: auto; /* Adiciona scroll se o conteúdo for maior */
 			box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 		}
-		.modal-container.active { display: block; }
-		.sidebar { transition: transform 0.3s ease-in-out; }
-		.sidebar.hidden { transform: translateX(-100%); }
-		.content-area { transition: margin-left 0.3s ease-in-out; }
-		.content-area.expanded { margin-left: 0; }
-		@media (max-width: 768px) {
-			.sidebar { position: fixed; z-index: 1000; height: 100vh; }
-			.content-area { margin-left: 0 !important; }
+		.modal-container.active {
+			display: block;
 		}
-		.hover-scale { transition: transform 0.2s; }
-		.hover-scale:hover { transform: scale(1.02); }
+		/* Transições para sidebar e área de conteúdo */
+		.sidebar {
+			transition: transform 0.3s ease-in-out;
+		}
+		.sidebar.hidden {
+			transform: translateX(-100%);
+		}
+		.content-area {
+			transition: margin-left 0.3s ease-in-out;
+		}
+		.content-area.expanded {
+			margin-left: 0;
+		}
+		/* Responsividade da sidebar */
+		@media (max-width: 768px) {
+			.sidebar {
+				position: fixed;
+				z-index: 1000;
+				height: 100vh;
+			}
+			.content-area {
+				margin-left: 0 !important;
+			}
+		}
+		/* Efeitos de hover */
+		.hover-scale {
+			transition: transform 0.2s;
+		}
+		.hover-scale:hover {
+			transform: scale(1.02);
+		}
+		/* Estilos de cards com gradiente */
 		.card-gradient {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border: 1px solid #475569;
 		}
+		/* Botão primário com gradiente */
 		.btn-primary {
 			background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 			transition: all 0.3s;
@@ -72,6 +109,7 @@
 			transform: translateY(-2px);
 			box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
 		}
+		/* Badges de status */
 		.status-badge {
 			padding: 0.25rem 0.75rem;
 			border-radius: 9999px;
@@ -83,6 +121,7 @@
 		.status-pendente { background-color: #f59e0b; color: white; }
 		.status-vencido { background-color: #ef4444; color: white; }
 		.status-pago { background-color: #06b6d4; color: white; }
+		/* Estilos para inputs e selects */
 		input, select, textarea {
 			background-color: #334155 !important;
 			border: 1px solid #475569 !important;
@@ -94,6 +133,7 @@
 			border-color: #3b82f6 !important;
 			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 		}
+		/* Estilos de tabela */
 		.table-header {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border-bottom: 2px solid #3b82f6;
@@ -105,17 +145,20 @@
 		.table-row:hover {
 			background-color: #1e293b;
 		}
+		/* Botões de ação */
 		.btn-action {
 			transition: all 0.2s;
 		}
 		.btn-action:hover {
 			transform: scale(1.1);
 		}
+		/* Gráficos */
 		.chart-container {
 			position: relative;
 			height: 300px;
 			margin-bottom: 2rem;
 		}
+		/* Cards de estatísticas */
 		.stat-card {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border-left: 4px solid #3b82f6;
@@ -125,6 +168,7 @@
 			transform: translateY(-5px);
 			box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
 		}
+		/* Spinner de carregamento */
 		.loading-spinner {
 			border: 3px solid #334155;
 			border-top: 3px solid #3b82f6;
@@ -137,6 +181,7 @@
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
 		}
+		/* Notificações */
 		.notification {
 			position: fixed;
 			top: 20px;
@@ -163,20 +208,36 @@
 		.notification.error { background-color: #ef4444; }
 		.notification.warning { background-color: #f59e0b; }
 		.notification.info { background-color: #3b82f6; }
-		#mainContent { overflow-y: auto; height: calc(100vh - 80px); }
-		#mainContent::-webkit-scrollbar { width: 8px; }
-		#mainContent::-webkit-scrollbar-track { background: #1e293b; }
+		/* Scrollbar customizada para mainContent */
+		#mainContent {
+			overflow-y: auto;
+			height: calc(100vh - 80px); /* Ajuste conforme a altura do header */
+		}
+		#mainContent::-webkit-scrollbar {
+			width: 8px;
+		}
+		#mainContent::-webkit-scrollbar-track {
+			background: #1e293b;
+		}
 		#mainContent::-webkit-scrollbar-thumb {
 			background: #475569;
 			border-radius: 4px;
 		}
-		#mainContent::-webkit-scrollbar-thumb:hover { background: #64748b; }
-		.modal-container::-webkit-scrollbar { width: 6px; }
-		.modal-container::-webkit-scrollbar-track { background: #1e293b; }
+		#mainContent::-webkit-scrollbar-thumb:hover {
+			background: #64748b;
+		}
+		/* Scrollbar customizada para modais */
+		.modal-container::-webkit-scrollbar {
+			width: 6px;
+		}
+		.modal-container::-webkit-scrollbar-track {
+			background: #1e293b;
+		}
 		.modal-container::-webkit-scrollbar-thumb {
 			background: #475569;
 			border-radius: 3px;
 		}
+		/* Estilos para itens de parcela */
 		.parcel-item {
 			background: #1e293b;
 			border: 1px solid #334155;
@@ -230,6 +291,14 @@
 			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="reports">
 				<i class="fas fa-chart-bar text-red-400"></i>
 				<span class="text-slate-200">Relatórios</span>
+			</a>
+			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="analytics">
+				<i class="fas fa-chart-pie text-orange-400"></i>
+				<span class="text-slate-200">Análises</span>
+			</a>
+			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="settings">
+				<i class="fas fa-cog text-gray-400"></i>
+				<span class="text-slate-200">Configurações</span>
 			</a>
 		</nav>
 
@@ -482,6 +551,39 @@
 			</button>
 		</div>
 	</div>
+
+	<!-- MODAL: LIXEIRA -->
+	<div id="trashModal" class="modal-container" style="max-width: 900px;">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-2xl font-bold text-white">
+				<i class="fas fa-trash-alt text-gray-500 mr-2"></i>
+				Lixeira
+			</h3>
+			<button class="close-modal text-slate-400 hover:text-white text-2xl">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+		<div id="trashContent" class="space-y-4">
+			<!-- Conteúdo da lixeira será carregado aqui -->
+		</div>
+	</div>
+
+	<!-- MODAL: WORKSHOP -->
+	<div id="workshopModal" class="modal-container" style="max-width: 900px;">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-2xl font-bold text-white">
+				<i class="fas fa-tools text-yellow-500 mr-2"></i>
+				Workshop de Correções
+			</h3>
+			<button class="close-modal text-slate-400 hover:text-white text-2xl">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+		<div id="workshopContent" class="space-y-4">
+			<!-- Conteúdo do workshop será carregado aqui -->
+		</div>
+	</div>
+
 	<!-- FIREBASE E JAVASCRIPT -->
 	<script type="module">
 		import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -500,7 +602,9 @@
 			deleteDoc, 
 			query, 
 			where,
-			orderBy 
+			orderBy,
+			limit,
+			startAfter
 		} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 		// Configuração do Firebase
@@ -522,6 +626,9 @@
 		let clients = [];
 		let contracts = [];
 		let currentSection = 'dashboard';
+		let lastVisibleClient = null;
+		let lastVisibleContract = null;
+		const PAGE_SIZE = 10; // Número de itens por página
 
 		// Utilitários
 		const showNotification = (message, type = 'info') => {
@@ -606,18 +713,22 @@
 
 		document.getElementById('modalBackdrop').addEventListener('click', closeModal);
 
-		// ============================================
+		// 
 		// CLIENTES
-		// ============================================
+		// 
 
-		const loadClients = async () => {
+		const loadClients = async (next = false) => {
 			try {
-				const q = query(collection(db, 'clients'), orderBy('name'));
-				const querySnapshot = await getDocs(q);
+				let clientQuery = query(collection(db, 'clients'), orderBy('name'), limit(PAGE_SIZE));
+				if (next && lastVisibleClient) {
+					clientQuery = query(collection(db, 'clients'), orderBy('name'), startAfter(lastVisibleClient), limit(PAGE_SIZE));
+				}
+				const querySnapshot = await getDocs(clientQuery);
 				clients = [];
 				querySnapshot.forEach((doc) => {
 					clients.push({ id: doc.id, ...doc.data() });
 				});
+				lastVisibleClient = querySnapshot.docs[querySnapshot.docs.length - 1];
 				updateClientSelects();
 			} catch (error) {
 				showNotification('Erro ao carregar clientes: ' + error.message, 'error');
@@ -689,17 +800,22 @@
 			}
 		};
 
-		// ============================================
+		// 
 		// CONTRATOS
-		// ============================================
+		// 
 
-		const loadContracts = async () => {
+		const loadContracts = async (next = false) => {
 			try {
-				const querySnapshot = await getDocs(collection(db, 'contracts'));
+				let contractQuery = query(collection(db, 'contracts'), orderBy('startDate', 'desc'), limit(PAGE_SIZE));
+				if (next && lastVisibleContract) {
+					contractQuery = query(collection(db, 'contracts'), orderBy('startDate', 'desc'), startAfter(lastVisibleContract), limit(PAGE_SIZE));
+				}
+				const querySnapshot = await getDocs(contractQuery);
 				contracts = [];
 				querySnapshot.forEach((doc) => {
 					contracts.push({ id: doc.id, ...doc.data() });
 				});
+				lastVisibleContract = querySnapshot.docs[querySnapshot.docs.length - 1];
 			} catch (error) {
 				showNotification('Erro ao carregar contratos: ' + error.message, 'error');
 			}
@@ -708,7 +824,7 @@
 		const generateParcels = (numParcels, totalValue, firstParcelDate, dueDay) => {
 			const parcels = [];
 			const parcelValue = totalValue / numParcels;
-			const baseDate = new Date(firstParcelDate + 'T12:00:00');
+			const baseDate = new Date(firstParcelDate + 'T12:00:00'); // Garante que a data base seja UTC para consistência
 
 			for (let i = 0; i < numParcels; i++) {
 				const dueDate = new Date(baseDate);
@@ -718,9 +834,10 @@
 				parcels.push({
 					number: i + 1,
 					value: parcelValue,
-					dueDate: dueDate.toISOString().split('T')[0],
+					dueDate: dueDate.toISOString().split('T')[0], // Salva apenas a data (YYYY-MM-DD)
 					status: 'Pendente',
 					paymentDate: null,
+					paymentAmount: null,
 					paymentMethod: null,
 					notes: null
 				});
@@ -778,6 +895,11 @@
 			document.getElementById('contractStartDate').value = contract.startDate;
 			document.getElementById('contractEndDate').value = contract.endDate || '';
 			document.getElementById('contractStatus').value = contract.status;
+			// Para edição, não geramos novas parcelas, apenas exibimos os dados existentes
+			document.getElementById('contractParcels').value = contract.parcels ? contract.parcels.length : 1;
+			document.getElementById('contractDueDay').value = contract.parcels && contract.parcels.length > 0 ? new Date(contract.parcels[0].dueDate).getDate() : 10;
+			document.getElementById('contractFirstParcel').value = contract.parcels && contract.parcels.length > 0 ? contract.parcels[0].dueDate : new Date().toISOString().split('T')[0];
+
 			openModal('contractModal');
 		};
 
@@ -801,7 +923,7 @@
 			const client = clients.find(c => c.id === contract.clientId);
 			const parcels = contract.parcels || [];
 			const paidParcels = parcels.filter(p => p.status === 'Paga').length;
-			const totalPaid = parcels.filter(p => p.status === 'Paga').reduce((sum, p) => sum + p.value, 0);
+			const totalPaid = parcels.filter(p => p.status === 'Paga').reduce((sum, p) => sum + (p.paymentAmount || p.value), 0);
 
 			let html = `
 				<div class="bg-slate-700 p-4 rounded-lg mb-4">
@@ -826,7 +948,7 @@
 
 			parcels.forEach((parcel, index) => {
 				const statusClass = parcel.status === 'Paga' ? 'parcel-paid' : 
-								   (new Date(parcel.dueDate) < new Date() ? 'parcel-overdue' : 'parcel-pending');
+								   (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'parcel-overdue' : 'parcel-pending');
 				
 				html += `
 					<div class="parcel-item ${statusClass}">
@@ -837,12 +959,13 @@
 								<p class="text-sm text-slate-400">Valor: ${formatCurrency(parcel.value)}</p>
 								${parcel.status === 'Paga' ? `
 									<p class="text-sm text-green-400">Pago em: ${formatDate(parcel.paymentDate)}</p>
+									<p class="text-sm text-slate-400">Valor Pago: ${formatCurrency(parcel.paymentAmount)}</p>
 									<p class="text-sm text-slate-400">Método: ${parcel.paymentMethod}</p>
 								` : ''}
 							</div>
 							<div>
-								<span class="status-badge status-${parcel.status === 'Paga' ? 'pago' : (new Date(parcel.dueDate) < new Date() ? 'vencido' : 'pendente')}">
-									${parcel.status}
+								<span class="status-badge status-${parcel.status === 'Paga' ? 'pago' : (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'vencido' : 'pendente')}">
+									${parcel.status === 'Paga' ? 'Paga' : (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'Vencida' : 'Pendente')}
 								</span>
 								${parcel.status !== 'Paga' ? `
 									<button onclick="window.openPaymentModal('${contractId}', ${index})" 
@@ -865,9 +988,9 @@
 			openModal('contractDetailsModal');
 		};
 
-		// ============================================
-		// PAGAMENTOS - ⚠️ CORREÇÃO 1: BUG DA DATA RETROATIVA
-		// ============================================
+		// 
+		// PAGAMENTOS
+		// 
 
 		window.openPaymentModal = (contractId, parcelIndex) => {
 			const contract = contracts.find(c => c.id === contractId);
@@ -936,9 +1059,10 @@
 				showNotification('Erro ao registrar pagamento: ' + error.message, 'error');
 			}
 		});
-		// ============================================
-		// RELATÓRIOS - ⚠️ CORREÇÃO 2: ADICIONAR INADIMPLENTES
-		// ============================================
+
+		// 
+		// RELATÓRIOS
+		// 
 
 		class ReportHandler {
 			calculateMonthlyIncome(month, year) {
@@ -1023,12 +1147,12 @@
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div class="bg-green-900/30 border border-green-600 p-4 rounded-lg">
 								<p class="text-green-400 text-sm font-semibold mb-1">TOTAL RECEBIDO</p>
-								<p class="text-3xl font-bold text-white">${formatCurrency(totalReceived)}</p>
+								<p class="text-3xl font-bold text-white mt-2">${formatCurrency(totalReceived)}</p>
 								<p class="text-sm text-slate-400 mt-1">${payments.length} pagamento(s) recebido(s)</p>
 							</div>
 							<div class="bg-red-900/30 border border-red-600 p-4 rounded-lg">
 								<p class="text-red-400 text-sm font-semibold mb-1">TOTAL PENDENTE</p>
-								<p class="text-3xl font-bold text-white">${formatCurrency(totalPending)}</p>
+								<p class="text-3xl font-bold text-white mt-2">${formatCurrency(totalPending)}</p>
 								<p class="text-sm text-slate-400 mt-1">${defaulters.length} cliente(s) inadimplente(s)</p>
 							</div>
 						</div>
@@ -1143,9 +1267,108 @@
 			openModal('reportModal');
 		};
 
-		// ============================================
+		document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+			const { jsPDF } = window.jspdf;
+			const doc = new jsPDF();
+			
+			const month = parseInt(document.getElementById('reportMonth').value);
+			const year = parseInt(document.getElementById('reportYear').value);
+			const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+								'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+			const reportTitle = `Relatório Mensal - ${monthNames[month - 1]} de ${year}`;
+
+			doc.setFontSize(18);
+			doc.text(reportTitle, 14, 22);
+
+			const { totalReceived, totalPending, payments, defaulters } = reportHandler.calculateMonthlyIncome(month, year);
+
+			doc.setFontSize(12);
+			doc.text(`Total Recebido: ${formatCurrency(totalReceived)}`, 14, 35);
+			doc.text(`Total Pendente: ${formatCurrency(totalPending)}`, 14, 42);
+
+			let y = 55;
+
+			doc.setFontSize(14);
+			doc.text('Pagamentos Recebidos:', 14, y);
+			y += 10;
+
+			if (payments.length === 0) {
+				doc.setFontSize(10);
+				doc.text('Nenhum pagamento registrado neste período.', 14, y);
+				y += 10;
+			} else {
+				const headers = [['Cliente', 'Contrato', 'Parcela', 'Data Pgto', 'Método', 'Valor']];
+				const data = payments.map(p => [
+					p.clientName,
+					p.contractDescription,
+					p.parcelNumber,
+					formatDate(p.paymentDate),
+					p.paymentMethod,
+					formatCurrency(p.value)
+				]);
+				doc.autoTable({
+					startY: y,
+					head: headers,
+					body: data,
+					theme: 'grid',
+					styles: { fontSize: 8, cellPadding: 2, fillColor: [30, 41, 59] },
+					headStyles: { fillColor: [51, 65, 85], textColor: [255, 255, 255] },
+					alternateRowStyles: { fillColor: [24, 33, 48] },
+					margin: { left: 14, right: 14 },
+					didDrawPage: function (data) {
+						// Footer
+						let str = 'Página ' + doc.internal.getNumberOfPages();
+						doc.setFontSize(10);
+						doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+					}
+				});
+				y = doc.autoTable.previous.finalY + 10;
+			}
+
+			doc.setFontSize(14);
+			doc.text('Clientes Inadimplentes:', 14, y);
+			y += 10;
+
+			if (defaulters.length === 0) {
+				doc.setFontSize(10);
+				doc.text('Nenhum cliente inadimplente neste período.', 14, y);
+				y += 10;
+			} else {
+				const headers = [['Cliente', 'Telefone', 'Contrato', 'Parcela', 'Vencimento', 'Atraso', 'Valor']];
+				const data = defaulters.map(d => [
+					d.clientName,
+					d.clientPhone,
+					d.contractDescription,
+					`${d.parcelNumber}/${d.totalParcels}`,
+					formatDate(d.dueDate),
+					d.daysOverdue > 0 ? `${d.daysOverdue} dias` : 'No prazo',
+					formatCurrency(d.value)
+				]);
+				doc.autoTable({
+					startY: y,
+					head: headers,
+					body: data,
+					theme: 'grid',
+					styles: { fontSize: 8, cellPadding: 2, fillColor: [30, 41, 59] },
+					headStyles: { fillColor: [153, 27, 27], textColor: [255, 255, 255] },
+					alternateRowStyles: { fillColor: [24, 33, 48] },
+					margin: { left: 14, right: 14 },
+					didDrawPage: function (data) {
+						// Footer
+						let str = 'Página ' + doc.internal.getNumberOfPages();
+						doc.setFontSize(10);
+						doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+					}
+				});
+				y = doc.autoTable.previous.finalY + 10;
+			}
+
+			doc.save(`Relatorio_Mensal_${monthNames[month - 1]}_${year}.pdf`);
+		});
+
+		// 
 		// RENDERIZAÇÃO DAS SEÇÕES
-		// ============================================
+		// 
 
 		const renderSection = (section) => {
 			const mainContent = document.getElementById('mainContent');
@@ -1175,6 +1398,16 @@
 					renderReportsSection();
 					document.getElementById('pageTitle').textContent = 'Relatórios';
 					document.getElementById('pageSubtitle').textContent = 'Relatórios financeiros';
+					break;
+				case 'analytics':
+					renderAnalyticsSection();
+					document.getElementById('pageTitle').textContent = 'Análises';
+					document.getElementById('pageSubtitle').textContent = 'Gráficos e insights';
+					break;
+				case 'settings':
+					renderSettingsSection();
+					document.getElementById('pageTitle').textContent = 'Configurações';
+					document.getElementById('pageSubtitle').textContent = 'Ajustes do sistema';
 					break;
 			}
 		};
@@ -1256,10 +1489,14 @@
 
 		const renderClientsSection = () => {
 			let html = `
-				<div class="mb-6">
+				<div class="mb-6 flex justify-between items-center">
 					<button onclick="window.openClientModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
 						<i class="fas fa-plus mr-2"></i>Novo Cliente
 					</button>
+					<div class="flex space-x-2">
+						<button onclick="loadClients(false)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Anterior</button>
+						<button onclick="loadClients(true)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Próximo</button>
+					</div>
 				</div>
 
 				<div class="card-gradient rounded-lg overflow-hidden">
@@ -1319,10 +1556,14 @@
 
 		const renderContractsSection = () => {
 			let html = `
-				<div class="mb-6">
+				<div class="mb-6 flex justify-between items-center">
 					<button onclick="window.openContractModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
 						<i class="fas fa-plus mr-2"></i>Novo Contrato
 					</button>
+					<div class="flex space-x-2">
+						<button onclick="loadContracts(false)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Anterior</button>
+						<button onclick="loadContracts(true)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Próximo</button>
+					</div>
 				</div>
 
 				<div class="card-gradient rounded-lg overflow-hidden">
@@ -1527,6 +1768,447 @@
 				</div>
 			`;
 		};
+
+		const renderAnalyticsSection = () => {
+			document.getElementById('mainContent').innerHTML = `
+				<div class="card-gradient p-8 rounded-lg">
+					<h3 class="text-2xl font-bold text-white mb-6">
+						<i class="fas fa-chart-pie text-orange-400 mr-2"></i>
+						Análises Financeiras
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<h4 class="text-xl font-semibold text-white mb-4">Receita por Mês</h4>
+							<div class="chart-container">
+								<canvas id="revenueChart"></canvas>
+							</div>
+						</div>
+						<div>
+							<h4 class="text-xl font-semibold text-white mb-4">Status dos Contratos</h4>
+							<div class="chart-container">
+								<canvas id="contractStatusChart"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+			renderCharts();
+		};
+
+		const renderCharts = () => {
+			const monthlyRevenue = {};
+			const contractStatusCounts = {
+				'Ativo': 0,
+				'Concluído': 0,
+				'Cancelado': 0
+			};
+
+			contracts.forEach(contract => {
+				contractStatusCounts[contract.status] = (contractStatusCounts[contract.status] || 0) + 1;
+				(contract.parcels || []).forEach(parcel => {
+					if (parcel.status === 'Paga' && parcel.paymentDate) {
+						const date = new Date(parcel.paymentDate);
+						const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+						monthlyRevenue[monthYear] = (monthlyRevenue[monthYear] || 0) + (parcel.paymentAmount || parcel.value);
+					}
+				});
+			});
+
+			// Ordenar meses para o gráfico de receita
+			const sortedMonths = Object.keys(monthlyRevenue).sort();
+			const revenueData = sortedMonths.map(month => monthlyRevenue[month]);
+
+			new Chart(document.getElementById('revenueChart'), {
+				type: 'line',
+				data: {
+					labels: sortedMonths,
+					datasets: [{
+						label: 'Receita Mensal (BRL)',
+						data: revenueData,
+						borderColor: '#3b82f6',
+						backgroundColor: 'rgba(59, 130, 246, 0.2)',
+						fill: true,
+						tension: 0.3
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					scales: {
+						y: {
+							beginAtZero: true,
+							ticks: {
+								color: '#cbd5e1',
+								callback: function(value) { return formatCurrency(value); }
+							},
+							grid: { color: '#475569' }
+						},
+						x: {
+							ticks: { color: '#cbd5e1' },
+							grid: { color: '#475569' }
+						}
+					},
+					plugins: {
+						legend: {
+							labels: { color: '#cbd5e1' }
+						}
+					}
+				}
+			});
+
+			new Chart(document.getElementById('contractStatusChart'), {
+				type: 'pie',
+				data: {
+					labels: Object.keys(contractStatusCounts),
+					datasets: [{
+						data: Object.values(contractStatusCounts),
+						backgroundColor: ['#10b981', '#06b6d4', '#ef4444'],
+						hoverOffset: 4
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: {
+							labels: { color: '#cbd5e1' }
+						}
+					}
+				}
+			});
+		};
+
+		const renderSettingsSection = () => {
+			document.getElementById('mainContent').innerHTML = `
+				<div class="card-gradient p-8 rounded-lg">
+					<h3 class="text-2xl font-bold text-white mb-6">
+						<i class="fas fa-cog text-gray-400 mr-2"></i>
+						Configurações do Sistema
+					</h3>
+					<div class="space-y-4">
+						<div class="bg-slate-700 p-4 rounded-lg">
+							<h4 class="font-semibold text-white mb-2">Informações da Conta</h4>
+							<p class="text-slate-300"><strong>E-mail:</strong> ${currentUser ? currentUser.email : 'N/A'}</p>
+							<button class="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Alterar Senha</button>
+						</div>
+						<div class="bg-slate-700 p-4 rounded-lg">
+							<h4 class="font-semibold text-white mb-2">Gerenciamento de Dados</h4>
+							<p class="text-slate-300">Opções para backup e restauração de dados.</p>
+							<button class="mt-3 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">Fazer Backup</button>
+						</div>
+						<div class="bg-slate-700 p-4 rounded-lg">
+							<h4 class="font-semibold text-white mb-2">Lixeira</h4>
+							<p class="text-slate-300">Visualize e restaure itens excluídos.</p>
+							<button onclick="window.openTrashModal()" class="mt-3 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">Abrir Lixeira</button>
+						</div>
+						<div class="bg-slate-700 p-4 rounded-lg">
+							<h4 class="font-semibold text-white mb-2">Workshop de Correções</h4>
+							<p class="text-slate-300">Ferramentas para corrigir inconsistências nos dados.</p>
+							<button onclick="window.openWorkshopModal()" class="mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg">Abrir Workshop</button>
+						</div>
+					</div>
+				</div>
+			`;
+		};
+
+		// 
+		// WORKSHOP DE CORREÇÕES (Exemplo de funcionalidade avançada)
+		// 
+
+		class CorrectionCalculator {
+			constructor(contracts, clients) {
+				this.contracts = contracts;
+				this.clients = clients;
+			}
+
+			// Verifica e corrige parcelas sem paymentAmount (para compatibilidade retroativa)
+			checkAndFixPaymentAmounts() {
+				let corrections = [];
+				this.contracts.forEach(contract => {
+					(contract.parcels || []).forEach(parcel => {
+						if (parcel.status === 'Paga' && parcel.paymentDate && parcel.paymentAmount === undefined) {
+							corrections.push({
+								type: 'Missing Payment Amount',
+								contractId: contract.id,
+								parcelNumber: parcel.number,
+								oldValue: 'undefined',
+								newValue: parcel.value,
+								description: `Parcela ${parcel.number} do contrato ${contract.description} paga, mas sem 'paymentAmount'. Definindo como 'value'.`
+							});
+							parcel.paymentAmount = parcel.value; // Define o valor pago como o valor da parcela
+						}
+					});
+				});
+				return corrections;
+			}
+
+			// Verifica se todos os contratos têm um cliente válido
+			checkInvalidClients() {
+				let invalidClientContracts = [];
+				this.contracts.forEach(contract => {
+					const clientExists = this.clients.some(c => c.id === contract.clientId);
+					if (!clientExists) {
+						invalidClientContracts.push({
+							contractId: contract.id,
+							contractDescription: contract.description,
+							clientId: contract.clientId,
+							description: `Contrato '${contract.description}' (${contract.id}) referencia um cliente inexistente (${contract.clientId}).`
+						});
+					}
+				});
+				return invalidClientContracts;
+			}
+
+			// Aplica as correções e salva no Firestore
+			async applyCorrections(corrections) {
+				const batch = [];
+				const updatedContractIds = new Set();
+
+				corrections.forEach(correction => {
+					if (correction.type === 'Missing Payment Amount') {
+						const contract = this.contracts.find(c => c.id === correction.contractId);
+						if (contract) {
+							const parcel = contract.parcels.find(p => p.number === correction.parcelNumber);
+							if (parcel) {
+								parcel.paymentAmount = correction.newValue;
+								updatedContractIds.add(contract.id);
+							}
+						}
+					}
+					// Adicionar outras lógicas de correção aqui
+				});
+
+				for (const contractId of updatedContractIds) {
+					const contract = this.contracts.find(c => c.id === contractId);
+					if (contract) {
+						batch.push(updateDoc(doc(db, 'contracts', contractId), {
+							parcels: contract.parcels,
+							updatedAt: new Date().toISOString()
+						}));
+					}
+				}
+
+				if (batch.length > 0) {
+					await Promise.all(batch); // Executa todas as atualizações em paralelo
+					showNotification(`${batch.length} contratos atualizados com sucesso!`, 'success');
+					await loadContracts(); // Recarrega os contratos após a correção
+				} else {
+					showNotification('Nenhuma correção aplicada.', 'info');
+				}
+			}
+		}
+
+		window.openWorkshopModal = async () => {
+			const workshopContent = document.getElementById('workshopContent');
+			workshopContent.innerHTML = `
+				<div class="loading-spinner mx-auto"></div>
+				<p class="text-center text-slate-400 mt-4">Verificando inconsistências...</p>
+			`;
+			openModal('workshopModal');
+
+			const correctionCalculator = new CorrectionCalculator(contracts, clients);
+			const missingPaymentAmounts = correctionCalculator.checkAndFixPaymentAmounts();
+			const invalidClientContracts = correctionCalculator.checkInvalidClients();
+
+			let html = `
+				<h4 class="text-xl font-semibold text-white mb-4">Resultados da Verificação</h4>
+			`;
+
+			if (missingPaymentAmounts.length > 0) {
+				html += `
+					<div class="bg-yellow-900/20 border border-yellow-600 p-4 rounded-lg mb-4">
+						<p class="text-yellow-400 font-semibold mb-2">
+							<i class="fas fa-exclamation-circle mr-2"></i>
+							${missingPaymentAmounts.length} Parcelas com 'paymentAmount' ausente:
+						</p>
+						<ul class="list-disc list-inside text-slate-300 space-y-1">
+							${missingPaymentAmounts.map(c => `<li>${c.description}</li>`).join('')}
+						</ul>
+						<button id="applyPaymentAmountFix" class="mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">
+							Aplicar Correção (Payment Amount)
+						</button>
+					</div>
+				`;
+			} else {
+				html += `
+					<div class="bg-green-900/20 border border-green-600 p-4 rounded-lg mb-4">
+						<p class="text-green-400 font-semibold">
+							<i class="fas fa-check-circle mr-2"></i>
+							Nenhuma parcela com 'paymentAmount' ausente encontrada.
+						</p>
+					</div>
+				`;
+			}
+
+			if (invalidClientContracts.length > 0) {
+				html += `
+					<div class="bg-red-900/20 border border-red-600 p-4 rounded-lg mb-4">
+						<p class="text-red-400 font-semibold mb-2">
+							<i class="fas fa-times-circle mr-2"></i>
+							${invalidClientContracts.length} Contratos com cliente inválido:
+						</p>
+						<ul class="list-disc list-inside text-slate-300 space-y-1">
+							${invalidClientContracts.map(c => `<li>${c.description}</li>`).join('')}
+						</ul>
+						<p class="text-sm text-slate-400 mt-2">
+							<strong>Atenção:</strong> Contratos com clientes inválidos podem precisar de correção manual ou exclusão.
+						</p>
+					</div>
+				`;
+			} else {
+				html += `
+					<div class="bg-green-900/20 border border-green-600 p-4 rounded-lg mb-4">
+						<p class="text-green-400 font-semibold">
+							<i class="fas fa-check-circle mr-2"></i>
+							Nenhum contrato com cliente inválido encontrado.
+						</p>
+					</div>
+				`;
+			}
+
+			if (missingPaymentAmounts.length === 0 && invalidClientContracts.length === 0) {
+				html += `
+					<div class="bg-blue-900/20 border border-blue-600 p-4 rounded-lg">
+						<p class="text-blue-400 font-semibold">
+							<i class="fas fa-info-circle mr-2"></i>
+							Nenhuma inconsistência crítica encontrada no momento.
+						</p>
+					</div>
+				`;
+			}
+
+			workshopContent.innerHTML = html;
+
+			if (missingPaymentAmounts.length > 0) {
+				document.getElementById('applyPaymentAmountFix').addEventListener('click', async () => {
+					await correctionCalculator.applyCorrections(missingPaymentAmounts);
+					closeModal();
+					showNotification('Correções de "paymentAmount" aplicadas!', 'success');
+					renderSection(currentSection); // Recarrega a seção atual
+				});
+			}
+		};
+
+		// 
+		// LIXEIRA (Exemplo de funcionalidade avançada)
+		// 
+
+		window.openTrashModal = async () => {
+			const trashContent = document.getElementById('trashContent');
+			trashContent.innerHTML = `
+				<div class="loading-spinner mx-auto"></div>
+				<p class="text-center text-slate-400 mt-4">Carregando itens excluídos...</p>
+			`;
+			openModal('trashModal');
+
+			try {
+				const q = query(collection(db, 'trash'), orderBy('deletedAt', 'desc'));
+				const querySnapshot = await getDocs(q);
+				const trashItems = [];
+				querySnapshot.forEach((doc) => {
+					trashItems.push({ id: doc.id, ...doc.data() });
+				});
+
+				let html = `
+					<h4 class="text-xl font-semibold text-white mb-4">Itens Excluídos Recentemente</h4>
+				`;
+
+				if (trashItems.length === 0) {
+					html += `
+						<div class="bg-blue-900/20 border border-blue-600 p-4 rounded-lg">
+							<p class="text-blue-400 font-semibold text-center">
+								<i class="fas fa-box-open mr-2"></i>
+								A lixeira está vazia.
+							</p>
+						</div>
+					`;
+				} else {
+					html += `
+						<div class="overflow-x-auto">
+							<table class="w-full">
+								<thead class="table-header">
+									<tr>
+										<th class="px-4 py-3 text-left text-white">Tipo</th>
+										<th class="px-4 py-3 text-left text-white">Nome/Descrição</th>
+										<th class="px-4 py-3 text-center text-white">Excluído em</th>
+										<th class="px-4 py-3 text-center text-white">Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+					`;
+					trashItems.forEach(item => {
+						html += `
+							<tr class="table-row">
+								<td class="px-4 py-3 text-slate-300">${item.type}</td>
+								<td class="px-4 py-3 text-slate-200 font-medium">${item.name || item.description || 'N/A'}</td>
+								<td class="px-4 py-3 text-center text-slate-300">${formatDate(item.deletedAt)}</td>
+								<td class="px-4 py-3 text-center">
+									<button onclick="window.restoreItem('${item.id}')" class="btn-action text-green-400 hover:text-green-300 mx-1" title="Restaurar">
+										<i class="fas fa-undo"></i>
+									</button>
+									<button onclick="window.permanentlyDeleteItem('${item.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1" title="Excluir Permanentemente">
+										<i class="fas fa-times"></i>
+									</button>
+								</td>
+							</tr>
+						`;
+					});
+					html += `
+								</tbody>
+							</table>
+						</div>
+					`;
+				}
+				trashContent.innerHTML = html;
+			} catch (error) {
+				showNotification('Erro ao carregar lixeira: ' + error.message, 'error');
+				closeModal();
+			}
+		};
+
+		window.restoreItem = async (itemId) => {
+			if (!confirm('Tem certeza que deseja restaurar este item?')) return;
+
+			try {
+				const itemDoc = await getDoc(doc(db, 'trash', itemId));
+				if (!itemDoc.exists()) throw new Error('Item na lixeira não encontrado.');
+				const itemData = itemDoc.data();
+
+				if (itemData.type === 'client') {
+					await addDoc(collection(db, 'clients'), { ...itemData, deletedAt: deleteField() });
+					await deleteDoc(doc(db, 'trash', itemId));
+					showNotification('Cliente restaurado com sucesso!', 'success');
+					await loadClients();
+				} else if (itemData.type === 'contract') {
+					await addDoc(collection(db, 'contracts'), { ...itemData, deletedAt: deleteField() });
+					await deleteDoc(doc(db, 'trash', itemId));
+					showNotification('Contrato restaurado com sucesso!', 'success');
+					await loadContracts();
+				} else {
+					throw new Error('Tipo de item desconhecido para restauração.');
+				}
+				
+				closeModal();
+				window.openTrashModal(); // Recarrega a lixeira
+				renderSection(currentSection); // Recarrega a seção atual
+			} catch (error) {
+				showNotification('Erro ao restaurar item: ' + error.message, 'error');
+			}
+		};
+
+		window.permanentlyDeleteItem = async (itemId) => {
+			if (!confirm('ATENÇÃO: Tem certeza que deseja EXCLUIR PERMANENTEMENTE este item? Esta ação não pode ser desfeita.')) return;
+
+			try {
+				await deleteDoc(doc(db, 'trash', itemId));
+				showNotification('Item excluído permanentemente!', 'success');
+				closeModal();
+				window.openTrashModal(); // Recarrega a lixeira
+			} catch (error) {
+				showNotification('Erro ao excluir permanentemente: ' + error.message, 'error');
+			}
+		};
+
 
 		// Expor funções globalmente
 		window.openClientModal = () => {
