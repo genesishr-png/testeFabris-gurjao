@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 	<style>
 		/* [SEÇÃO 1: Estilos Gerais] */
 		body {
@@ -16,34 +17,21 @@
 			position: relative;
 			background-color: #0f172a;
 			color: #d1d5db;
-			overflow-y: hidden; /* Evita scroll na página principal */
+			overflow-y: hidden; /* Controlado pelo JS para mainContent */
 		}
-		/* Efeito de fundo com imagem */
 		body::after {
 			content: '';
 			position: fixed;
-			z-index: -2; /* Garante que fique atrás de todo o conteúdo */
+			z-index: -2;
 			top: 0; left: 0; right: 0; bottom: 0;
 			background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg');
 			background-repeat: no-repeat;
 			background-size: cover;
 			background-position: center center;
-			opacity: 0.12; /* Ajuste a opacidade conforme desejado */
+			opacity: 0.12;
 		}
-		/* Estilos para modais */
-		.modal-backdrop {
-			display: none;
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0,0,0,0.7);
-			z-index: 9000;
-		}
-		.modal-backdrop.active {
-			display: block;
-		}
+		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
+		.modal-backdrop.active { display: block; }
 		.modal-container {
 			display: none;
 			position: fixed;
@@ -56,50 +44,25 @@
 			z-index: 9001;
 			max-width: 600px;
 			width: 90%;
-			max-height: 85vh; /* Limita a altura do modal */
-			overflow-y: auto; /* Adiciona scroll se o conteúdo for maior */
+			max-height: 85vh;
+			overflow-y: auto;
 			box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 		}
-		.modal-container.active {
-			display: block;
-		}
-		/* Transições para sidebar e área de conteúdo */
-		.sidebar {
-			transition: transform 0.3s ease-in-out;
-		}
-		.sidebar.hidden {
-			transform: translateX(-100%);
-		}
-		.content-area {
-			transition: margin-left 0.3s ease-in-out;
-		}
-		.content-area.expanded {
-			margin-left: 0;
-		}
-		/* Responsividade da sidebar */
+		.modal-container.active { display: block; }
+		.sidebar { transition: transform 0.3s ease-in-out; }
+		.sidebar.hidden { transform: translateX(-100%); }
+		.content-area { transition: margin-left 0.3s ease-in-out; }
+		.content-area.expanded { margin-left: 0; }
 		@media (max-width: 768px) {
-			.sidebar {
-				position: fixed;
-				z-index: 1000;
-				height: 100vh;
-			}
-			.content-area {
-				margin-left: 0 !important;
-			}
+			.sidebar { position: fixed; z-index: 1000; height: 100vh; }
+			.content-area { margin-left: 0 !important; }
 		}
-		/* Efeitos de hover */
-		.hover-scale {
-			transition: transform 0.2s;
-		}
-		.hover-scale:hover {
-			transform: scale(1.02);
-		}
-		/* Estilos de cards com gradiente */
+		.hover-scale { transition: transform 0.2s; }
+		.hover-scale:hover { transform: scale(1.02); }
 		.card-gradient {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border: 1px solid #475569;
 		}
-		/* Botão primário com gradiente */
 		.btn-primary {
 			background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 			transition: all 0.3s;
@@ -109,7 +72,6 @@
 			transform: translateY(-2px);
 			box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
 		}
-		/* Badges de status */
 		.status-badge {
 			padding: 0.25rem 0.75rem;
 			border-radius: 9999px;
@@ -118,10 +80,11 @@
 			text-transform: uppercase;
 		}
 		.status-ativo { background-color: #10b981; color: white; }
+		.status-concluido { background-color: #6366f1; color: white; }
+		.status-cancelado { background-color: #ef4444; color: white; }
 		.status-pendente { background-color: #f59e0b; color: white; }
 		.status-vencido { background-color: #ef4444; color: white; }
 		.status-pago { background-color: #06b6d4; color: white; }
-		/* Estilos para inputs e selects */
 		input, select, textarea {
 			background-color: #334155 !important;
 			border: 1px solid #475569 !important;
@@ -133,7 +96,6 @@
 			border-color: #3b82f6 !important;
 			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 		}
-		/* Estilos de tabela */
 		.table-header {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border-bottom: 2px solid #3b82f6;
@@ -145,20 +107,17 @@
 		.table-row:hover {
 			background-color: #1e293b;
 		}
-		/* Botões de ação */
 		.btn-action {
 			transition: all 0.2s;
 		}
 		.btn-action:hover {
 			transform: scale(1.1);
 		}
-		/* Gráficos */
 		.chart-container {
 			position: relative;
 			height: 300px;
 			margin-bottom: 2rem;
 		}
-		/* Cards de estatísticas */
 		.stat-card {
 			background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 			border-left: 4px solid #3b82f6;
@@ -168,7 +127,6 @@
 			transform: translateY(-5px);
 			box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
 		}
-		/* Spinner de carregamento */
 		.loading-spinner {
 			border: 3px solid #334155;
 			border-top: 3px solid #3b82f6;
@@ -181,7 +139,6 @@
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
 		}
-		/* Notificações */
 		.notification {
 			position: fixed;
 			top: 20px;
@@ -208,36 +165,20 @@
 		.notification.error { background-color: #ef4444; }
 		.notification.warning { background-color: #f59e0b; }
 		.notification.info { background-color: #3b82f6; }
-		/* Scrollbar customizada para mainContent */
-		#mainContent {
-			overflow-y: auto;
-			height: calc(100vh - 80px); /* Ajuste conforme a altura do header */
-		}
-		#mainContent::-webkit-scrollbar {
-			width: 8px;
-		}
-		#mainContent::-webkit-scrollbar-track {
-			background: #1e293b;
-		}
+		#mainContent { overflow-y: auto; height: calc(100vh - 80px); }
+		#mainContent::-webkit-scrollbar { width: 8px; }
+		#mainContent::-webkit-scrollbar-track { background: #1e293b; }
 		#mainContent::-webkit-scrollbar-thumb {
 			background: #475569;
 			border-radius: 4px;
 		}
-		#mainContent::-webkit-scrollbar-thumb:hover {
-			background: #64748b;
-		}
-		/* Scrollbar customizada para modais */
-		.modal-container::-webkit-scrollbar {
-			width: 6px;
-		}
-		.modal-container::-webkit-scrollbar-track {
-			background: #1e293b;
-		}
+		#mainContent::-webkit-scrollbar-thumb:hover { background: #64748b; }
+		.modal-container::-webkit-scrollbar { width: 6px; }
+		.modal-container::-webkit-scrollbar-track { background: #1e293b; }
 		.modal-container::-webkit-scrollbar-thumb {
 			background: #475569;
 			border-radius: 3px;
 		}
-		/* Estilos para itens de parcela */
 		.parcel-item {
 			background: #1e293b;
 			border: 1px solid #334155;
@@ -253,9 +194,290 @@
 		.parcel-paid { border-left: 4px solid #10b981; }
 		.parcel-pending { border-left: 4px solid #f59e0b; }
 		.parcel-overdue { border-left: 4px solid #ef4444; }
+
+		/* Estilos para o Kanban */
+		.kanban-board {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1.5rem;
+		}
+		.kanban-column {
+			background-color: #1e293b;
+			border-radius: 8px;
+			padding: 1rem;
+			min-height: 200px;
+			display: flex;
+			flex-direction: column;
+		}
+		.kanban-column-header {
+			font-weight: 600;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid #334155;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.kanban-card {
+			background-color: #334155;
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 0.75rem;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+			cursor: grab;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+		.kanban-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+		}
+		.kanban-card.dragging {
+			opacity: 0.5;
+			transform: rotate(2deg);
+		}
+		.kanban-card-title {
+			font-weight: 500;
+			color: #f1f5f9;
+			margin-bottom: 0.5rem;
+		}
+		.kanban-card-meta {
+			font-size: 0.85rem;
+			color: #94a3b8;
+		}
+		.kanban-card-meta span {
+			display: block;
+		}
+		.kanban-card-actions {
+			margin-top: 0.75rem;
+			display: flex;
+			gap: 0.5rem;
+		}
+		.kanban-card-actions button {
+			padding: 0.3rem 0.6rem;
+			font-size: 0.75rem;
+			border-radius: 4px;
+		}
+		.kanban-column-body {
+			flex-grow: 1;
+			overflow-y: auto;
+			padding-right: 5px; /* Para scrollbar */
+		}
+		.kanban-column-body::-webkit-scrollbar { width: 6px; }
+		.kanban-column-body::-webkit-scrollbar-track { background: #1e293b; }
+		.kanban-column-body::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+		.kanban-column-body::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+		/* Estilos para o lixo */
+		.trash-item {
+			background: #1e293b;
+			border: 1px solid #334155;
+			border-radius: 8px;
+			padding: 1rem;
+			margin-bottom: 0.75rem;
+			transition: all 0.2s;
+		}
+		.trash-item:hover {
+			border-color: #ef4444;
+			box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+		}
+		.trash-item-title {
+			font-weight: 500;
+			color: #f1f5f9;
+			margin-bottom: 0.5rem;
+		}
+		.trash-item-meta {
+			font-size: 0.85rem;
+			color: #94a3b8;
+		}
+		.trash-item-actions {
+			margin-top: 0.75rem;
+			display: flex;
+			gap: 0.5rem;
+		}
+		.trash-item-actions button {
+			padding: 0.3rem 0.6rem;
+			font-size: 0.75rem;
+			border-radius: 4px;
+		}
+
+		/* Estilos para o overlay de carregamento */
+		#loadingOverlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(15, 23, 42, 0.95); /* bg-slate-900 com opacidade */
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			z-index: 10000;
+			color: white;
+			font-size: 1.2rem;
+		}
+		#loadingOverlay.hidden {
+			display: none;
+		}
+		.loading-spinner-lg {
+			border: 5px solid #334155;
+			border-top: 5px solid #3b82f6;
+			border-radius: 50%;
+			width: 60px;
+			height: 60px;
+			animation: spin 1s linear infinite;
+			margin-bottom: 1rem;
+		}
+
+		/* Estilos para o overlay de autenticação */
+		#authOverlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #0f172a; /* bg-slate-900 */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: 9999;
+		}
+		#authOverlay.hidden {
+			display: none;
+		}
+		.auth-container {
+			background-color: #1e293b; /* bg-slate-800 */
+			padding: 3rem;
+			border-radius: 12px;
+			box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+			width: 100%;
+			max-width: 400px;
+			text-align: center;
+		}
+		.auth-input {
+			background-color: #334155 !important;
+			border: 1px solid #475569 !important;
+			color: #f1f5f9 !important;
+			padding: 0.75rem 1rem;
+			border-radius: 8px;
+			width: 100%;
+			margin-bottom: 1rem;
+		}
+		.auth-input:focus {
+			outline: none !important;
+			border-color: #3b82f6 !important;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+		}
+		.auth-button {
+			background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+			color: white;
+			padding: 0.75rem 1.5rem;
+			border-radius: 8px;
+			width: 100%;
+			font-weight: 600;
+			transition: all 0.3s;
+		}
+		.auth-button:hover {
+			background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+		}
+		.auth-toggle-link {
+			color: #94a3b8;
+			font-size: 0.9rem;
+			margin-top: 1rem;
+			cursor: pointer;
+			display: block;
+		}
+		.auth-toggle-link:hover {
+			color: #cbd5e1;
+		}
+
+		/* Estilos para o menu inferior mobile */
+		.bottom-nav {
+			display: none; /* Escondido por padrão, visível apenas em mobile */
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			background-color: #1e293b;
+			border-top: 1px solid #334155;
+			z-index: 1000;
+			justify-content: space-around;
+			padding: 0.5rem 0;
+		}
+		.bottom-nav-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			color: #94a3b8;
+			font-size: 0.75rem;
+			padding: 0.5rem;
+			border-radius: 8px;
+			transition: background-color 0.2s, color 0.2s;
+		}
+		.bottom-nav-item i {
+			font-size: 1.2rem;
+			margin-bottom: 0.2rem;
+		}
+		.bottom-nav-item.active, .bottom-nav-item:hover {
+			background-color: #334155;
+			color: #3b82f6;
+		}
+		@media (max-width: 768px) {
+			.sidebar { display: none; } /* Esconde a sidebar em mobile */
+			.content-area { margin-left: 0 !important; }
+			.bottom-nav { display: flex; } /* Mostra o menu inferior em mobile */
+			#mainContent { height: calc(100vh - 120px); /* Ajusta altura para considerar o bottom nav */ }
+		}
+
+		/* Estilos para o modal de confirmação customizado */
+		#confirmModal .modal-container {
+			max-width: 400px;
+			text-align: center;
+		}
+		#confirmModal .modal-container h3 {
+			color: #ef4444;
+		}
+		#confirmModal .modal-container p {
+			margin-bottom: 1.5rem;
+		}
+		#confirmModal .modal-container button {
+			flex: 1;
+		}
 	</style>
 </head>
 <body>
+	<!-- Overlay de Carregamento -->
+	<div id="loadingOverlay" class="hidden">
+		<div class="loading-spinner-lg"></div>
+		<p>Carregando sistema...</p>
+	</div>
+
+	<!-- Overlay de Autenticação -->
+	<div id="authOverlay">
+		<div class="auth-container">
+			<h2 class="text-3xl font-bold text-white mb-6">
+				<i class="fas fa-balance-scale text-blue-500 mr-2"></i>
+				Advocacia Financeiro
+			</h2>
+			<form id="loginForm" class="space-y-4">
+				<input type="email" id="loginEmail" placeholder="E-mail" required class="auth-input">
+				<input type="password" id="loginPassword" placeholder="Senha" required class="auth-input">
+				<button type="submit" class="auth-button">Entrar</button>
+				<a href="#" id="showRegister" class="auth-toggle-link">Não tem conta? Cadastre-se</a>
+			</form>
+			<form id="registerForm" class="space-y-4 hidden">
+				<input type="email" id="registerEmail" placeholder="E-mail" required class="auth-input">
+				<input type="password" id="registerPassword" placeholder="Senha" required class="auth-input">
+				<input type="password" id="registerConfirmPassword" placeholder="Confirmar Senha" required class="auth-input">
+				<button type="submit" class="auth-button">Registrar</button>
+				<a href="#" id="showLogin" class="auth-toggle-link">Já tem conta? Faça login</a>
+			</form>
+		</div>
+	</div>
+
+	<!-- Notificações -->
 	<div id="notification" class="notification"></div>
 	<div class="modal-backdrop" id="modalBackdrop"></div>
 
@@ -288,16 +510,20 @@
 				<i class="fas fa-money-bill-wave text-yellow-400"></i>
 				<span class="text-slate-200">Pagamentos</span>
 			</a>
+			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="services">
+				<i class="fas fa-briefcase text-orange-400"></i>
+				<span class="text-slate-200">Serviços</span>
+			</a>
 			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="reports">
 				<i class="fas fa-chart-bar text-red-400"></i>
 				<span class="text-slate-200">Relatórios</span>
 			</a>
-			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="analytics">
-				<i class="fas fa-chart-pie text-orange-400"></i>
-				<span class="text-slate-200">Análises</span>
+			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="trash">
+				<i class="fas fa-trash text-gray-400"></i>
+				<span class="text-slate-200">Lixeira</span>
 			</a>
 			<a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors" data-section="settings">
-				<i class="fas fa-cog text-gray-400"></i>
+				<i class="fas fa-cog text-blue-400"></i>
 				<span class="text-slate-200">Configurações</span>
 			</a>
 		</nav>
@@ -333,6 +559,30 @@
 		<div id="mainContent">
 			<!-- Conteúdo dinâmico será carregado aqui -->
 		</div>
+	</div>
+
+	<!-- BOTTOM NAVIGATION (MOBILE) -->
+	<div id="bottomNav" class="bottom-nav">
+		<a href="#" class="bottom-nav-item active" data-section="dashboard">
+			<i class="fas fa-home"></i>
+			<span>Dashboard</span>
+		</a>
+		<a href="#" class="bottom-nav-item" data-section="clients">
+			<i class="fas fa-users"></i>
+			<span>Clientes</span>
+		</a>
+		<a href="#" class="bottom-nav-item" data-section="contracts">
+			<i class="fas fa-file-contract"></i>
+			<span>Contratos</span>
+		</a>
+		<a href="#" class="bottom-nav-item" data-section="payments">
+			<i class="fas fa-money-bill-wave"></i>
+			<span>Pagamentos</span>
+		</a>
+		<a href="#" class="bottom-nav-item" data-section="reports">
+			<i class="fas fa-chart-bar"></i>
+			<span>Relatórios</span>
+		</a>
 	</div>
 
 	<!-- MODAL: ADICIONAR/EDITAR CLIENTE -->
@@ -447,6 +697,14 @@
 						<input type="date" id="contractFirstParcel" required class="w-full px-4 py-2 rounded-lg">
 					</div>
 				</div>
+				<div class="mt-4">
+					<button type="button" id="addManualParcelBtn" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">
+						<i class="fas fa-plus mr-1"></i> Adicionar Parcela Manual
+					</button>
+					<div id="manualParcelsContainer" class="mt-4 space-y-2">
+						<!-- Parcelas manuais serão adicionadas aqui -->
+					</div>
+				</div>
 			</div>
 			<div class="flex space-x-3 pt-4">
 				<button type="submit" class="flex-1 btn-primary text-white py-3 rounded-lg font-semibold">
@@ -528,6 +786,63 @@
 		</form>
 	</div>
 
+	<!-- MODAL: ADICIONAR/EDITAR SERVIÇO -->
+	<div id="serviceModal" class="modal-container">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-2xl font-bold text-white">
+				<i class="fas fa-briefcase text-orange-500 mr-2"></i>
+				<span id="serviceModalTitle">Novo Serviço</span>
+			</h3>
+			<button class="close-modal text-slate-400 hover:text-white text-2xl">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+		<form id="serviceForm" class="space-y-4">
+			<input type="hidden" id="serviceId">
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Contrato *</label>
+				<select id="serviceContract" required class="w-full px-4 py-2 rounded-lg">
+					<option value="">Selecione um contrato</option>
+				</select>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Descrição do Serviço *</label>
+				<input type="text" id="serviceDescription" required class="w-full px-4 py-2 rounded-lg" placeholder="Ex: Petição Inicial, Audiência, Recurso">
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Advogado Responsável</label>
+				<select id="serviceAdvogado" class="w-full px-4 py-2 rounded-lg">
+					<option value="">Selecione um advogado</option>
+				</select>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Data de Início</label>
+				<input type="date" id="serviceStartDate" class="w-full px-4 py-2 rounded-lg">
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Data de Conclusão Prevista</label>
+				<input type="date" id="serviceEndDate" class="w-full px-4 py-2 rounded-lg">
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-slate-300 mb-2">Status *</label>
+				<select id="serviceStatus" required class="w-full px-4 py-2 rounded-lg">
+					<option value="A Fazer">A Fazer</option>
+					<option value="Em Andamento">Em Andamento</option>
+					<option value="Concluído">Concluído</option>
+					<option value="Aguardando Cliente">Aguardando Cliente</option>
+				</select>
+			</div>
+			<div class="flex space-x-3 pt-4">
+				<button type="submit" class="flex-1 btn-primary text-white py-3 rounded-lg font-semibold">
+					<i class="fas fa-save mr-2"></i>Salvar Serviço
+				</button>
+				<button type="button" class="close-modal px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors">
+					Cancelar
+				</button>
+			</div>
+		</form>
+	</div>
+
 	<!-- MODAL: RELATÓRIO -->
 	<div id="reportModal" class="modal-container" style="max-width: 900px;">
 		<div class="flex justify-between items-center mb-6">
@@ -552,35 +867,65 @@
 		</div>
 	</div>
 
-	<!-- MODAL: LIXEIRA -->
-	<div id="trashModal" class="modal-container" style="max-width: 900px;">
+	<!-- MODAL: CONFIRMAÇÃO GENÉRICA -->
+	<div id="confirmModal" class="modal-container">
 		<div class="flex justify-between items-center mb-6">
-			<h3 class="text-2xl font-bold text-white">
-				<i class="fas fa-trash-alt text-gray-500 mr-2"></i>
-				Lixeira
+			<h3 class="text-2xl font-bold text-red-500">
+				<i class="fas fa-exclamation-triangle mr-2"></i>
+				Confirmação
 			</h3>
 			<button class="close-modal text-slate-400 hover:text-white text-2xl">
 				<i class="fas fa-times"></i>
 			</button>
 		</div>
-		<div id="trashContent" class="space-y-4">
-			<!-- Conteúdo da lixeira será carregado aqui -->
+		<p id="confirmMessage" class="text-slate-300 mb-4">Tem certeza que deseja realizar esta ação?</p>
+		<div class="flex space-x-3 pt-4">
+			<button id="confirmActionBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition-colors">
+				Confirmar
+			</button>
+			<button type="button" class="close-modal flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors">
+				Cancelar
+			</button>
 		</div>
 	</div>
 
-	<!-- MODAL: WORKSHOP -->
-	<div id="workshopModal" class="modal-container" style="max-width: 900px;">
+	<!-- MODAL: HISTÓRICO DO CLIENTE -->
+	<div id="clientHistoryModal" class="modal-container" style="max-width: 900px;">
 		<div class="flex justify-between items-center mb-6">
 			<h3 class="text-2xl font-bold text-white">
-				<i class="fas fa-tools text-yellow-500 mr-2"></i>
-				Workshop de Correções
+				<i class="fas fa-history text-blue-500 mr-2"></i>
+				Histórico do Cliente: <span id="clientHistoryName"></span>
 			</h3>
 			<button class="close-modal text-slate-400 hover:text-white text-2xl">
 				<i class="fas fa-times"></i>
 			</button>
 		</div>
-		<div id="workshopContent" class="space-y-4">
-			<!-- Conteúdo do workshop será carregado aqui -->
+		<div id="clientHistoryContent" class="space-y-4">
+			<!-- Conteúdo do histórico será carregado aqui -->
+		</div>
+	</div>
+
+	<!-- MODAL: OFICINA (KANBAN CARD DETAILS) -->
+	<div id="oficinaModal" class="modal-container" style="max-width: 700px;">
+		<div class="flex justify-between items-center mb-6">
+			<h3 class="text-2xl font-bold text-white">
+				<i class="fas fa-tasks text-orange-500 mr-2"></i>
+				Detalhes do Serviço
+			</h3>
+			<button class="close-modal text-slate-400 hover:text-white text-2xl">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+		<div id="oficinaContent" class="space-y-4">
+			<!-- Conteúdo do serviço será carregado aqui -->
+		</div>
+		<div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-slate-600">
+			<button id="editOficinaServiceBtn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+				<i class="fas fa-edit mr-2"></i>Editar Serviço
+			</button>
+			<button class="close-modal px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors">
+				Fechar
+			</button>
 		</div>
 	</div>
 
@@ -590,6 +935,8 @@
 		import { 
 			getAuth, 
 			onAuthStateChanged, 
+			signInWithEmailAndPassword, 
+			createUserWithEmailAndPassword, 
 			signOut 
 		} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 		import { 
@@ -604,7 +951,9 @@
 			where,
 			orderBy,
 			limit,
-			startAfter
+			startAfter,
+			onSnapshot,
+			serverTimestamp
 		} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 		// Configuração do Firebase
@@ -621,450 +970,899 @@
 		const auth = getAuth(app);
 		const db = getFirestore(app);
 
-		// Estado Global
+		// Constantes e Variáveis Globais
+		const ADMIN_USERS = ["admin@advocacia.com", "lilian@advocacia.com"]; // Usuários com permissão de administrador
+		const CONTRACTS_PER_PAGE = 10;
 		let currentUser = null;
+		let isAdmin = false;
 		let clients = [];
 		let contracts = [];
+		let services = [];
+		let trashItems = [];
+		let lawyers = [];
 		let currentSection = 'dashboard';
-		let lastVisibleClient = null;
 		let lastVisibleContract = null;
-		const PAGE_SIZE = 10; // Número de itens por página
-
-		// Utilitários
-		const showNotification = (message, type = 'info') => {
-			const notification = document.getElementById('notification');
-			notification.textContent = message;
-			notification.className = `notification ${type}`;
-			notification.style.display = 'block';
-			setTimeout(() => {
-				notification.style.display = 'none';
-			}, 4000);
-		};
-
-		const formatCurrency = (value) => {
-			return new Intl.NumberFormat('pt-BR', { 
-				style: 'currency', 
-				currency: 'BRL' 
-			}).format(value);
-		};
-
-		const formatDate = (dateString) => {
-			if (!dateString) return '-';
-			const date = new Date(dateString);
-			return date.toLocaleDateString('pt-BR');
-		};
-
-		const openModal = (modalId) => {
-			document.getElementById(modalId).classList.add('active');
-			document.getElementById('modalBackdrop').classList.add('active');
-		};
-
-		const closeModal = () => {
-			document.querySelectorAll('.modal-container').forEach(modal => {
-				modal.classList.remove('active');
-			});
-			document.getElementById('modalBackdrop').classList.remove('active');
-		};
-
-		// Verificação de autenticação
-		onAuthStateChanged(auth, (user) => {
-			if (user) {
-				currentUser = user;
-				document.getElementById('userEmail').textContent = user.email;
-				loadClients();
-				loadContracts();
-				renderSection(currentSection);
-			} else {
-				window.location.href = 'index.html';
-			}
-		});
-
-		// Logout
-		document.getElementById('logoutBtn').addEventListener('click', async () => {
-			try {
-				await signOut(auth);
-				window.location.href = 'index.html';
-			} catch (error) {
-				showNotification('Erro ao sair: ' + error.message, 'error');
-			}
-		});
-
-		// Navegação
-		document.querySelectorAll('.nav-link').forEach(link => {
-			link.addEventListener('click', (e) => {
-				e.preventDefault();
-				document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-				link.classList.add('active');
-				currentSection = link.getAttribute('data-section');
-				renderSection(currentSection);
-			});
-		});
-
-		// Toggle Sidebar (Mobile)
-		document.getElementById('toggleSidebar').addEventListener('click', () => {
-			const sidebar = document.getElementById('sidebar');
-			sidebar.classList.toggle('hidden');
-		});
-
-		// Fechar modais
-		document.querySelectorAll('.close-modal').forEach(btn => {
-			btn.addEventListener('click', closeModal);
-		});
-
-		document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+		let contractPaginationQuery = null;
+		let contractUnsubscribe = null; // Para real-time updates de contratos
+		let serviceUnsubscribe = null; // Para real-time updates de serviços
 
 		// 
-		// CLIENTES
+		// UTILS CLASS
 		// 
+		class Utils {
+			static showNotification(message, type = 'info') {
+				const notification = document.getElementById('notification');
+				notification.textContent = message;
+				notification.className = `notification ${type}`;
+				notification.style.display = 'block';
+				setTimeout(() => {
+					notification.style.display = 'none';
+				}, 4000);
+			}
 
-		const loadClients = async (next = false) => {
-			try {
-				let clientQuery = query(collection(db, 'clients'), orderBy('name'), limit(PAGE_SIZE));
-				if (next && lastVisibleClient) {
-					clientQuery = query(collection(db, 'clients'), orderBy('name'), startAfter(lastVisibleClient), limit(PAGE_SIZE));
-				}
-				const querySnapshot = await getDocs(clientQuery);
-				clients = [];
-				querySnapshot.forEach((doc) => {
-					clients.push({ id: doc.id, ...doc.data() });
+			static formatCurrency(value) {
+				return new Intl.NumberFormat('pt-BR', { 
+					style: 'currency', 
+					currency: 'BRL' 
+				}).format(value);
+			}
+
+			static formatDate(dateString) {
+				if (!dateString) return '-';
+				const date = new Date(dateString);
+				// Garante que a data seja formatada no fuso horário local sem problemas de UTC
+				return new Date(date.getTime() + date.getTimezoneOffset() * 60000).toLocaleDateString('pt-BR');
+			}
+
+			static openModal(modalId) {
+				document.getElementById(modalId).classList.add('active');
+				document.getElementById('modalBackdrop').classList.add('active');
+			}
+
+			static closeModal() {
+				document.querySelectorAll('.modal-container').forEach(modal => {
+					modal.classList.remove('active');
 				});
-				lastVisibleClient = querySnapshot.docs[querySnapshot.docs.length - 1];
-				updateClientSelects();
-			} catch (error) {
-				showNotification('Erro ao carregar clientes: ' + error.message, 'error');
+				document.getElementById('modalBackdrop').classList.remove('active');
 			}
-		};
 
-		const updateClientSelects = () => {
-			const select = document.getElementById('contractClient');
-			select.innerHTML = '<option value="">Selecione um cliente</option>';
-			clients.forEach(client => {
-				select.innerHTML += `<option value="${client.id}">${client.name}</option>`;
-			});
-		};
+			static showLoading() {
+				document.getElementById('loadingOverlay').classList.remove('hidden');
+			}
 
-		document.getElementById('clientForm').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const clientId = document.getElementById('clientId').value;
-			const clientData = {
-				name: document.getElementById('clientName').value,
-				cpf: document.getElementById('clientCpf').value,
-				phone: document.getElementById('clientPhone').value,
-				email: document.getElementById('clientEmail').value,
-				address: document.getElementById('clientAddress').value,
-				createdAt: clientId ? undefined : new Date().toISOString(),
-				updatedAt: new Date().toISOString()
-			};
+			static hideLoading() {
+				document.getElementById('loadingOverlay').classList.add('hidden');
+			}
 
-			try {
-				if (clientId) {
-					await updateDoc(doc(db, 'clients', clientId), clientData);
-					showNotification('Cliente atualizado com sucesso!', 'success');
-				} else {
-					await addDoc(collection(db, 'clients'), clientData);
-					showNotification('Cliente adicionado com sucesso!', 'success');
+			static showAuthOverlay() {
+				document.getElementById('authOverlay').classList.remove('hidden');
+			}
+
+			static hideAuthOverlay() {
+				document.getElementById('authOverlay').classList.add('hidden');
+			}
+
+			static confirmAction(message, callback) {
+				document.getElementById('confirmMessage').textContent = message;
+				Utils.openModal('confirmModal');
+				const confirmBtn = document.getElementById('confirmActionBtn');
+				confirmBtn.onclick = () => {
+					callback();
+					Utils.closeModal();
+				};
+			}
+
+			static getMonthName(monthNumber) {
+				const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+								   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+				return monthNames[monthNumber - 1];
+			}
+
+			static getStatusBadge(status) {
+				let statusClass = '';
+				switch (status) {
+					case 'Ativo': statusClass = 'status-ativo'; break;
+					case 'Concluído': statusClass = 'status-concluido'; break;
+					case 'Cancelado': statusClass = 'status-cancelado'; break;
+					case 'Pendente': statusClass = 'status-pendente'; break;
+					case 'Vencido': statusClass = 'status-vencido'; break;
+					case 'Paga': statusClass = 'status-pago'; break;
+					case 'A Fazer': statusClass = 'status-pendente'; break;
+					case 'Em Andamento': statusClass = 'status-ativo'; break;
+					case 'Aguardando Cliente': statusClass = 'status-vencido'; break; // Usar vencido para chamar atenção
+					default: statusClass = 'bg-gray-500'; break;
 				}
-				closeModal();
-				document.getElementById('clientForm').reset();
-				await loadClients();
-				if (currentSection === 'clients') renderClientsSection();
-			} catch (error) {
-				showNotification('Erro ao salvar cliente: ' + error.message, 'error');
+				return `<span class="status-badge ${statusClass}">${status}</span>`;
 			}
-		});
-
-		const editClient = (clientId) => {
-			const client = clients.find(c => c.id === clientId);
-			if (!client) return;
-
-			document.getElementById('clientModalTitle').textContent = 'Editar Cliente';
-			document.getElementById('clientId').value = client.id;
-			document.getElementById('clientName').value = client.name;
-			document.getElementById('clientCpf').value = client.cpf;
-			document.getElementById('clientPhone').value = client.phone;
-			document.getElementById('clientEmail').value = client.email || '';
-			document.getElementById('clientAddress').value = client.address || '';
-			openModal('clientModal');
-		};
-
-		const deleteClient = async (clientId) => {
-			if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-
-			try {
-				await deleteDoc(doc(db, 'clients', clientId));
-				showNotification('Cliente excluído com sucesso!', 'success');
-				await loadClients();
-				if (currentSection === 'clients') renderClientsSection();
-			} catch (error) {
-				showNotification('Erro ao excluir cliente: ' + error.message, 'error');
-			}
-		};
+		}
 
 		// 
-		// CONTRATOS
+		// AUTH SERVICE CLASS
 		// 
+		class AuthService {
+			constructor(authInstance) {
+				this.auth = authInstance;
+			}
 
-		const loadContracts = async (next = false) => {
-			try {
-				let contractQuery = query(collection(db, 'contracts'), orderBy('startDate', 'desc'), limit(PAGE_SIZE));
-				if (next && lastVisibleContract) {
-					contractQuery = query(collection(db, 'contracts'), orderBy('startDate', 'desc'), startAfter(lastVisibleContract), limit(PAGE_SIZE));
+			async login(email, password) {
+				Utils.showLoading();
+				try {
+					await signInWithEmailAndPassword(this.auth, email, password);
+					Utils.showNotification('Login realizado com sucesso!', 'success');
+					Utils.hideAuthOverlay();
+				} catch (error) {
+					Utils.showNotification('Erro no login: ' + error.message, 'error');
+					console.error("Login error:", error);
+				} finally {
+					Utils.hideLoading();
 				}
-				const querySnapshot = await getDocs(contractQuery);
-				contracts = [];
-				querySnapshot.forEach((doc) => {
-					contracts.push({ id: doc.id, ...doc.data() });
-				});
-				lastVisibleContract = querySnapshot.docs[querySnapshot.docs.length - 1];
-			} catch (error) {
-				showNotification('Erro ao carregar contratos: ' + error.message, 'error');
 			}
-		};
 
-		const generateParcels = (numParcels, totalValue, firstParcelDate, dueDay) => {
-			const parcels = [];
-			const parcelValue = totalValue / numParcels;
-			const baseDate = new Date(firstParcelDate + 'T12:00:00'); // Garante que a data base seja UTC para consistência
-
-			for (let i = 0; i < numParcels; i++) {
-				const dueDate = new Date(baseDate);
-				dueDate.setMonth(dueDate.getMonth() + i);
-				dueDate.setDate(dueDay);
-
-				parcels.push({
-					number: i + 1,
-					value: parcelValue,
-					dueDate: dueDate.toISOString().split('T')[0], // Salva apenas a data (YYYY-MM-DD)
-					status: 'Pendente',
-					paymentDate: null,
-					paymentAmount: null,
-					paymentMethod: null,
-					notes: null
-				});
-			}
-			return parcels;
-		};
-
-		document.getElementById('contractForm').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const contractId = document.getElementById('contractId').value;
-			const clientId = document.getElementById('contractClient').value;
-			const totalValue = parseFloat(document.getElementById('contractValue').value);
-			const numParcels = parseInt(document.getElementById('contractParcels').value);
-			const dueDay = parseInt(document.getElementById('contractDueDay').value);
-			const firstParcelDate = document.getElementById('contractFirstParcel').value;
-
-			const contractData = {
-				clientId: clientId,
-				description: document.getElementById('contractDescription').value,
-				value: totalValue,
-				startDate: document.getElementById('contractStartDate').value,
-				endDate: document.getElementById('contractEndDate').value || null,
-				status: document.getElementById('contractStatus').value,
-				parcels: contractId ? undefined : generateParcels(numParcels, totalValue, firstParcelDate, dueDay),
-				createdAt: contractId ? undefined : new Date().toISOString(),
-				updatedAt: new Date().toISOString()
-			};
-
-			try {
-				if (contractId) {
-					await updateDoc(doc(db, 'contracts', contractId), contractData);
-					showNotification('Contrato atualizado com sucesso!', 'success');
-				} else {
-					await addDoc(collection(db, 'contracts'), contractData);
-					showNotification('Contrato criado com sucesso!', 'success');
+			async register(email, password) {
+				Utils.showLoading();
+				try {
+					await createUserWithEmailAndPassword(this.auth, email, password);
+					Utils.showNotification('Conta criada com sucesso!', 'success');
+					Utils.hideAuthOverlay();
+				} catch (error) {
+					Utils.showNotification('Erro no registro: ' + error.message, 'error');
+					console.error("Register error:", error);
+				} finally {
+					Utils.hideLoading();
 				}
-				closeModal();
-				document.getElementById('contractForm').reset();
-				await loadContracts();
-				if (currentSection === 'contracts') renderContractsSection();
-			} catch (error) {
-				showNotification('Erro ao salvar contrato: ' + error.message, 'error');
 			}
-		});
 
-		const editContract = (contractId) => {
-			const contract = contracts.find(c => c.id === contractId);
-			if (!contract) return;
-
-			document.getElementById('contractModalTitle').textContent = 'Editar Contrato';
-			document.getElementById('contractId').value = contract.id;
-			document.getElementById('contractClient').value = contract.clientId;
-			document.getElementById('contractDescription').value = contract.description;
-			document.getElementById('contractValue').value = contract.value;
-			document.getElementById('contractStartDate').value = contract.startDate;
-			document.getElementById('contractEndDate').value = contract.endDate || '';
-			document.getElementById('contractStatus').value = contract.status;
-			// Para edição, não geramos novas parcelas, apenas exibimos os dados existentes
-			document.getElementById('contractParcels').value = contract.parcels ? contract.parcels.length : 1;
-			document.getElementById('contractDueDay').value = contract.parcels && contract.parcels.length > 0 ? new Date(contract.parcels[0].dueDate).getDate() : 10;
-			document.getElementById('contractFirstParcel').value = contract.parcels && contract.parcels.length > 0 ? contract.parcels[0].dueDate : new Date().toISOString().split('T')[0];
-
-			openModal('contractModal');
-		};
-
-		const deleteContract = async (contractId) => {
-			if (!confirm('Tem certeza que deseja excluir este contrato?')) return;
-
-			try {
-				await deleteDoc(doc(db, 'contracts', contractId));
-				showNotification('Contrato excluído com sucesso!', 'success');
-				await loadContracts();
-				if (currentSection === 'contracts') renderContractsSection();
-			} catch (error) {
-				showNotification('Erro ao excluir contrato: ' + error.message, 'error');
+			async logout() {
+				Utils.showLoading();
+				try {
+					await signOut(this.auth);
+					Utils.showNotification('Sessão encerrada.', 'info');
+					Utils.showAuthOverlay();
+				} catch (error) {
+					Utils.showNotification('Erro ao sair: ' + error.message, 'error');
+					console.error("Logout error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
 			}
-		};
 
-		const viewContractDetails = (contractId) => {
-			const contract = contracts.find(c => c.id === contractId);
-			if (!contract) return;
+			onAuthStateChanged(callback) {
+				onAuthStateChanged(this.auth, callback);
+			}
+		}
 
-			const client = clients.find(c => c.id === contract.clientId);
-			const parcels = contract.parcels || [];
-			const paidParcels = parcels.filter(p => p.status === 'Paga').length;
-			const totalPaid = parcels.filter(p => p.status === 'Paga').reduce((sum, p) => sum + (p.paymentAmount || p.value), 0);
+		// 
+		// FIREBASE SERVICE CLASS
+		// 
+		class FirebaseService {
+			constructor(dbInstance) {
+				this.db = dbInstance;
+			}
 
-			let html = `
-				<div class="bg-slate-700 p-4 rounded-lg mb-4">
-					<h4 class="font-semibold text-white mb-2">Informações do Cliente</h4>
-					<p class="text-slate-300"><strong>Nome:</strong> ${client ? client.name : 'N/A'}</p>
-					<p class="text-slate-300"><strong>CPF/CNPJ:</strong> ${client ? client.cpf : 'N/A'}</p>
-					<p class="text-slate-300"><strong>Telefone:</strong> ${client ? client.phone : 'N/A'}</p>
-				</div>
-				<div class="bg-slate-700 p-4 rounded-lg mb-4">
-					<h4 class="font-semibold text-white mb-2">Informações do Contrato</h4>
-					<p class="text-slate-300"><strong>Descrição:</strong> ${contract.description}</p>
-					<p class="text-slate-300"><strong>Valor Total:</strong> ${formatCurrency(contract.value)}</p>
-					<p class="text-slate-300"><strong>Período:</strong> ${formatDate(contract.startDate)} até ${formatDate(contract.endDate)}</p>
-					<p class="text-slate-300"><strong>Status:</strong> <span class="status-badge status-${contract.status.toLowerCase()}">${contract.status}</span></p>
-					<p class="text-slate-300"><strong>Parcelas Pagas:</strong> ${paidParcels} de ${parcels.length}</p>
-					<p class="text-slate-300"><strong>Total Recebido:</strong> ${formatCurrency(totalPaid)}</p>
-				</div>
-				<div class="bg-slate-700 p-4 rounded-lg">
-					<h4 class="font-semibold text-white mb-3">Parcelas</h4>
-					<div class="space-y-2">
-			`;
+			async addDocument(collectionName, data) {
+				try {
+					const docRef = await addDoc(collection(this.db, collectionName), {
+						...data,
+						createdAt: serverTimestamp(),
+						updatedAt: serverTimestamp()
+					});
+					return { id: docRef.id, ...data };
+				} catch (error) {
+					console.error("Error adding document:", error);
+					throw error;
+				}
+			}
 
-			parcels.forEach((parcel, index) => {
-				const statusClass = parcel.status === 'Paga' ? 'parcel-paid' : 
-								   (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'parcel-overdue' : 'parcel-pending');
+			async getDocuments(collectionName, conditions = [], order = null, limitCount = null, startAfterDoc = null) {
+				try {
+					let q = collection(this.db, collectionName);
+					conditions.forEach(cond => {
+						q = query(q, where(cond.field, cond.operator, cond.value));
+					});
+					if (order) {
+						q = query(q, orderBy(order.field, order.direction));
+					}
+					if (limitCount) {
+						q = query(q, limit(limitCount));
+					}
+					if (startAfterDoc) {
+						q = query(q, startAfter(startAfterDoc));
+					}
+					const querySnapshot = await getDocs(q);
+					const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+					return { docs, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1] };
+				} catch (error) {
+					console.error("Error getting documents:", error);
+					throw error;
+				}
+			}
+
+			async updateDocument(collectionName, id, data) {
+				try {
+					await updateDoc(doc(this.db, collectionName, id), {
+						...data,
+						updatedAt: serverTimestamp()
+					});
+				} catch (error) {
+					console.error("Error updating document:", error);
+					throw error;
+				}
+			}
+
+			async deleteDocument(collectionName, id) {
+				try {
+					await deleteDoc(doc(this.db, collectionName, id));
+				} catch (error) {
+					console.error("Error deleting document:", error);
+					throw error;
+				}
+			}
+
+			onCollectionSnapshot(collectionName, callback, conditions = [], order = null) {
+				let q = collection(this.db, collectionName);
+				conditions.forEach(cond => {
+					q = query(q, where(cond.field, cond.operator, cond.value));
+				});
+				if (order) {
+					q = query(q, orderBy(order.field, order.direction));
+				}
+				return onSnapshot(q, (snapshot) => {
+					const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+					callback(docs);
+				}, (error) => {
+					console.error("Error listening to collection:", error);
+					Utils.showNotification('Erro ao carregar dados em tempo real: ' + error.message, 'error');
+				});
+			}
+		}
+
+		// 
+		// DOM BUILDER CLASS
+		// 
+		class DOMBuilder {
+			constructor(appInstance) {
+				this.app = appInstance;
+			}
+
+			renderDashboard() {
+				const totalClients = clients.length;
+				const activeContracts = contracts.filter(c => c.status === 'Ativo').length;
 				
-				html += `
-					<div class="parcel-item ${statusClass}">
-						<div class="flex justify-between items-center">
-							<div>
-								<p class="font-semibold text-white">Parcela ${parcel.number}</p>
-								<p class="text-sm text-slate-400">Vencimento: ${formatDate(parcel.dueDate)}</p>
-								<p class="text-sm text-slate-400">Valor: ${formatCurrency(parcel.value)}</p>
-								${parcel.status === 'Paga' ? `
-									<p class="text-sm text-green-400">Pago em: ${formatDate(parcel.paymentDate)}</p>
-									<p class="text-sm text-slate-400">Valor Pago: ${formatCurrency(parcel.paymentAmount)}</p>
-									<p class="text-sm text-slate-400">Método: ${parcel.paymentMethod}</p>
-								` : ''}
+				let totalRevenue = 0;
+				let pendingPayments = 0;
+				
+				contracts.forEach(contract => {
+					(contract.parcels || []).forEach(parcel => {
+						if (parcel.status === 'Paga') {
+							totalRevenue += parcel.paymentAmount || parcel.value;
+						} else {
+							pendingPayments += parcel.value;
+						}
+					});
+				});
+
+				document.getElementById('mainContent').innerHTML = `
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+						<div class="stat-card p-6 rounded-lg">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-slate-400 text-sm font-medium">Total de Clientes</p>
+									<p class="text-3xl font-bold text-white mt-2">${totalClients}</p>
+								</div>
+								<div class="bg-blue-500/20 p-4 rounded-full">
+									<i class="fas fa-users text-blue-400 text-2xl"></i>
+								</div>
 							</div>
-							<div>
-								<span class="status-badge status-${parcel.status === 'Paga' ? 'pago' : (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'vencido' : 'pendente')}">
-									${parcel.status === 'Paga' ? 'Paga' : (new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga' ? 'Vencida' : 'Pendente')}
-								</span>
-								${parcel.status !== 'Paga' ? `
-									<button onclick="window.openPaymentModal('${contractId}', ${index})" 
-											class="ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
-										<i class="fas fa-dollar-sign"></i> Pagar
-									</button>
-								` : ''}
+						</div>
+
+						<div class="stat-card p-6 rounded-lg">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-slate-400 text-sm font-medium">Contratos Ativos</p>
+									<p class="text-3xl font-bold text-white mt-2">${activeContracts}</p>
+								</div>
+								<div class="bg-green-500/20 p-4 rounded-full">
+									<i class="fas fa-file-contract text-green-400 text-2xl"></i>
+								</div>
+							</div>
+						</div>
+
+						<div class="stat-card p-6 rounded-lg">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-slate-400 text-sm font-medium">Receita Total</p>
+									<p class="text-2xl font-bold text-white mt-2">${Utils.formatCurrency(totalRevenue)}</p>
+								</div>
+								<div class="bg-purple-500/20 p-4 rounded-full">
+									<i class="fas fa-dollar-sign text-purple-400 text-2xl"></i>
+								</div>
+							</div>
+						</div>
+
+						<div class="stat-card p-6 rounded-lg">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-slate-400 text-sm font-medium">A Receber</p>
+									<p class="text-2xl font-bold text-white mt-2">${Utils.formatCurrency(pendingPayments)}</p>
+								</div>
+								<div class="bg-yellow-500/20 p-4 rounded-full">
+									<i class="fas fa-clock text-yellow-400 text-2xl"></i>
+								</div>
 							</div>
 						</div>
 					</div>
-				`;
-			});
 
-			html += `
+					<div class="card-gradient p-6 rounded-lg">
+						<h3 class="text-xl font-bold text-white mb-4">Bem-vindo ao Sistema de Gestão Financeira</h3>
+						<p class="text-slate-300">Utilize o menu lateral para navegar entre as seções e gerenciar clientes, contratos, pagamentos e relatórios.</p>
 					</div>
-				</div>
-			`;
+				`;
+			}
 
-			document.getElementById('contractDetailsContent').innerHTML = html;
-			openModal('contractDetailsModal');
-		};
+			renderClientsSection() {
+				let html = `
+					<div class="mb-6 flex justify-between items-center">
+						<button onclick="app.openClientModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
+							<i class="fas fa-plus mr-2"></i>Novo Cliente
+						</button>
+						<button onclick="app.renderClientHistorySection()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
+							<i class="fas fa-history mr-2"></i>Histórico Clientes
+						</button>
+					</div>
 
-		// 
-		// PAGAMENTOS
-		// 
+					<div class="card-gradient rounded-lg overflow-hidden">
+						<div class="overflow-x-auto">
+							<table class="w-full">
+								<thead class="table-header">
+									<tr>
+										<th class="px-6 py-4 text-left text-white">Nome</th>
+										<th class="px-6 py-4 text-left text-white">CPF/CNPJ</th>
+										<th class="px-6 py-4 text-left text-white">Telefone</th>
+										<th class="px-6 py-4 text-left text-white">E-mail</th>
+										<th class="px-6 py-4 text-center text-white">Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+				`;
 
-		window.openPaymentModal = (contractId, parcelIndex) => {
-			const contract = contracts.find(c => c.id === contractId);
-			if (!contract) return;
+				if (clients.length === 0) {
+					html += `
+						<tr>
+							<td colspan="5" class="px-6 py-8 text-center text-slate-400">
+								<i class="fas fa-inbox text-4xl mb-2"></i>
+								<p>Nenhum cliente cadastrado</p>
+							</td>
+						</tr>
+					`;
+				} else {
+					clients.forEach(client => {
+						html += `
+							<tr class="table-row">
+								<td class="px-6 py-4 text-slate-200 font-medium">${client.name}</td>
+								<td class="px-6 py-4 text-slate-300">${client.cpf}</td>
+								<td class="px-6 py-4 text-slate-300">${client.phone}</td>
+								<td class="px-6 py-4 text-slate-300">${client.email || '-'}</td>
+								<td class="px-6 py-4 text-center">
+									<button onclick="app.editClient('${client.id}')" class="btn-action text-blue-400 hover:text-blue-300 mx-1">
+										<i class="fas fa-edit"></i>
+									</button>
+									<button onclick="app.deleteClient('${client.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1">
+										<i class="fas fa-trash"></i>
+									</button>
+								</td>
+							</tr>
+						`;
+					});
+				}
 
-			const parcel = contract.parcels[parcelIndex];
-			const client = clients.find(c => c.id === contract.clientId);
+				html += `
+								</tbody>
+							</table>
+						</div>
+					</div>
+				`;
 
-			document.getElementById('paymentContractId').value = contractId;
-			document.getElementById('paymentParcelIndex').value = parcelIndex;
-			document.getElementById('paymentAmount').value = parcel.value.toFixed(2);
-			
-			// Define data atual como padrão
-			const today = new Date().toISOString().split('T')[0];
-			document.getElementById('paymentDate').value = today;
+				document.getElementById('mainContent').innerHTML = html;
+			}
 
-			document.getElementById('paymentInfo').innerHTML = `
-				<h4 class="font-semibold text-white mb-2">Detalhes do Pagamento</h4>
-				<p class="text-slate-300"><strong>Cliente:</strong> ${client ? client.name : 'N/A'}</p>
-				<p class="text-slate-300"><strong>Contrato:</strong> ${contract.description}</p>
-				<p class="text-slate-300"><strong>Parcela:</strong> ${parcel.number} de ${contract.parcels.length}</p>
-				<p class="text-slate-300"><strong>Vencimento:</strong> ${formatDate(parcel.dueDate)}</p>
-				<p class="text-slate-300"><strong>Valor:</strong> ${formatCurrency(parcel.value)}</p>
-			`;
+			renderContractsSection() {
+				let html = `
+					<div class="mb-6 flex justify-between items-center">
+						<button onclick="app.openContractModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
+							<i class="fas fa-plus mr-2"></i>Novo Contrato
+						</button>
+						<div class="flex space-x-2">
+							<select id="advogadoFilter" class="px-4 py-2 rounded-lg">
+								<option value="">Todos Advogados</option>
+								${lawyers.map(lawyer => `<option value="${lawyer.id}">${lawyer.name}</option>`).join('')}
+							</select>
+							<select id="servicosAdvogadoFilter" class="px-4 py-2 rounded-lg">
+								<option value="">Todos Serviços</option>
+								${this.app.serviceTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+							</select>
+						</div>
+					</div>
 
-			openModal('paymentModal');
-		};
+					<div class="card-gradient rounded-lg overflow-hidden">
+						<div class="overflow-x-auto">
+							<table class="w-full">
+								<thead class="table-header">
+									<tr>
+										<th class="px-6 py-4 text-left text-white">Cliente</th>
+										<th class="px-6 py-4 text-left text-white">Descrição</th>
+										<th class="px-6 py-4 text-center text-white">Valor</th>
+										<th class="px-6 py-4 text-center text-white">Status</th>
+										<th class="px-6 py-4 text-center text-white">Ações</th>
+									</tr>
+								</thead>
+								<tbody id="contractsTableBody">
+				`;
 
-		document.getElementById('paymentForm').addEventListener('submit', async (e) => {
-			e.preventDefault();
+				if (contracts.length === 0) {
+					html += `
+						<tr>
+							<td colspan="5" class="px-6 py-8 text-center text-slate-400">
+								<i class="fas fa-inbox text-4xl mb-2"></i>
+								<p>Nenhum contrato cadastrado</p>
+							</td>
+						</tr>
+					`;
+				} else {
+					contracts.forEach(contract => {
+						const client = clients.find(c => c.id === contract.clientId);
+						html += `
+							<tr class="table-row">
+								<td class="px-6 py-4 text-slate-200 font-medium">${client ? client.name : 'N/A'}</td>
+								<td class="px-6 py-4 text-slate-300">${contract.description}</td>
+								<td class="px-6 py-4 text-center text-slate-300">${Utils.formatCurrency(contract.value)}</td>
+								<td class="px-6 py-4 text-center">
+									${Utils.getStatusBadge(contract.status)}
+								</td>
+								<td class="px-6 py-4 text-center">
+									<button onclick="app.viewContractDetails('${contract.id}')" class="btn-action text-purple-400 hover:text-purple-300 mx-1" title="Ver Detalhes">
+										<i class="fas fa-eye"></i>
+									</button>
+									<button onclick="app.editContract('${contract.id}')" class="btn-action text-blue-400 hover:text-blue-300 mx-1" title="Editar">
+										<i class="fas fa-edit"></i>
+									</button>
+									<button onclick="app.deleteContract('${contract.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</button>
+								</td>
+							</tr>
+						`;
+					});
+				}
 
-			const contractId = document.getElementById('paymentContractId').value;
-			const parcelIndex = parseInt(document.getElementById('paymentParcelIndex').value);
-			const paymentDate = document.getElementById('paymentDate').value;
-			const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
-			const paymentMethod = document.getElementById('paymentMethod').value;
-			const notes = document.getElementById('paymentNotes').value;
+				html += `
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="flex justify-center mt-6 space-x-4">
+						<button id="loadMoreContractsBtn" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold ${contracts.length < CONTRACTS_PER_PAGE ? 'hidden' : ''}">
+							Carregar Mais
+						</button>
+					</div>
+				`;
 
-			try {
+				document.getElementById('mainContent').innerHTML = html;
+				document.getElementById('loadMoreContractsBtn').addEventListener('click', () => this.app.loadContracts(true));
+				document.getElementById('advogadoFilter').addEventListener('change', () => this.app.loadContracts());
+				document.getElementById('servicosAdvogadoFilter').addEventListener('change', () => this.app.loadContracts());
+			}
+
+			renderContractDetails(contractId) {
 				const contract = contracts.find(c => c.id === contractId);
-				if (!contract) throw new Error('Contrato não encontrado');
+				if (!contract) return;
 
-				// ⚠️ CORREÇÃO APLICADA: Converte data para UTC mantendo o dia correto
-				const [year, month, day] = paymentDate.split('-');
-				const utcDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0));
-				
-				contract.parcels[parcelIndex].status = 'Paga';
-				contract.parcels[parcelIndex].paymentDate = utcDate.toISOString();
-				contract.parcels[parcelIndex].paymentAmount = paymentAmount;
-				contract.parcels[parcelIndex].paymentMethod = paymentMethod;
-				contract.parcels[parcelIndex].notes = notes;
+				const client = clients.find(c => c.id === contract.clientId);
+				const parcels = contract.parcels || [];
+				const paidParcels = parcels.filter(p => p.status === 'Paga').length;
+				const totalPaid = parcels.filter(p => p.status === 'Paga').reduce((sum, p) => sum + (p.paymentAmount || p.value), 0);
 
-				await updateDoc(doc(db, 'contracts', contractId), {
-					parcels: contract.parcels,
-					updatedAt: new Date().toISOString()
+				let html = `
+					<div class="bg-slate-700 p-4 rounded-lg mb-4">
+						<h4 class="font-semibold text-white mb-2">Informações do Cliente</h4>
+						<p class="text-slate-300"><strong>Nome:</strong> ${client ? client.name : 'N/A'}</p>
+						<p class="text-slate-300"><strong>CPF/CNPJ:</strong> ${client ? client.cpf : 'N/A'}</p>
+						<p class="text-slate-300"><strong>Telefone:</strong> ${client ? client.phone : 'N/A'}</p>
+					</div>
+					<div class="bg-slate-700 p-4 rounded-lg mb-4">
+						<h4 class="font-semibold text-white mb-2">Informações do Contrato</h4>
+						<p class="text-slate-300"><strong>Descrição:</strong> ${contract.description}</p>
+						<p class="text-slate-300"><strong>Valor Total:</strong> ${Utils.formatCurrency(contract.value)}</p>
+						<p class="text-slate-300"><strong>Período:</strong> ${Utils.formatDate(contract.startDate)} até ${Utils.formatDate(contract.endDate)}</p>
+						<p class="text-slate-300"><strong>Status:</strong> ${Utils.getStatusBadge(contract.status)}</p>
+						<p class="text-slate-300"><strong>Parcelas Pagas:</strong> ${paidParcels} de ${parcels.length}</p>
+						<p class="text-slate-300"><strong>Total Recebido:</strong> ${Utils.formatCurrency(totalPaid)}</p>
+					</div>
+					<div class="bg-slate-700 p-4 rounded-lg">
+						<h4 class="font-semibold text-white mb-3">Parcelas</h4>
+						<div class="space-y-2">
+				`;
+
+				parcels.forEach((parcel, index) => {
+					const isOverdue = new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga';
+					const statusText = parcel.status === 'Paga' ? 'Paga' : (isOverdue ? 'Vencida' : 'Pendente');
+					const statusClass = parcel.status === 'Paga' ? 'parcel-paid' : 
+										(isOverdue ? 'parcel-overdue' : 'parcel-pending');
+					
+					html += `
+						<div class="parcel-item ${statusClass}">
+							<div class="flex justify-between items-center">
+								<div>
+									<p class="font-semibold text-white">Parcela ${parcel.number}</p>
+									<p class="text-sm text-slate-400">Vencimento: ${Utils.formatDate(parcel.dueDate)}</p>
+									<p class="text-sm text-slate-400">Valor: ${Utils.formatCurrency(parcel.value)}</p>
+									${parcel.status === 'Paga' ? `
+										<p class="text-sm text-green-400">Pago em: ${Utils.formatDate(parcel.paymentDate)}</p>
+										<p class="text-sm text-slate-400">Método: ${parcel.paymentMethod}</p>
+									` : ''}
+								</div>
+								<div>
+									${Utils.getStatusBadge(statusText)}
+									${parcel.status !== 'Paga' ? `
+										<button onclick="app.openPaymentModal('${contractId}', ${index})" 
+												class="ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
+											<i class="fas fa-dollar-sign"></i> Pagar
+										</button>
+									` : ''}
+								</div>
+							</div>
+						</div>
+					`;
 				});
 
-				showNotification('Pagamento registrado com sucesso!', 'success');
-				closeModal();
-				document.getElementById('paymentForm').reset();
-				await loadContracts();
-				
-				if (currentSection === 'contracts') renderContractsSection();
-				if (currentSection === 'payments') renderPaymentsSection();
-			} catch (error) {
-				showNotification('Erro ao registrar pagamento: ' + error.message, 'error');
+				html += `
+						</div>
+					</div>
+				`;
+
+				document.getElementById('contractDetailsContent').innerHTML = html;
+				Utils.openModal('contractDetailsModal');
 			}
-		});
+
+			renderPaymentsSection() {
+				let allParcels = [];
+				
+				contracts.forEach(contract => {
+					const client = clients.find(c => c.id === contract.clientId);
+					(contract.parcels || []).forEach((parcel, index) => {
+						allParcels.push({
+							contractId: contract.id,
+							parcelIndex: index,
+							clientName: client ? client.name : 'N/A',
+							contractDescription: contract.description,
+							...parcel
+						});
+					});
+				});
+
+				allParcels.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+				let html = `
+					<div class="card-gradient rounded-lg overflow-hidden">
+						<div class="overflow-x-auto">
+							<table class="w-full">
+								<thead class="table-header">
+									<tr>
+										<th class="px-6 py-4 text-left text-white">Cliente</th>
+										<th class="px-6 py-4 text-left text-white">Contrato</th>
+										<th class="px-6 py-4 text-center text-white">Parcela</th>
+										<th class="px-6 py-4 text-center text-white">Vencimento</th>
+										<th class="px-6 py-4 text-center text-white">Valor</th>
+										<th class="px-6 py-4 text-center text-white">Status</th>
+										<th class="px-6 py-4 text-center text-white">Ação</th>
+									</tr>
+								</thead>
+								<tbody>
+				`;
+
+				if (allParcels.length === 0) {
+					html += `
+						<tr>
+							<td colspan="7" class="px-6 py-8 text-center text-slate-400">
+								<i class="fas fa-inbox text-4xl mb-2"></i>
+								<p>Nenhuma parcela encontrada</p>
+							</td>
+						</tr>
+					`;
+				} else {
+					allParcels.forEach(parcel => {
+						const isOverdue = new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga';
+						const statusText = parcel.status === 'Paga' ? 'Paga' : (isOverdue ? 'Vencida' : 'Pendente');
+						html += `
+							<tr class="table-row">
+								<td class="px-6 py-4 text-slate-200 font-medium">${parcel.clientName}</td>
+								<td class="px-6 py-4 text-slate-300">${parcel.contractDescription}</td>
+								<td class="px-6 py-4 text-center text-slate-300">${parcel.number}</td>
+								<td class="px-6 py-4 text-center text-slate-300">${Utils.formatDate(parcel.dueDate)}</td>
+								<td class="px-6 py-4 text-center text-slate-300">${Utils.formatCurrency(parcel.value)}</td>
+								<td class="px-6 py-4 text-center">
+									${Utils.getStatusBadge(statusText)}
+								</td>
+								<td class="px-6 py-4 text-center">
+									${parcel.status !== 'Paga' ? `
+										<button onclick="app.openPaymentModal('${parcel.contractId}', ${parcel.parcelIndex})" 
+												class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold">
+											<i class="fas fa-dollar-sign mr-1"></i>Pagar
+										</button>
+									` : `
+										<span class="text-green-400"><i class="fas fa-check-circle"></i> Pago</span>
+									`}
+								</td>
+							</tr>
+						`;
+					});
+				}
+
+				html += `
+								</tbody>
+							</table>
+						</div>
+					</div>
+				`;
+
+				document.getElementById('mainContent').innerHTML = html;
+			}
+
+			renderServicesSection() {
+				let html = `
+					<div class="mb-6 flex justify-between items-center">
+						<button onclick="app.openServiceModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
+							<i class="fas fa-plus mr-2"></i>Novo Serviço
+						</button>
+						<div class="flex space-x-2">
+							<select id="serviceAdvogadoFilter" class="px-4 py-2 rounded-lg">
+								<option value="">Todos Advogados</option>
+								${lawyers.map(lawyer => `<option value="${lawyer.id}">${lawyer.name}</option>`).join('')}
+							</select>
+							<select id="serviceStatusFilter" class="px-4 py-2 rounded-lg">
+								<option value="">Todos Status</option>
+								<option value="A Fazer">A Fazer</option>
+								<option value="Em Andamento">Em Andamento</option>
+								<option value="Concluído">Concluído</option>
+								<option value="Aguardando Cliente">Aguardando Cliente</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="kanban-board">
+						${['A Fazer', 'Em Andamento', 'Aguardando Cliente', 'Concluído'].map(status => `
+							<div class="kanban-column">
+								<div class="kanban-column-header text-white">
+									${status}
+									<span class="text-sm text-slate-400">(${services.filter(s => s.status === status).length})</span>
+								</div>
+								<div class="kanban-column-body" data-status="${status}" ondragover="event.preventDefault()" ondrop="app.handleServiceDrop(event)">
+									${services.filter(s => s.status === status).map(service => {
+										const contract = contracts.find(c => c.id === service.contractId);
+										const client = contract ? clients.find(cl => cl.id === contract.clientId) : null;
+										const lawyer = lawyers.find(l => l.id === service.advogadoId);
+										return `
+											<div class="kanban-card" draggable="true" ondragstart="app.handleServiceDragStart(event, '${service.id}')">
+												<h5 class="kanban-card-title">${service.description}</h5>
+												<p class="kanban-card-meta">Cliente: ${client ? client.name : 'N/A'}</p>
+												<p class="kanban-card-meta">Contrato: ${contract ? contract.description : 'N/A'}</p>
+												<p class="kanban-card-meta">Advogado: ${lawyer ? lawyer.name : 'N/A'}</p>
+												<p class="kanban-card-meta">Previsão: ${Utils.formatDate(service.endDate)}</p>
+												<div class="kanban-card-actions">
+													<button onclick="app.viewOficinaService('${service.id}')" class="bg-blue-500 hover:bg-blue-600 text-white">
+														<i class="fas fa-eye"></i>
+													</button>
+													<button onclick="app.editService('${service.id}')" class="bg-green-500 hover:bg-green-600 text-white">
+														<i class="fas fa-edit"></i>
+													</button>
+													<button onclick="app.deleteService('${service.id}')" class="bg-red-500 hover:bg-red-600 text-white">
+														<i class="fas fa-trash"></i>
+													</button>
+												</div>
+											</div>
+										`;
+									}).join('')}
+								</div>
+							</div>
+						`).join('')}
+					</div>
+				`;
+				document.getElementById('mainContent').innerHTML = html;
+				document.getElementById('serviceAdvogadoFilter').addEventListener('change', () => this.app.loadServices());
+				document.getElementById('serviceStatusFilter').addEventListener('change', () => this.app.loadServices());
+			}
+
+			renderReportsSection() {
+				const currentDate = new Date();
+				const currentMonth = currentDate.getMonth() + 1;
+				const currentYear = currentDate.getFullYear();
+
+				let monthOptions = '';
+				const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+								   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+				
+				monthNames.forEach((name, index) => {
+					const value = index + 1;
+					monthOptions += `<option value="${value}" ${value === currentMonth ? 'selected' : ''}>${name}</option>`;
+				});
+
+				let yearOptions = '';
+				for (let y = currentYear - 2; y <= currentYear + 1; y++) {
+					yearOptions += `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
+				}
+
+				document.getElementById('mainContent').innerHTML = `
+					<div class="card-gradient p-8 rounded-lg max-w-2xl">
+						<h3 class="text-2xl font-bold text-white mb-6">
+							<i class="fas fa-chart-line text-blue-400 mr-2"></i>
+							Gerar Relatório Mensal
+						</h3>
+						
+						<div class="space-y-4">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div>
+									<label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
+									<select id="reportMonth" class="w-full px-4 py-3 rounded-lg">
+										${monthOptions}
+									</select>
+								</div>
+								<div>
+									<label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
+									<select id="reportYear" class="w-full px-4 py-3 rounded-lg">
+										${yearOptions}
+									</select>
+								</div>
+							</div>
+
+							<button onclick="app.generateAndShowReport()" class="w-full btn-primary py-4 rounded-lg text-white font-semibold text-lg">
+								<i class="fas fa-file-invoice mr-2"></i>Gerar Relatório
+							</button>
+						</div>
+
+						<div class="mt-6 p-4 bg-blue-900/20 border border-blue-600 rounded-lg">
+							<p class="text-sm text-slate-300">
+								<i class="fas fa-info-circle text-blue-400 mr-2"></i>
+								<strong>Informação:</strong> O relatório exibirá todos os pagamentos recebidos e clientes inadimplentes no período selecionado.
+							</p>
+						</div>
+					</div>
+				`;
+			}
+
+			renderTrashSection() {
+				let html = `
+					<div class="mb-6">
+						<h3 class="text-2xl font-bold text-white">
+							<i class="fas fa-trash-alt text-gray-400 mr-2"></i>
+							Lixeira
+						</h3>
+						<p class="text-slate-400 mt-1">Itens excluídos podem ser restaurados ou permanentemente removidos.</p>
+					</div>
+
+					<div class="card-gradient rounded-lg p-6">
+						<div class="space-y-4">
+				`;
+
+				if (trashItems.length === 0) {
+					html += `
+						<div class="text-center py-8 text-slate-400">
+							<i class="fas fa-box-open text-4xl mb-2"></i>
+							<p>A lixeira está vazia.</p>
+						</div>
+					`;
+				} else {
+					trashItems.forEach(item => {
+						html += `
+							<div class="trash-item">
+								<h5 class="trash-item-title">${item.name || item.description || 'Item sem nome'}</h5>
+								<p class="trash-item-meta">Tipo: ${item.type}</p>
+								<p class="trash-item-meta">Excluído em: ${Utils.formatDate(item.deletedAt ? item.deletedAt.toDate().toISOString() : '')}</p>
+								<div class="trash-item-actions">
+									<button onclick="app.restoreItem('${item.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+										<i class="fas fa-undo mr-1"></i>Restaurar
+									</button>
+									<button onclick="app.permanentlyDeleteItem('${item.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+										<i class="fas fa-times mr-1"></i>Remover Permanentemente
+									</button>
+								</div>
+							</div>
+						`;
+					});
+				}
+
+				html += `
+						</div>
+					</div>
+				`;
+				document.getElementById('mainContent').innerHTML = html;
+			}
+
+			renderSettingsSection() {
+				let html = `
+					<div class="mb-6">
+						<h3 class="text-2xl font-bold text-white">
+							<i class="fas fa-cog text-blue-400 mr-2"></i>
+							Configurações
+						</h3>
+						<p class="text-slate-400 mt-1">Gerencie as configurações do sistema.</p>
+					</div>
+
+					<div class="card-gradient p-6 rounded-lg mb-6">
+						<h4 class="text-xl font-semibold text-white mb-4">Advogados</h4>
+						<div class="space-y-3">
+							${lawyers.map(lawyer => `
+								<div class="flex justify-between items-center bg-slate-700 p-3 rounded-lg">
+									<span class="text-slate-200">${lawyer.name}</span>
+									<button onclick="app.removeAdvogado('${lawyer.id}')" class="text-red-400 hover:text-red-300">
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+							`).join('')}
+						</div>
+						<div class="mt-4 flex space-x-2">
+							<input type="text" id="newAdvogadoName" placeholder="Nome do novo advogado" class="flex-grow px-4 py-2 rounded-lg">
+							<button onclick="app.addAdvogado()" class="btn-primary px-4 py-2 rounded-lg text-white">
+								<i class="fas fa-plus mr-1"></i>Adicionar
+							</button>
+						</div>
+					</div>
+
+					<div class="card-gradient p-6 rounded-lg">
+						<h4 class="text-xl font-semibold text-white mb-4">Tipos de Serviço</h4>
+						<div class="space-y-3">
+							${this.app.serviceTypes.map(type => `
+								<div class="flex justify-between items-center bg-slate-700 p-3 rounded-lg">
+									<span class="text-slate-200">${type}</span>
+									<button onclick="app.removeServiceType('${type}')" class="text-red-400 hover:text-red-300">
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+							`).join('')}
+						</div>
+						<div class="mt-4 flex space-x-2">
+							<input type="text" id="newServiceType" placeholder="Novo tipo de serviço" class="flex-grow px-4 py-2 rounded-lg">
+							<button onclick="app.addServiceType()" class="btn-primary px-4 py-2 rounded-lg text-white">
+								<i class="fas fa-plus mr-1"></i>Adicionar
+							</button>
+						</div>
+					</div>
+				`;
+				document.getElementById('mainContent').innerHTML = html;
+			}
+
+			renderClientHistorySection() {
+				let html = `
+					<div class="mb-6">
+						<h3 class="text-2xl font-bold text-white">
+							<i class="fas fa-history text-blue-400 mr-2"></i>
+							Histórico de Clientes
+						</h3>
+						<p class="text-slate-400 mt-1">Visualize o histórico completo de contratos e pagamentos por cliente.</p>
+					</div>
+
+					<div class="card-gradient p-6 rounded-lg">
+						<label class="block text-sm font-medium text-slate-300 mb-2">Selecione um Cliente</label>
+						<select id="selectClientHistory" class="w-full px-4 py-2 rounded-lg mb-4">
+							<option value="">Selecione um cliente</option>
+							${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('')}
+						</select>
+						<div id="clientHistoryDisplay" class="space-y-6 mt-6">
+							<!-- Histórico será carregado aqui -->
+						</div>
+					</div>
+				`;
+				document.getElementById('mainContent').innerHTML = html;
+				document.getElementById('selectClientHistory').addEventListener('change', (e) => this.app.displayClientHistory(e.target.value));
+			}
+		}
 
 		// 
-		// RELATÓRIOS
+		// REPORT HANDLER CLASS
 		// 
-
 		class ReportHandler {
+			constructor(appInstance) {
+				this.app = appInstance;
+			}
+
 			calculateMonthlyIncome(month, year) {
 				const startDate = new Date(year, month - 1, 1);
 				const endDate = new Date(year, month, 0, 23, 59, 59);
@@ -1147,12 +1945,12 @@
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div class="bg-green-900/30 border border-green-600 p-4 rounded-lg">
 								<p class="text-green-400 text-sm font-semibold mb-1">TOTAL RECEBIDO</p>
-								<p class="text-3xl font-bold text-white mt-2">${formatCurrency(totalReceived)}</p>
+								<p class="text-3xl font-bold text-white">${Utils.formatCurrency(totalReceived)}</p>
 								<p class="text-sm text-slate-400 mt-1">${payments.length} pagamento(s) recebido(s)</p>
 							</div>
 							<div class="bg-red-900/30 border border-red-600 p-4 rounded-lg">
 								<p class="text-red-400 text-sm font-semibold mb-1">TOTAL PENDENTE</p>
-								<p class="text-3xl font-bold text-white mt-2">${formatCurrency(totalPending)}</p>
+								<p class="text-3xl font-bold text-white">${Utils.formatCurrency(totalPending)}</p>
 								<p class="text-sm text-slate-400 mt-1">${defaulters.length} cliente(s) inadimplente(s)</p>
 							</div>
 						</div>
@@ -1189,9 +1987,9 @@
 								<td class="px-4 py-3 text-slate-300">${payment.clientName}</td>
 								<td class="px-4 py-3 text-slate-300">${payment.contractDescription}</td>
 								<td class="px-4 py-3 text-center text-slate-300">${payment.parcelNumber}</td>
-								<td class="px-4 py-3 text-center text-slate-300">${formatDate(payment.paymentDate)}</td>
+								<td class="px-4 py-3 text-center text-slate-300">${Utils.formatDate(payment.paymentDate)}</td>
 								<td class="px-4 py-3 text-center text-slate-300">${payment.paymentMethod}</td>
-								<td class="px-4 py-3 text-right text-green-400 font-semibold">${formatCurrency(payment.value)}</td>
+								<td class="px-4 py-3 text-right text-green-400 font-semibold">${Utils.formatCurrency(payment.value)}</td>
 							</tr>
 						`;
 					});
@@ -1237,11 +2035,11 @@
 								<td class="px-4 py-3 text-slate-300">${defaulter.clientPhone}</td>
 								<td class="px-4 py-3 text-slate-300">${defaulter.contractDescription}</td>
 								<td class="px-4 py-3 text-center text-slate-300">${defaulter.parcelNumber}/${defaulter.totalParcels}</td>
-								<td class="px-4 py-3 text-center text-slate-300">${formatDate(defaulter.dueDate)}</td>
+								<td class="px-4 py-3 text-center text-slate-300">${Utils.formatDate(defaulter.dueDate)}</td>
 								<td class="px-4 py-3 text-center ${defaulter.daysOverdue > 0 ? 'text-red-400 font-bold' : 'text-yellow-400'}">
 									${defaulter.daysOverdue > 0 ? defaulter.daysOverdue + ' dias' : 'No prazo'}
 								</td>
-								<td class="px-4 py-3 text-right text-red-400 font-semibold">${formatCurrency(defaulter.value)}</td>
+								<td class="px-4 py-3 text-right text-red-400 font-semibold">${Utils.formatCurrency(defaulter.value)}</td>
 							</tr>
 						`;
 					});
@@ -1253,990 +2051,1257 @@
 
 				return html;
 			}
+
+			async downloadPdf(reportContentHtml, month, year) {
+				Utils.showLoading();
+				try {
+					const { jsPDF } = window.jspdf;
+					const doc = new jsPDF('p', 'pt', 'a4');
+					const margin = 40;
+					const scale = 0.7; // Ajuste a escala para caber na página
+
+					const content = document.createElement('div');
+					content.innerHTML = reportContentHtml;
+					content.style.padding = '20px';
+					content.style.backgroundColor = '#1e293b'; // Cor de fundo do modal
+					content.style.color = '#f1f5f9'; // Cor do texto
+					content.style.fontFamily = 'Inter, sans-serif';
+
+					// Adiciona estilos para badges e tabelas para o PDF
+					const style = document.createElement('style');
+					style.innerHTML = `
+						.status-badge {
+							padding: 0.25rem 0.75rem;
+							border-radius: 9999px;
+							font-size: 0.75rem;
+							font-weight: 600;
+							text-transform: uppercase;
+							color: white;
+						}
+						.status-ativo { background-color: #10b981; }
+						.status-concluido { background-color: #6366f1; }
+						.status-cancelado { background-color: #ef4444; }
+						.status-pendente { background-color: #f59e0b; }
+						.status-vencido { background-color: #ef4444; }
+						.status-pago { background-color: #06b6d4; }
+						table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+						th, td { padding: 8px; border: 1px solid #334155; text-align: left; }
+						th { background-color: #334155; color: #f1f5f9; }
+						td { color: #d1d5db; }
+						.bg-green-900\/30 { background-color: rgba(16, 185, 129, 0.3); border-color: #10b981; }
+						.bg-red-900\/30 { background-color: rgba(239, 68, 68, 0.3); border-color: #ef4444; }
+						.bg-red-900\/20 { background-color: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+						.bg-red-800 { background-color: #991b1b; }
+						.text-green-400 { color: #4ade80; }
+						.text-red-400 { color: #f87171; }
+						.text-yellow-400 { color: #facc15; }
+						.font-semibold { font-weight: 600; }
+						.font-bold { font-weight: 700; }
+					`;
+					content.appendChild(style);
+
+					document.body.appendChild(content); // Adiciona temporariamente ao DOM para renderização
+
+					const canvas = await html2canvas(content, { scale: 2, useCORS: true, backgroundColor: '#1e293b' });
+					const imgData = canvas.toDataURL('image/png');
+					const imgWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+					const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+					let position = margin;
+					let heightLeft = imgHeight;
+
+					doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+					heightLeft -= doc.internal.pageSize.getHeight();
+
+					while (heightLeft >= 0) {
+						position = heightLeft - imgHeight + margin;
+						doc.addPage();
+						doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+						heightLeft -= doc.internal.pageSize.getHeight();
+					}
+
+					doc.save(`Relatorio_Mensal_${Utils.getMonthName(month)}_${year}.pdf`);
+					document.body.removeChild(content); // Remove do DOM
+					Utils.showNotification('Relatório PDF gerado com sucesso!', 'success');
+				} catch (error) {
+					console.error("Erro ao gerar PDF:", error);
+					Utils.showNotification('Erro ao gerar PDF: ' + error.message, 'error');
+				} finally {
+					Utils.hideLoading();
+				}
+			}
 		}
 
-		const reportHandler = new ReportHandler();
-
-		const generateAndShowReport = () => {
-			const month = parseInt(document.getElementById('reportMonth').value);
-			const year = parseInt(document.getElementById('reportYear').value);
-			
-			const reportContent = reportHandler.generateMonthlyReport(month, year);
-			document.getElementById('reportContent').innerHTML = reportContent;
-			
-			openModal('reportModal');
-		};
-
-		document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-			const { jsPDF } = window.jspdf;
-			const doc = new jsPDF();
-			
-			const month = parseInt(document.getElementById('reportMonth').value);
-			const year = parseInt(document.getElementById('reportYear').value);
-			const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-								'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-			const reportTitle = `Relatório Mensal - ${monthNames[month - 1]} de ${year}`;
-
-			doc.setFontSize(18);
-			doc.text(reportTitle, 14, 22);
-
-			const { totalReceived, totalPending, payments, defaulters } = reportHandler.calculateMonthlyIncome(month, year);
-
-			doc.setFontSize(12);
-			doc.text(`Total Recebido: ${formatCurrency(totalReceived)}`, 14, 35);
-			doc.text(`Total Pendente: ${formatCurrency(totalPending)}`, 14, 42);
-
-			let y = 55;
-
-			doc.setFontSize(14);
-			doc.text('Pagamentos Recebidos:', 14, y);
-			y += 10;
-
-			if (payments.length === 0) {
-				doc.setFontSize(10);
-				doc.text('Nenhum pagamento registrado neste período.', 14, y);
-				y += 10;
-			} else {
-				const headers = [['Cliente', 'Contrato', 'Parcela', 'Data Pgto', 'Método', 'Valor']];
-				const data = payments.map(p => [
-					p.clientName,
-					p.contractDescription,
-					p.parcelNumber,
-					formatDate(p.paymentDate),
-					p.paymentMethod,
-					formatCurrency(p.value)
-				]);
-				doc.autoTable({
-					startY: y,
-					head: headers,
-					body: data,
-					theme: 'grid',
-					styles: { fontSize: 8, cellPadding: 2, fillColor: [30, 41, 59] },
-					headStyles: { fillColor: [51, 65, 85], textColor: [255, 255, 255] },
-					alternateRowStyles: { fillColor: [24, 33, 48] },
-					margin: { left: 14, right: 14 },
-					didDrawPage: function (data) {
-						// Footer
-						let str = 'Página ' + doc.internal.getNumberOfPages();
-						doc.setFontSize(10);
-						doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
-					}
-				});
-				y = doc.autoTable.previous.finalY + 10;
-			}
-
-			doc.setFontSize(14);
-			doc.text('Clientes Inadimplentes:', 14, y);
-			y += 10;
-
-			if (defaulters.length === 0) {
-				doc.setFontSize(10);
-				doc.text('Nenhum cliente inadimplente neste período.', 14, y);
-				y += 10;
-			} else {
-				const headers = [['Cliente', 'Telefone', 'Contrato', 'Parcela', 'Vencimento', 'Atraso', 'Valor']];
-				const data = defaulters.map(d => [
-					d.clientName,
-					d.clientPhone,
-					d.contractDescription,
-					`${d.parcelNumber}/${d.totalParcels}`,
-					formatDate(d.dueDate),
-					d.daysOverdue > 0 ? `${d.daysOverdue} dias` : 'No prazo',
-					formatCurrency(d.value)
-				]);
-				doc.autoTable({
-					startY: y,
-					head: headers,
-					body: data,
-					theme: 'grid',
-					styles: { fontSize: 8, cellPadding: 2, fillColor: [30, 41, 59] },
-					headStyles: { fillColor: [153, 27, 27], textColor: [255, 255, 255] },
-					alternateRowStyles: { fillColor: [24, 33, 48] },
-					margin: { left: 14, right: 14 },
-					didDrawPage: function (data) {
-						// Footer
-						let str = 'Página ' + doc.internal.getNumberOfPages();
-						doc.setFontSize(10);
-						doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
-					}
-				});
-				y = doc.autoTable.previous.finalY + 10;
-			}
-
-			doc.save(`Relatorio_Mensal_${monthNames[month - 1]}_${year}.pdf`);
-		});
-
 		// 
-		// RENDERIZAÇÃO DAS SEÇÕES
+		// ANALYTICS HANDLER CLASS
 		// 
-
-		const renderSection = (section) => {
-			const mainContent = document.getElementById('mainContent');
-			
-			switch(section) {
-				case 'dashboard':
-					renderDashboard();
-					document.getElementById('pageTitle').textContent = 'Dashboard';
-					document.getElementById('pageSubtitle').textContent = 'Visão geral do sistema';
-					break;
-				case 'clients':
-					renderClientsSection();
-					document.getElementById('pageTitle').textContent = 'Clientes';
-					document.getElementById('pageSubtitle').textContent = 'Gerencie seus clientes';
-					break;
-				case 'contracts':
-					renderContractsSection();
-					document.getElementById('pageTitle').textContent = 'Contratos';
-					document.getElementById('pageSubtitle').textContent = 'Gerencie os contratos';
-					break;
-				case 'payments':
-					renderPaymentsSection();
-					document.getElementById('pageTitle').textContent = 'Pagamentos';
-					document.getElementById('pageSubtitle').textContent = 'Controle de pagamentos';
-					break;
-				case 'reports':
-					renderReportsSection();
-					document.getElementById('pageTitle').textContent = 'Relatórios';
-					document.getElementById('pageSubtitle').textContent = 'Relatórios financeiros';
-					break;
-				case 'analytics':
-					renderAnalyticsSection();
-					document.getElementById('pageTitle').textContent = 'Análises';
-					document.getElementById('pageSubtitle').textContent = 'Gráficos e insights';
-					break;
-				case 'settings':
-					renderSettingsSection();
-					document.getElementById('pageTitle').textContent = 'Configurações';
-					document.getElementById('pageSubtitle').textContent = 'Ajustes do sistema';
-					break;
-			}
-		};
-
-		const renderDashboard = () => {
-			const totalClients = clients.length;
-			const activeContracts = contracts.filter(c => c.status === 'Ativo').length;
-			
-			let totalRevenue = 0;
-			let pendingPayments = 0;
-			
-			contracts.forEach(contract => {
-				(contract.parcels || []).forEach(parcel => {
-					if (parcel.status === 'Paga') {
-						totalRevenue += parcel.paymentAmount || parcel.value;
-					} else {
-						pendingPayments += parcel.value;
-					}
-				});
-			});
-
-			document.getElementById('mainContent').innerHTML = `
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					<div class="stat-card p-6 rounded-lg">
-						<div class="flex items-center justify-between">
-							<div>
-								<p class="text-slate-400 text-sm font-medium">Total de Clientes</p>
-								<p class="text-3xl font-bold text-white mt-2">${totalClients}</p>
-							</div>
-							<div class="bg-blue-500/20 p-4 rounded-full">
-								<i class="fas fa-users text-blue-400 text-2xl"></i>
-							</div>
-						</div>
-					</div>
-
-					<div class="stat-card p-6 rounded-lg">
-						<div class="flex items-center justify-between">
-							<div>
-								<p class="text-slate-400 text-sm font-medium">Contratos Ativos</p>
-								<p class="text-3xl font-bold text-white mt-2">${activeContracts}</p>
-							</div>
-							<div class="bg-green-500/20 p-4 rounded-full">
-								<i class="fas fa-file-contract text-green-400 text-2xl"></i>
-							</div>
-						</div>
-					</div>
-
-					<div class="stat-card p-6 rounded-lg">
-						<div class="flex items-center justify-between">
-							<div>
-								<p class="text-slate-400 text-sm font-medium">Receita Total</p>
-								<p class="text-2xl font-bold text-white mt-2">${formatCurrency(totalRevenue)}</p>
-							</div>
-							<div class="bg-purple-500/20 p-4 rounded-full">
-								<i class="fas fa-dollar-sign text-purple-400 text-2xl"></i>
-							</div>
-						</div>
-					</div>
-
-					<div class="stat-card p-6 rounded-lg">
-						<div class="flex items-center justify-between">
-							<div>
-								<p class="text-slate-400 text-sm font-medium">A Receber</p>
-								<p class="text-2xl font-bold text-white mt-2">${formatCurrency(pendingPayments)}</p>
-							</div>
-							<div class="bg-yellow-500/20 p-4 rounded-full">
-								<i class="fas fa-clock text-yellow-400 text-2xl"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="card-gradient p-6 rounded-lg">
-					<h3 class="text-xl font-bold text-white mb-4">Bem-vindo ao Sistema de Gestão Financeira</h3>
-					<p class="text-slate-300">Utilize o menu lateral para navegar entre as seções e gerenciar clientes, contratos, pagamentos e relatórios.</p>
-				</div>
-			`;
-		};
-
-		const renderClientsSection = () => {
-			let html = `
-				<div class="mb-6 flex justify-between items-center">
-					<button onclick="window.openClientModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
-						<i class="fas fa-plus mr-2"></i>Novo Cliente
-					</button>
-					<div class="flex space-x-2">
-						<button onclick="loadClients(false)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Anterior</button>
-						<button onclick="loadClients(true)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Próximo</button>
-					</div>
-				</div>
-
-				<div class="card-gradient rounded-lg overflow-hidden">
-					<div class="overflow-x-auto">
-						<table class="w-full">
-							<thead class="table-header">
-								<tr>
-									<th class="px-6 py-4 text-left text-white">Nome</th>
-									<th class="px-6 py-4 text-left text-white">CPF/CNPJ</th>
-									<th class="px-6 py-4 text-left text-white">Telefone</th>
-									<th class="px-6 py-4 text-left text-white">E-mail</th>
-									<th class="px-6 py-4 text-center text-white">Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-			`;
-
-			if (clients.length === 0) {
-				html += `
-					<tr>
-						<td colspan="5" class="px-6 py-8 text-center text-slate-400">
-							<i class="fas fa-inbox text-4xl mb-2"></i>
-							<p>Nenhum cliente cadastrado</p>
-						</td>
-					</tr>
-				`;
-			} else {
-				clients.forEach(client => {
-					html += `
-						<tr class="table-row">
-							<td class="px-6 py-4 text-slate-200 font-medium">${client.name}</td>
-							<td class="px-6 py-4 text-slate-300">${client.cpf}</td>
-							<td class="px-6 py-4 text-slate-300">${client.phone}</td>
-							<td class="px-6 py-4 text-slate-300">${client.email || '-'}</td>
-							<td class="px-6 py-4 text-center">
-								<button onclick="window.editClient('${client.id}')" class="btn-action text-blue-400 hover:text-blue-300 mx-1">
-									<i class="fas fa-edit"></i>
-								</button>
-								<button onclick="window.deleteClient('${client.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1">
-									<i class="fas fa-trash"></i>
-								</button>
-							</td>
-						</tr>
-					`;
-				});
+		class AnalyticsHandler {
+			constructor(appInstance) {
+				this.app = appInstance;
 			}
 
-			html += `
-							</tbody>
-						</table>
-					</div>
-				</div>
-			`;
-
-			document.getElementById('mainContent').innerHTML = html;
-		};
-
-		const renderContractsSection = () => {
-			let html = `
-				<div class="mb-6 flex justify-between items-center">
-					<button onclick="window.openContractModal()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
-						<i class="fas fa-plus mr-2"></i>Novo Contrato
-					</button>
-					<div class="flex space-x-2">
-						<button onclick="loadContracts(false)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Anterior</button>
-						<button onclick="loadContracts(true)" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">Próximo</button>
-					</div>
-				</div>
-
-				<div class="card-gradient rounded-lg overflow-hidden">
-					<div class="overflow-x-auto">
-						<table class="w-full">
-							<thead class="table-header">
-								<tr>
-									<th class="px-6 py-4 text-left text-white">Cliente</th>
-									<th class="px-6 py-4 text-left text-white">Descrição</th>
-									<th class="px-6 py-4 text-center text-white">Valor</th>
-									<th class="px-6 py-4 text-center text-white">Status</th>
-									<th class="px-6 py-4 text-center text-white">Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-			`;
-
-			if (contracts.length === 0) {
-				html += `
-					<tr>
-						<td colspan="5" class="px-6 py-8 text-center text-slate-400">
-							<i class="fas fa-inbox text-4xl mb-2"></i>
-							<p>Nenhum contrato cadastrado</p>
-						</td>
-					</tr>
-				`;
-			} else {
+			// Exemplo de função para coletar dados para gráficos
+			getContractStatusDistribution() {
+				const statusCounts = {
+					'Ativo': 0,
+					'Concluído': 0,
+					'Cancelado': 0
+				};
 				contracts.forEach(contract => {
-					const client = clients.find(c => c.id === contract.clientId);
-					html += `
-						<tr class="table-row">
-							<td class="px-6 py-4 text-slate-200 font-medium">${client ? client.name : 'N/A'}</td>
-							<td class="px-6 py-4 text-slate-300">${contract.description}</td>
-							<td class="px-6 py-4 text-center text-slate-300">${formatCurrency(contract.value)}</td>
-							<td class="px-6 py-4 text-center">
-								<span class="status-badge status-${contract.status.toLowerCase()}">${contract.status}</span>
-							</td>
-							<td class="px-6 py-4 text-center">
-								<button onclick="window.viewContractDetails('${contract.id}')" class="btn-action text-purple-400 hover:text-purple-300 mx-1" title="Ver Detalhes">
-									<i class="fas fa-eye"></i>
-								</button>
-								<button onclick="window.editContract('${contract.id}')" class="btn-action text-blue-400 hover:text-blue-300 mx-1" title="Editar">
-									<i class="fas fa-edit"></i>
-								</button>
-								<button onclick="window.deleteContract('${contract.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1" title="Excluir">
-									<i class="fas fa-trash"></i>
-								</button>
-							</td>
-						</tr>
-					`;
+					if (statusCounts[contract.status] !== undefined) {
+						statusCounts[contract.status]++;
+					}
 				});
+				return statusCounts;
 			}
 
-			html += `
-							</tbody>
-						</table>
-					</div>
-				</div>
-			`;
-
-			document.getElementById('mainContent').innerHTML = html;
-		};
-
-		const renderPaymentsSection = () => {
-			let allParcels = [];
-			
-			contracts.forEach(contract => {
-				const client = clients.find(c => c.id === contract.clientId);
-				(contract.parcels || []).forEach((parcel, index) => {
-					allParcels.push({
-						contractId: contract.id,
-						parcelIndex: index,
-						clientName: client ? client.name : 'N/A',
-						contractDescription: contract.description,
-						...parcel
+			getMonthlyRevenueData(year) {
+				const monthlyRevenue = Array(12).fill(0);
+				contracts.forEach(contract => {
+					(contract.parcels || []).forEach(parcel => {
+						if (parcel.status === 'Paga' && parcel.paymentDate) {
+							const paymentDateObj = new Date(parcel.paymentDate);
+							if (paymentDateObj.getUTCFullYear() === year) {
+								const month = paymentDateObj.getUTCMonth(); // 0-11
+								monthlyRevenue[month] += parcel.paymentAmount || parcel.value;
+							}
+						}
 					});
 				});
-			});
+				return monthlyRevenue;
+			}
 
-			allParcels.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+			renderCharts() {
+				const statusData = this.getContractStatusDistribution();
+				const monthlyRevenueData = this.getMonthlyRevenueData(new Date().getFullYear());
 
-			let html = `
-				<div class="card-gradient rounded-lg overflow-hidden">
-					<div class="overflow-x-auto">
-						<table class="w-full">
-							<thead class="table-header">
-								<tr>
-									<th class="px-6 py-4 text-left text-white">Cliente</th>
-									<th class="px-6 py-4 text-left text-white">Contrato</th>
-									<th class="px-6 py-4 text-center text-white">Parcela</th>
-									<th class="px-6 py-4 text-center text-white">Vencimento</th>
-									<th class="px-6 py-4 text-center text-white">Valor</th>
-									<th class="px-6 py-4 text-center text-white">Status</th>
-									<th class="px-6 py-4 text-center text-white">Ação</th>
-								</tr>
-							</thead>
-							<tbody>
-			`;
+				// Gráfico de Status de Contratos
+				const ctxStatus = document.getElementById('contractStatusChart');
+				if (ctxStatus) {
+					new Chart(ctxStatus, {
+						type: 'pie',
+						data: {
+							labels: Object.keys(statusData),
+							datasets: [{
+								data: Object.values(statusData),
+								backgroundColor: ['#10b981', '#6366f1', '#ef4444'], // green, indigo, red
+								hoverOffset: 4
+							}]
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									labels: {
+										color: '#d1d5db'
+									}
+								}
+							}
+						}
+					});
+				}
 
-			if (allParcels.length === 0) {
-				html += `
-					<tr>
-						<td colspan="7" class="px-6 py-8 text-center text-slate-400">
-							<i class="fas fa-inbox text-4xl mb-2"></i>
-							<p>Nenhuma parcela encontrada</p>
-						</td>
-					</tr>
-				`;
-			} else {
-				allParcels.forEach(parcel => {
-					const isOverdue = new Date(parcel.dueDate) < new Date() && parcel.status !== 'Paga';
-					html += `
-						<tr class="table-row">
-							<td class="px-6 py-4 text-slate-200 font-medium">${parcel.clientName}</td>
-							<td class="px-6 py-4 text-slate-300">${parcel.contractDescription}</td>
-							<td class="px-6 py-4 text-center text-slate-300">${parcel.number}</td>
-							<td class="px-6 py-4 text-center text-slate-300">${formatDate(parcel.dueDate)}</td>
-							<td class="px-6 py-4 text-center text-slate-300">${formatCurrency(parcel.value)}</td>
-							<td class="px-6 py-4 text-center">
-								<span class="status-badge status-${parcel.status === 'Paga' ? 'pago' : (isOverdue ? 'vencido' : 'pendente')}">
-									${parcel.status === 'Paga' ? 'Paga' : (isOverdue ? 'Vencida' : 'Pendente')}
-								</span>
-							</td>
-							<td class="px-6 py-4 text-center">
-								${parcel.status !== 'Paga' ? `
-									<button onclick="window.openPaymentModal('${parcel.contractId}', ${parcel.parcelIndex})" 
-											class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold">
-										<i class="fas fa-dollar-sign mr-1"></i>Pagar
-									</button>
-								` : `
-									<span class="text-green-400"><i class="fas fa-check-circle"></i> Pago</span>
-								`}
-							</td>
-						</tr>
-					`;
+				// Gráfico de Receita Mensal
+				const ctxRevenue = document.getElementById('monthlyRevenueChart');
+				if (ctxRevenue) {
+					new Chart(ctxRevenue, {
+						type: 'bar',
+						data: {
+							labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+							datasets: [{
+								label: 'Receita Mensal (R$)',
+								data: monthlyRevenueData,
+								backgroundColor: '#3b82f6', // blue
+								borderColor: '#2563eb',
+								borderWidth: 1
+							}]
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									labels: {
+										color: '#d1d5db'
+									}
+								}
+							},
+							scales: {
+								y: {
+									beginAtZero: true,
+									ticks: {
+										color: '#d1d5db',
+										callback: function(value) {
+											return Utils.formatCurrency(value);
+										}
+									},
+									grid: {
+										color: '#334155'
+									}
+								},
+								x: {
+									ticks: {
+										color: '#d1d5db'
+									},
+									grid: {
+										color: '#334155'
+									}
+								}
+							}
+						}
+					});
+				}
+			}
+		}
+
+		// 
+		// CORRECTION CALCULATOR CLASS (IPCA)
+		// 
+		class CorrectionCalculator {
+			constructor() {
+				// Tabela IPCA (exemplo - dados reais devem ser atualizados periodicamente)
+				// Fonte: IBGE ou Banco Central
+				this.ipcaTable = {
+					"2023-01": 0.53, "2023-02": 0.84, "2023-03": 0.71, "2023-04": 0.61, "2023-05": 0.23, "2023-06": -0.08,
+					"2023-07": 0.12, "2023-08": 0.23, "2023-09": 0.26, "2023-10": 0.24, "2023-11": 0.28, "2023-12": 0.56,
+					"2024-01": 0.42, "2024-02": 0.83, "2024-03": 0.16, "2024-04": 0.38, "2024-05": 0.46, "2024-06": 0.42,
+					"2024-07": 0.24, "2024-08": 0.19, "2024-09": 0.29, "2024-10": 0.34, "2024-11": 0.41, "2024-12": 0.50,
+					"2025-01": 0.45, "2025-02": 0.78, "2025-03": 0.20, "2025-04": 0.35, "2025-05": 0.40, "2025-06": 0.38,
+					"2025-07": 0.20, "2025-08": 0.15, "2025-09": 0.25, "2025-10": 0.30, "2025-11": 0.37, "2025-12": 0.48,
+					// Adicione mais dados conforme necessário
+				};
+			}
+
+			getIpcaFactor(startDate, endDate) {
+				let factor = 1;
+				let currentMonth = new Date(startDate);
+				
+				while (currentMonth <= endDate) {
+					const year = currentMonth.getFullYear();
+					const month = (currentMonth.getMonth() + 1).toString().padStart(2, '0');
+					const key = `${year}-${month}`;
+					
+					if (this.ipcaTable[key] !== undefined) {
+						factor *= (1 + this.ipcaTable[key] / 100);
+					} else {
+						// Se não houver IPCA para o mês, assume 0 ou um valor padrão
+						// console.warn(`IPCA não encontrado para ${key}. Usando 0%.`);
+					}
+					
+					currentMonth.setMonth(currentMonth.getMonth() + 1);
+				}
+				return factor;
+			}
+
+			calculateCorrectedValue(originalValue, startDate, endDate) {
+				const factor = this.getIpcaFactor(new Date(startDate), new Date(endDate));
+				return originalValue * factor;
+			}
+		}
+
+		// 
+		// APP CLASS (MAIN APPLICATION LOGIC)
+		// 
+		class App {
+			constructor(authService, firebaseService, domBuilder, reportHandler, analyticsHandler, correctionCalculator) {
+				this.authService = authService;
+				this.firebaseService = firebaseService;
+				this.domBuilder = domBuilder;
+				this.reportHandler = reportHandler;
+				this.analyticsHandler = analyticsHandler;
+				this.correctionCalculator = correctionCalculator;
+
+				this.serviceTypes = ['Petição Inicial', 'Audiência', 'Recurso', 'Consultoria', 'Parecer', 'Outros'];
+				this.initListeners();
+				this.setupRealtimeListeners();
+			}
+
+			initListeners() {
+				// Auth Listeners
+				document.getElementById('loginForm').addEventListener('submit', (e) => {
+					e.preventDefault();
+					const email = document.getElementById('loginEmail').value;
+					const password = document.getElementById('loginPassword').value;
+					this.authService.login(email, password);
+				});
+
+				document.getElementById('registerForm').addEventListener('submit', (e) => {
+					e.preventDefault();
+					const email = document.getElementById('registerEmail').value;
+					const password = document.getElementById('registerPassword').value;
+					const confirmPassword = document.getElementById('registerConfirmPassword').value;
+					if (password !== confirmPassword) {
+						Utils.showNotification('As senhas não coincidem!', 'error');
+						return;
+					}
+					this.authService.register(email, password);
+				});
+
+				document.getElementById('showRegister').addEventListener('click', (e) => {
+					e.preventDefault();
+					document.getElementById('loginForm').classList.add('hidden');
+					document.getElementById('registerForm').classList.remove('hidden');
+				});
+
+				document.getElementById('showLogin').addEventListener('click', (e) => {
+					e.preventDefault();
+					document.getElementById('registerForm').classList.add('hidden');
+					document.getElementById('loginForm').classList.remove('hidden');
+				});
+
+				document.getElementById('logoutBtn').addEventListener('click', () => this.authService.logout());
+
+				// Navigation Listeners
+				document.querySelectorAll('.nav-link').forEach(link => {
+					link.addEventListener('click', (e) => {
+						e.preventDefault();
+						document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+						link.classList.add('active');
+						currentSection = link.getAttribute('data-section');
+						this.renderSection(currentSection);
+					});
+				});
+
+				document.querySelectorAll('.bottom-nav-item').forEach(link => {
+					link.addEventListener('click', (e) => {
+						e.preventDefault();
+						document.querySelectorAll('.bottom-nav-item').forEach(l => l.classList.remove('active'));
+						link.classList.add('active');
+						currentSection = link.getAttribute('data-section');
+						this.renderSection(currentSection);
+					});
+				});
+
+				// Toggle Sidebar (Mobile)
+				document.getElementById('toggleSidebar').addEventListener('click', () => {
+					const sidebar = document.getElementById('sidebar');
+					sidebar.classList.toggle('hidden');
+				});
+
+				// Close Modals
+				document.querySelectorAll('.close-modal').forEach(btn => {
+					btn.addEventListener('click', Utils.closeModal);
+				});
+				document.getElementById('modalBackdrop').addEventListener('click', Utils.closeModal);
+
+				// Contract Form Parcelamento Manual
+				document.getElementById('addManualParcelBtn').addEventListener('click', () => this.handleAddManualParcel());
+				
+				// Forms Submit
+				document.getElementById('clientForm').addEventListener('submit', (e) => this.handleClientSubmit(e));
+				document.getElementById('contractForm').addEventListener('submit', (e) => this.handleContractSubmit(e));
+				document.getElementById('paymentForm').addEventListener('submit', (e) => this.handlePaymentSubmit(e));
+				document.getElementById('serviceForm').addEventListener('submit', (e) => this.handleServiceSubmit(e));
+
+				// PDF Download
+				document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+					const month = parseInt(document.getElementById('reportMonth').value);
+					const year = parseInt(document.getElementById('reportYear').value);
+					const reportContentHtml = this.reportHandler.generateMonthlyReport(month, year);
+					this.reportHandler.downloadPdf(reportContentHtml, month, year);
+				});
+
+				// Edit Oficina Service from Modal
+				document.getElementById('editOficinaServiceBtn').addEventListener('click', () => {
+					const serviceId = document.getElementById('oficinaModal').dataset.serviceId;
+					if (serviceId) {
+						Utils.closeModal();
+						this.editService(serviceId);
+					}
 				});
 			}
 
-			html += `
-							</tbody>
-						</table>
-					</div>
-				</div>
-			`;
+			setupRealtimeListeners() {
+				// Real-time clients
+				this.firebaseService.onCollectionSnapshot('clients', (updatedClients) => {
+					clients = updatedClients;
+					this.updateClientSelects();
+					if (currentSection === 'clients') this.domBuilder.renderClientsSection();
+					if (currentSection === 'dashboard') this.domBuilder.renderDashboard();
+					if (currentSection === 'client-history') this.domBuilder.renderClientHistorySection();
+				}, [], { field: 'name', direction: 'asc' });
 
-			document.getElementById('mainContent').innerHTML = html;
-		};
+				// Real-time contracts
+				if (contractUnsubscribe) contractUnsubscribe(); // Limpa listener anterior
+				contractUnsubscribe = this.firebaseService.onCollectionSnapshot('contracts', (updatedContracts) => {
+					contracts = updatedContracts;
+					this.updateContractSelects();
+					if (currentSection === 'contracts') this.domBuilder.renderContractsSection();
+					if (currentSection === 'payments') this.domBuilder.renderPaymentsSection();
+					if (currentSection === 'dashboard') this.domBuilder.renderDashboard();
+					if (currentSection === 'reports') this.domBuilder.renderReportsSection();
+					if (currentSection === 'services') this.domBuilder.renderServicesSection();
+				});
 
-		const renderReportsSection = () => {
-			const currentDate = new Date();
-			const currentMonth = currentDate.getMonth() + 1;
-			const currentYear = currentDate.getFullYear();
+				// Real-time services
+				if (serviceUnsubscribe) serviceUnsubscribe(); // Limpa listener anterior
+				serviceUnsubscribe = this.firebaseService.onCollectionSnapshot('services', (updatedServices) => {
+					services = updatedServices;
+					if (currentSection === 'services') this.domBuilder.renderServicesSection();
+				});
 
-			let monthOptions = '';
-			const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-							   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-			
-			monthNames.forEach((name, index) => {
-				const value = index + 1;
-				monthOptions += `<option value="${value}" ${value === currentMonth ? 'selected' : ''}>${name}</option>`;
-			});
+				// Real-time trash
+				this.firebaseService.onCollectionSnapshot('trash', (updatedTrashItems) => {
+					trashItems = updatedTrashItems;
+					if (currentSection === 'trash') this.domBuilder.renderTrashSection();
+				});
 
-			let yearOptions = '';
-			for (let y = currentYear - 2; y <= currentYear + 1; y++) {
-				yearOptions += `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
+				// Real-time lawyers
+				this.firebaseService.onCollectionSnapshot('lawyers', (updatedLawyers) => {
+					lawyers = updatedLawyers;
+					this.updateLawyerSelects();
+					if (currentSection === 'settings') this.domBuilder.renderSettingsSection();
+					if (currentSection === 'services') this.domBuilder.renderServicesSection();
+				});
+
+				// Real-time settings (service types)
+				this.firebaseService.onCollectionSnapshot('settings', (settingsDocs) => {
+					const settings = settingsDocs.find(doc => doc.id === 'general');
+					if (settings && settings.serviceTypes) {
+						this.serviceTypes = settings.serviceTypes;
+						this.updateServiceTypeSelects();
+						if (currentSection === 'settings') this.domBuilder.renderSettingsSection();
+						if (currentSection === 'services') this.domBuilder.renderServicesSection();
+					}
+				});
 			}
 
-			document.getElementById('mainContent').innerHTML = `
-				<div class="card-gradient p-8 rounded-lg max-w-2xl">
-					<h3 class="text-2xl font-bold text-white mb-6">
-						<i class="fas fa-chart-line text-blue-400 mr-2"></i>
-						Gerar Relatório Mensal
-					</h3>
-					
-					<div class="space-y-4">
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<div>
-								<label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
-								<select id="reportMonth" class="w-full px-4 py-3 rounded-lg">
-									${monthOptions}
-								</select>
-							</div>
-							<div>
-								<label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
-								<select id="reportYear" class="w-full px-4 py-3 rounded-lg">
-									${yearOptions}
-								</select>
-							</div>
-						</div>
+			renderSection(section) {
+				document.getElementById('mainContent').innerHTML = ''; // Limpa conteúdo
+				document.getElementById('pageTitle').textContent = section.charAt(0).toUpperCase() + section.slice(1);
+				document.getElementById('pageSubtitle').textContent = `Gerencie seus ${section}`;
 
-						<button onclick="window.generateAndShowReport()" class="w-full btn-primary py-4 rounded-lg text-white font-semibold text-lg">
-							<i class="fas fa-file-invoice mr-2"></i>Gerar Relatório
+				switch(section) {
+					case 'dashboard':
+						this.domBuilder.renderDashboard();
+						break;
+					case 'clients':
+						this.domBuilder.renderClientsSection();
+						break;
+					case 'contracts':
+						this.loadContracts(); // Carrega contratos com paginação/filtros
+						break;
+					case 'payments':
+						this.domBuilder.renderPaymentsSection();
+						break;
+					case 'services':
+						this.domBuilder.renderServicesSection();
+						break;
+					case 'reports':
+						this.domBuilder.renderReportsSection();
+						break;
+					case 'trash':
+						this.domBuilder.renderTrashSection();
+						break;
+					case 'settings':
+						this.domBuilder.renderSettingsSection();
+						break;
+					case 'client-history':
+						this.domBuilder.renderClientHistorySection();
+						break;
+				}
+			}
+
+			// 
+			// CLIENTES
+			// 
+			openClientModal() {
+				document.getElementById('clientModalTitle').textContent = 'Novo Cliente';
+				document.getElementById('clientForm').reset();
+				document.getElementById('clientId').value = '';
+				Utils.openModal('clientModal');
+			}
+
+			async handleClientSubmit(e) {
+				e.preventDefault();
+				Utils.showLoading();
+				const clientId = document.getElementById('clientId').value;
+				const clientData = {
+					name: document.getElementById('clientName').value,
+					cpf: document.getElementById('clientCpf').value,
+					phone: document.getElementById('clientPhone').value,
+					email: document.getElementById('clientEmail').value,
+					address: document.getElementById('clientAddress').value,
+				};
+
+				try {
+					if (clientId) {
+						await this.firebaseService.updateDocument('clients', clientId, clientData);
+						Utils.showNotification('Cliente atualizado com sucesso!', 'success');
+					} else {
+						await this.firebaseService.addDocument('clients', clientData);
+						Utils.showNotification('Cliente adicionado com sucesso!', 'success');
+					}
+					Utils.closeModal();
+					document.getElementById('clientForm').reset();
+				} catch (error) {
+					Utils.showNotification('Erro ao salvar cliente: ' + error.message, 'error');
+					console.error("Client save error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			editClient(clientId) {
+				const client = clients.find(c => c.id === clientId);
+				if (!client) return;
+
+				document.getElementById('clientModalTitle').textContent = 'Editar Cliente';
+				document.getElementById('clientId').value = client.id;
+				document.getElementById('clientName').value = client.name;
+				document.getElementById('clientCpf').value = client.cpf;
+				document.getElementById('clientPhone').value = client.phone;
+				document.getElementById('clientEmail').value = client.email || '';
+				document.getElementById('clientAddress').value = client.address || '';
+				Utils.openModal('clientModal');
+			}
+
+			deleteClient(clientId) {
+				Utils.confirmAction('Tem certeza que deseja excluir este cliente? Ele será movido para a lixeira.', async () => {
+					Utils.showLoading();
+					try {
+						const client = clients.find(c => c.id === clientId);
+						if (client) {
+							await this.firebaseService.addDocument('trash', {
+								type: 'client',
+								originalId: clientId,
+								name: client.name,
+								data: client,
+								deletedAt: serverTimestamp()
+							});
+							await this.firebaseService.deleteDocument('clients', clientId);
+							Utils.showNotification('Cliente movido para a lixeira!', 'info');
+						}
+					} catch (error) {
+						Utils.showNotification('Erro ao excluir cliente: ' + error.message, 'error');
+						console.error("Client delete error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
+			}
+
+			updateClientSelects() {
+				const select = document.getElementById('contractClient');
+				if (select) {
+					select.innerHTML = '<option value="">Selecione um cliente</option>';
+					clients.forEach(client => {
+						select.innerHTML += `<option value="${client.id}">${client.name}</option>`;
+					});
+				}
+				const selectHistory = document.getElementById('selectClientHistory');
+				if (selectHistory) {
+					const currentSelected = selectHistory.value;
+					selectHistory.innerHTML = '<option value="">Selecione um cliente</option>';
+					clients.forEach(client => {
+						selectHistory.innerHTML += `<option value="${client.id}" ${client.id === currentSelected ? 'selected' : ''}>${client.name}</option>`;
+					});
+				}
+			}
+
+			async displayClientHistory(clientId) {
+				const clientHistoryDisplay = document.getElementById('clientHistoryDisplay');
+				clientHistoryDisplay.innerHTML = '';
+				if (!clientId) return;
+
+				Utils.showLoading();
+				try {
+					const client = clients.find(c => c.id === clientId);
+					if (!client) {
+						clientHistoryDisplay.innerHTML = '<p class="text-red-400">Cliente não encontrado.</p>';
+						return;
+					}
+
+					document.getElementById('clientHistoryName').textContent = client.name;
+
+					let historyHtml = `
+						<div class="bg-slate-700 p-4 rounded-lg mb-4">
+							<h4 class="font-semibold text-white mb-2">Dados do Cliente</h4>
+							<p class="text-slate-300"><strong>Nome:</strong> ${client.name}</p>
+							<p class="text-slate-300"><strong>CPF/CNPJ:</strong> ${client.cpf}</p>
+							<p class="text-slate-300"><strong>Telefone:</strong> ${client.phone}</p>
+							<p class="text-slate-300"><strong>E-mail:</strong> ${client.email || '-'}</p>
+							<p class="text-slate-300"><strong>Endereço:</strong> ${client.address || '-'}</p>
+						</div>
+						<h4 class="text-xl font-semibold text-white mb-3">Contratos Associados</h4>
+					`;
+
+					const clientContracts = contracts.filter(c => c.clientId === clientId);
+					if (clientContracts.length === 0) {
+						historyHtml += '<p class="text-slate-400">Nenhum contrato associado a este cliente.</p>';
+					} else {
+						clientContracts.forEach(contract => {
+							const parcels = contract.parcels || [];
+							const paidParcels = parcels.filter(p => p.status === 'Paga').length;
+							const totalPaid = parcels.filter(p => p.status === 'Paga').reduce((sum, p) => sum + (p.paymentAmount || p.value), 0);
+
+							historyHtml += `
+								<div class="bg-slate-700 p-4 rounded-lg mb-4 border-l-4 border-purple-500">
+									<h5 class="font-semibold text-white text-lg mb-2">Contrato: ${contract.description}</h5>
+									<p class="text-slate-300"><strong>Valor Total:</strong> ${Utils.formatCurrency(contract.value)}</p>
+									<p class="text-slate-300"><strong>Status:</strong> ${Utils.getStatusBadge(contract.status)}</p>
+									<p class="text-slate-300"><strong>Parcelas Pagas:</strong> ${paidParcels} de ${parcels.length}</p>
+									<p class="text-slate-300"><strong>Total Recebido:</strong> ${Utils.formatCurrency(totalPaid)}</p>
+									<button onclick="app.viewContractDetails('${contract.id}')" class="mt-3 btn-primary px-4 py-2 rounded-lg text-white text-sm">
+										Ver Detalhes do Contrato
+									</button>
+								</div>
+							`;
+						});
+					}
+					clientHistoryDisplay.innerHTML = historyHtml;
+				} catch (error) {
+					Utils.showNotification('Erro ao carregar histórico do cliente: ' + error.message, 'error');
+					console.error("Client history error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			// 
+			// CONTRATOS
+			// 
+			openContractModal() {
+				document.getElementById('contractModalTitle').textContent = 'Novo Contrato';
+				document.getElementById('contractForm').reset();
+				document.getElementById('contractId').value = '';
+				const today = new Date().toISOString().split('T')[0];
+				document.getElementById('contractStartDate').value = today;
+				document.getElementById('contractFirstParcel').value = today;
+				document.getElementById('manualParcelsContainer').innerHTML = ''; // Limpa parcelas manuais
+				Utils.openModal('contractModal');
+			}
+
+			generateParcels(numParcels, totalValue, firstParcelDate, dueDay) {
+				const parcels = [];
+				const parcelValue = totalValue / numParcels;
+				const baseDate = new Date(firstParcelDate + 'T12:00:00'); // Garante fuso horário consistente
+
+				for (let i = 0; i < numParcels; i++) {
+					const dueDate = new Date(baseDate);
+					dueDate.setMonth(dueDate.getMonth() + i);
+					dueDate.setDate(dueDay);
+
+					parcels.push({
+						number: i + 1,
+						value: parcelValue,
+						dueDate: dueDate.toISOString().split('T')[0],
+						status: 'Pendente',
+						paymentDate: null,
+						paymentAmount: null,
+						paymentMethod: null,
+						notes: null
+					});
+				}
+				return parcels;
+			}
+
+			handleAddManualParcel() {
+				const container = document.getElementById('manualParcelsContainer');
+				const index = container.children.length;
+				const newParcelHtml = `
+					<div class="flex space-x-2 items-center bg-slate-800 p-2 rounded-lg">
+						<input type="number" placeholder="Valor" class="manual-parcel-value flex-grow px-3 py-1 rounded-lg" step="0.01" min="0">
+						<input type="date" class="manual-parcel-due-date px-3 py-1 rounded-lg">
+						<button type="button" onclick="this.parentNode.remove()" class="text-red-400 hover:text-red-300">
+							<i class="fas fa-times"></i>
 						</button>
 					</div>
-
-					<div class="mt-6 p-4 bg-blue-900/20 border border-blue-600 rounded-lg">
-						<p class="text-sm text-slate-300">
-							<i class="fas fa-info-circle text-blue-400 mr-2"></i>
-							<strong>Informação:</strong> O relatório exibirá todos os pagamentos recebidos e clientes inadimplentes no período selecionado.
-						</p>
-					</div>
-				</div>
-			`;
-		};
-
-		const renderAnalyticsSection = () => {
-			document.getElementById('mainContent').innerHTML = `
-				<div class="card-gradient p-8 rounded-lg">
-					<h3 class="text-2xl font-bold text-white mb-6">
-						<i class="fas fa-chart-pie text-orange-400 mr-2"></i>
-						Análises Financeiras
-					</h3>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div>
-							<h4 class="text-xl font-semibold text-white mb-4">Receita por Mês</h4>
-							<div class="chart-container">
-								<canvas id="revenueChart"></canvas>
-							</div>
-						</div>
-						<div>
-							<h4 class="text-xl font-semibold text-white mb-4">Status dos Contratos</h4>
-							<div class="chart-container">
-								<canvas id="contractStatusChart"></canvas>
-							</div>
-						</div>
-					</div>
-				</div>
-			`;
-			renderCharts();
-		};
-
-		const renderCharts = () => {
-			const monthlyRevenue = {};
-			const contractStatusCounts = {
-				'Ativo': 0,
-				'Concluído': 0,
-				'Cancelado': 0
-			};
-
-			contracts.forEach(contract => {
-				contractStatusCounts[contract.status] = (contractStatusCounts[contract.status] || 0) + 1;
-				(contract.parcels || []).forEach(parcel => {
-					if (parcel.status === 'Paga' && parcel.paymentDate) {
-						const date = new Date(parcel.paymentDate);
-						const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-						monthlyRevenue[monthYear] = (monthlyRevenue[monthYear] || 0) + (parcel.paymentAmount || parcel.value);
-					}
-				});
-			});
-
-			// Ordenar meses para o gráfico de receita
-			const sortedMonths = Object.keys(monthlyRevenue).sort();
-			const revenueData = sortedMonths.map(month => monthlyRevenue[month]);
-
-			new Chart(document.getElementById('revenueChart'), {
-				type: 'line',
-				data: {
-					labels: sortedMonths,
-					datasets: [{
-						label: 'Receita Mensal (BRL)',
-						data: revenueData,
-						borderColor: '#3b82f6',
-						backgroundColor: 'rgba(59, 130, 246, 0.2)',
-						fill: true,
-						tension: 0.3
-					}]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					scales: {
-						y: {
-							beginAtZero: true,
-							ticks: {
-								color: '#cbd5e1',
-								callback: function(value) { return formatCurrency(value); }
-							},
-							grid: { color: '#475569' }
-						},
-						x: {
-							ticks: { color: '#cbd5e1' },
-							grid: { color: '#475569' }
-						}
-					},
-					plugins: {
-						legend: {
-							labels: { color: '#cbd5e1' }
-						}
-					}
-				}
-			});
-
-			new Chart(document.getElementById('contractStatusChart'), {
-				type: 'pie',
-				data: {
-					labels: Object.keys(contractStatusCounts),
-					datasets: [{
-						data: Object.values(contractStatusCounts),
-						backgroundColor: ['#10b981', '#06b6d4', '#ef4444'],
-						hoverOffset: 4
-					}]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					plugins: {
-						legend: {
-							labels: { color: '#cbd5e1' }
-						}
-					}
-				}
-			});
-		};
-
-		const renderSettingsSection = () => {
-			document.getElementById('mainContent').innerHTML = `
-				<div class="card-gradient p-8 rounded-lg">
-					<h3 class="text-2xl font-bold text-white mb-6">
-						<i class="fas fa-cog text-gray-400 mr-2"></i>
-						Configurações do Sistema
-					</h3>
-					<div class="space-y-4">
-						<div class="bg-slate-700 p-4 rounded-lg">
-							<h4 class="font-semibold text-white mb-2">Informações da Conta</h4>
-							<p class="text-slate-300"><strong>E-mail:</strong> ${currentUser ? currentUser.email : 'N/A'}</p>
-							<button class="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Alterar Senha</button>
-						</div>
-						<div class="bg-slate-700 p-4 rounded-lg">
-							<h4 class="font-semibold text-white mb-2">Gerenciamento de Dados</h4>
-							<p class="text-slate-300">Opções para backup e restauração de dados.</p>
-							<button class="mt-3 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">Fazer Backup</button>
-						</div>
-						<div class="bg-slate-700 p-4 rounded-lg">
-							<h4 class="font-semibold text-white mb-2">Lixeira</h4>
-							<p class="text-slate-300">Visualize e restaure itens excluídos.</p>
-							<button onclick="window.openTrashModal()" class="mt-3 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">Abrir Lixeira</button>
-						</div>
-						<div class="bg-slate-700 p-4 rounded-lg">
-							<h4 class="font-semibold text-white mb-2">Workshop de Correções</h4>
-							<p class="text-slate-300">Ferramentas para corrigir inconsistências nos dados.</p>
-							<button onclick="window.openWorkshopModal()" class="mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg">Abrir Workshop</button>
-						</div>
-					</div>
-				</div>
-			`;
-		};
-
-		// 
-		// WORKSHOP DE CORREÇÕES (Exemplo de funcionalidade avançada)
-		// 
-
-		class CorrectionCalculator {
-			constructor(contracts, clients) {
-				this.contracts = contracts;
-				this.clients = clients;
+				`;
+				container.insertAdjacentHTML('beforeend', newParcelHtml);
 			}
 
-			// Verifica e corrige parcelas sem paymentAmount (para compatibilidade retroativa)
-			checkAndFixPaymentAmounts() {
-				let corrections = [];
-				this.contracts.forEach(contract => {
-					(contract.parcels || []).forEach(parcel => {
-						if (parcel.status === 'Paga' && parcel.paymentDate && parcel.paymentAmount === undefined) {
-							corrections.push({
-								type: 'Missing Payment Amount',
-								contractId: contract.id,
-								parcelNumber: parcel.number,
-								oldValue: 'undefined',
-								newValue: parcel.value,
-								description: `Parcela ${parcel.number} do contrato ${contract.description} paga, mas sem 'paymentAmount'. Definindo como 'value'.`
-							});
-							parcel.paymentAmount = parcel.value; // Define o valor pago como o valor da parcela
-						}
-					});
-				});
-				return corrections;
-			}
+			async handleContractSubmit(e) {
+				e.preventDefault();
+				Utils.showLoading();
+				const contractId = document.getElementById('contractId').value;
+				const clientId = document.getElementById('contractClient').value;
+				const totalValue = parseFloat(document.getElementById('contractValue').value);
+				const numParcels = parseInt(document.getElementById('contractParcels').value);
+				const dueDay = parseInt(document.getElementById('contractDueDay').value);
+				const firstParcelDate = document.getElementById('contractFirstParcel').value;
 
-			// Verifica se todos os contratos têm um cliente válido
-			checkInvalidClients() {
-				let invalidClientContracts = [];
-				this.contracts.forEach(contract => {
-					const clientExists = this.clients.some(c => c.id === contract.clientId);
-					if (!clientExists) {
-						invalidClientContracts.push({
-							contractId: contract.id,
-							contractDescription: contract.description,
-							clientId: contract.clientId,
-							description: `Contrato '${contract.description}' (${contract.id}) referencia um cliente inexistente (${contract.clientId}).`
+				let parcels = [];
+				if (!contractId) { // Apenas gera parcelas automáticas para novos contratos
+					parcels = this.generateParcels(numParcels, totalValue, firstParcelDate, dueDay);
+				}
+
+				// Adiciona parcelas manuais
+				document.querySelectorAll('#manualParcelsContainer .flex').forEach((parcelDiv, idx) => {
+					const value = parseFloat(parcelDiv.querySelector('.manual-parcel-value').value);
+					const dueDate = parcelDiv.querySelector('.manual-parcel-due-date').value;
+					if (value && dueDate) {
+						parcels.push({
+							number: parcels.length + 1,
+							value: value,
+							dueDate: dueDate,
+							status: 'Pendente',
+							paymentDate: null,
+							paymentAmount: null,
+							paymentMethod: null,
+							notes: null,
+							isManual: true
 						});
 					}
 				});
-				return invalidClientContracts;
+
+				const contractData = {
+					clientId: clientId,
+					description: document.getElementById('contractDescription').value,
+					value: totalValue,
+					startDate: document.getElementById('contractStartDate').value,
+					endDate: document.getElementById('contractEndDate').value || null,
+					status: document.getElementById('contractStatus').value,
+					parcels: parcels, // Inclui parcelas automáticas e manuais
+				};
+
+				try {
+					if (contractId) {
+						await this.firebaseService.updateDocument('contracts', contractId, contractData);
+						Utils.showNotification('Contrato atualizado com sucesso!', 'success');
+					} else {
+						await this.firebaseService.addDocument('contracts', contractData);
+						Utils.showNotification('Contrato criado com sucesso!', 'success');
+					}
+					Utils.closeModal();
+					document.getElementById('contractForm').reset();
+				} catch (error) {
+					Utils.showNotification('Erro ao salvar contrato: ' + error.message, 'error');
+					console.error("Contract save error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
 			}
 
-			// Aplica as correções e salva no Firestore
-			async applyCorrections(corrections) {
-				const batch = [];
-				const updatedContractIds = new Set();
+			async loadContracts(loadMore = false) {
+				Utils.showLoading();
+				try {
+					const advogadoFilter = document.getElementById('advogadoFilter')?.value || '';
+					const servicosAdvogadoFilter = document.getElementById('servicosAdvogadoFilter')?.value || '';
+					
+					let conditions = [];
+					if (advogadoFilter) {
+						// Isso exigiria que o contrato tivesse um campo 'advogadoId'
+						// Ou que os serviços do contrato fossem filtrados e depois os contratos
+						// Para simplificar, vamos assumir que o contrato pode ter um advogado principal
+						// Ou que o filtro será aplicado aos serviços e depois aos contratos
+						// Por enquanto, deixaremos essa parte mais complexa para uma implementação futura
+						// ou para ser filtrada no lado do cliente se a lista de contratos for pequena.
+						// Para fins de demonstração, vamos ignorar este filtro no Firebase query direto.
+					}
+					
+					const { docs, lastVisible } = await this.firebaseService.getDocuments(
+						'contracts', 
+						conditions, 
+						{ field: 'createdAt', direction: 'desc' }, 
+						CONTRACTS_PER_PAGE, 
+						loadMore ? lastVisibleContract : null
+					);
 
-				corrections.forEach(correction => {
-					if (correction.type === 'Missing Payment Amount') {
-						const contract = this.contracts.find(c => c.id === correction.contractId);
-						if (contract) {
-							const parcel = contract.parcels.find(p => p.number === correction.parcelNumber);
-							if (parcel) {
-								parcel.paymentAmount = correction.newValue;
-								updatedContractIds.add(contract.id);
-							}
+					if (loadMore) {
+						contracts = [...contracts, ...docs];
+					} else {
+						contracts = docs;
+					}
+					lastVisibleContract = lastVisible;
+					
+					this.domBuilder.renderContractsSection();
+					
+					// Esconde o botão "Carregar Mais" se não houver mais contratos
+					const loadMoreBtn = document.getElementById('loadMoreContractsBtn');
+					if (loadMoreBtn) {
+						if (!lastVisible) {
+							loadMoreBtn.classList.add('hidden');
+						} else {
+							loadMoreBtn.classList.remove('hidden');
 						}
 					}
-					// Adicionar outras lógicas de correção aqui
+
+				} catch (error) {
+					Utils.showNotification('Erro ao carregar contratos: ' + error.message, 'error');
+					console.error("Load contracts error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			editContract(contractId) {
+				const contract = contracts.find(c => c.id === contractId);
+				if (!contract) return;
+
+				document.getElementById('contractModalTitle').textContent = 'Editar Contrato';
+				document.getElementById('contractId').value = contract.id;
+				document.getElementById('contractClient').value = contract.clientId;
+				document.getElementById('contractDescription').value = contract.description;
+				document.getElementById('contractValue').value = contract.value;
+				document.getElementById('contractStartDate').value = contract.startDate;
+				document.getElementById('contractEndDate').value = contract.endDate || '';
+				document.getElementById('contractStatus').value = contract.status;
+				// Para edição, não preenchemos parcelas automáticas, apenas as manuais se existirem
+				document.getElementById('manualParcelsContainer').innerHTML = '';
+				(contract.parcels || []).filter(p => p.isManual).forEach(parcel => {
+					const container = document.getElementById('manualParcelsContainer');
+					const newParcelHtml = `
+						<div class="flex space-x-2 items-center bg-slate-800 p-2 rounded-lg">
+							<input type="number" value="${parcel.value}" class="manual-parcel-value flex-grow px-3 py-1 rounded-lg" step="0.01" min="0">
+							<input type="date" value="${parcel.dueDate}" class="manual-parcel-due-date px-3 py-1 rounded-lg">
+							<button type="button" onclick="this.parentNode.remove()" class="text-red-400 hover:text-red-300">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+					`;
+					container.insertAdjacentHTML('beforeend', newParcelHtml);
 				});
+				Utils.openModal('contractModal');
+			}
 
-				for (const contractId of updatedContractIds) {
-					const contract = this.contracts.find(c => c.id === contractId);
-					if (contract) {
-						batch.push(updateDoc(doc(db, 'contracts', contractId), {
-							parcels: contract.parcels,
-							updatedAt: new Date().toISOString()
-						}));
+			deleteContract(contractId) {
+				Utils.confirmAction('Tem certeza que deseja excluir este contrato? Ele será movido para a lixeira.', async () => {
+					Utils.showLoading();
+					try {
+						const contract = contracts.find(c => c.id === contractId);
+						if (contract) {
+							await this.firebaseService.addDocument('trash', {
+								type: 'contract',
+								originalId: contractId,
+								name: contract.description,
+								data: contract,
+								deletedAt: serverTimestamp()
+							});
+							await this.firebaseService.deleteDocument('contracts', contractId);
+							Utils.showNotification('Contrato movido para a lixeira!', 'info');
+						}
+					} catch (error) {
+						Utils.showNotification('Erro ao excluir contrato: ' + error.message, 'error');
+						console.error("Contract delete error:", error);
+					} finally {
+						Utils.hideLoading();
 					}
+				});
+			}
+
+			viewContractDetails(contractId) {
+				this.domBuilder.renderContractDetails(contractId);
+			}
+
+			updateContractSelects() {
+				const select = document.getElementById('serviceContract');
+				if (select) {
+					select.innerHTML = '<option value="">Selecione um contrato</option>';
+					contracts.forEach(contract => {
+						const client = clients.find(c => c.id === contract.clientId);
+						select.innerHTML += `<option value="${contract.id}">${contract.description} (${client ? client.name : 'N/A'})</option>`;
+					});
+				}
+			}
+
+			// 
+			// PAGAMENTOS
+			// 
+			openPaymentModal(contractId, parcelIndex) {
+				const contract = contracts.find(c => c.id === contractId);
+				if (!contract) return;
+
+				const parcel = contract.parcels[parcelIndex];
+				const client = clients.find(c => c.id === contract.clientId);
+
+				document.getElementById('paymentContractId').value = contractId;
+				document.getElementById('paymentParcelIndex').value = parcelIndex;
+				document.getElementById('paymentAmount').value = parcel.value.toFixed(2);
+				
+				// Define data atual como padrão
+				const today = new Date().toISOString().split('T')[0];
+				document.getElementById('paymentDate').value = today;
+
+				document.getElementById('paymentInfo').innerHTML = `
+					<h4 class="font-semibold text-white mb-2">Detalhes do Pagamento</h4>
+					<p class="text-slate-300"><strong>Cliente:</strong> ${client ? client.name : 'N/A'}</p>
+					<p class="text-slate-300"><strong>Contrato:</strong> ${contract.description}</p>
+					<p class="text-slate-300"><strong>Parcela:</strong> ${parcel.number} de ${contract.parcels.length}</p>
+					<p class="text-slate-300"><strong>Vencimento:</strong> ${Utils.formatDate(parcel.dueDate)}</p>
+					<p class="text-slate-300"><strong>Valor:</strong> ${Utils.formatCurrency(parcel.value)}</p>
+				`;
+
+				Utils.openModal('paymentModal');
+			}
+
+			async handlePaymentSubmit(e) {
+				e.preventDefault();
+				Utils.showLoading();
+
+				const contractId = document.getElementById('paymentContractId').value;
+				const parcelIndex = parseInt(document.getElementById('paymentParcelIndex').value);
+				const paymentDate = document.getElementById('paymentDate').value;
+				const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+				const paymentMethod = document.getElementById('paymentMethod').value;
+				const notes = document.getElementById('paymentNotes').value;
+
+				try {
+					const contract = contracts.find(c => c.id === contractId);
+					if (!contract) throw new Error('Contrato não encontrado');
+
+					// ⚠️ CORREÇÃO 1: Convert date to UTC maintaining correct day
+					const [year, month, day] = paymentDate.split('-');
+					const utcDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0));
+					
+					contract.parcels[parcelIndex].status = 'Paga';
+					contract.parcels[parcelIndex].paymentDate = utcDate.toISOString();
+					contract.parcels[parcelIndex].paymentAmount = paymentAmount;
+					contract.parcels[parcelIndex].paymentMethod = paymentMethod;
+					contract.parcels[parcelIndex].notes = notes;
+
+					await this.firebaseService.updateDocument('contracts', contractId, {
+						parcels: contract.parcels,
+					});
+
+					Utils.showNotification('Pagamento registrado com sucesso!', 'success');
+					Utils.closeModal();
+					document.getElementById('paymentForm').reset();
+				} catch (error) {
+					Utils.showNotification('Erro ao registrar pagamento: ' + error.message, 'error');
+					console.error("Payment submit error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			// 
+			// SERVIÇOS (KANBAN)
+			// 
+			openServiceModal() {
+				document.getElementById('serviceModalTitle').textContent = 'Novo Serviço';
+				document.getElementById('serviceForm').reset();
+				document.getElementById('serviceId').value = '';
+				document.getElementById('serviceStartDate').value = new Date().toISOString().split('T')[0];
+				document.getElementById('serviceEndDate').value = '';
+				this.updateContractSelects();
+				this.updateLawyerSelects();
+				Utils.openModal('serviceModal');
+			}
+
+			async handleServiceSubmit(e) {
+				e.preventDefault();
+				Utils.showLoading();
+				const serviceId = document.getElementById('serviceId').value;
+				const serviceData = {
+					contractId: document.getElementById('serviceContract').value,
+					description: document.getElementById('serviceDescription').value,
+					advogadoId: document.getElementById('serviceAdvogado').value || null,
+					startDate: document.getElementById('serviceStartDate').value || null,
+					endDate: document.getElementById('serviceEndDate').value || null,
+					status: document.getElementById('serviceStatus').value,
+				};
+
+				try {
+					if (serviceId) {
+						await this.firebaseService.updateDocument('services', serviceId, serviceData);
+						Utils.showNotification('Serviço atualizado com sucesso!', 'success');
+					} else {
+						await this.firebaseService.addDocument('services', serviceData);
+						Utils.showNotification('Serviço adicionado com sucesso!', 'success');
+					}
+					Utils.closeModal();
+					document.getElementById('serviceForm').reset();
+				} catch (error) {
+					Utils.showNotification('Erro ao salvar serviço: ' + error.message, 'error');
+					console.error("Service save error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			editService(serviceId) {
+				const service = services.find(s => s.id === serviceId);
+				if (!service) return;
+
+				document.getElementById('serviceModalTitle').textContent = 'Editar Serviço';
+				document.getElementById('serviceId').value = service.id;
+				document.getElementById('serviceContract').value = service.contractId;
+				document.getElementById('serviceDescription').value = service.description;
+				document.getElementById('serviceAdvogado').value = service.advogadoId || '';
+				document.getElementById('serviceStartDate').value = service.startDate || '';
+				document.getElementById('serviceEndDate').value = service.endDate || '';
+				document.getElementById('serviceStatus').value = service.status;
+				Utils.openModal('serviceModal');
+			}
+
+			deleteService(serviceId) {
+				Utils.confirmAction('Tem certeza que deseja excluir este serviço? Ele será movido para a lixeira.', async () => {
+					Utils.showLoading();
+					try {
+						const service = services.find(s => s.id === serviceId);
+						if (service) {
+							await this.firebaseService.addDocument('trash', {
+								type: 'service',
+								originalId: serviceId,
+								name: service.description,
+								data: service,
+								deletedAt: serverTimestamp()
+							});
+							await this.firebaseService.deleteDocument('services', serviceId);
+							Utils.showNotification('Serviço movido para a lixeira!', 'info');
+						}
+					} catch (error) {
+						Utils.showNotification('Erro ao excluir serviço: ' + error.message, 'error');
+						console.error("Service delete error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
+			}
+
+			viewOficinaService(serviceId) {
+				const service = services.find(s => s.id === serviceId);
+				if (!service) return;
+
+				const contract = contracts.find(c => c.id === service.contractId);
+				const client = contract ? clients.find(cl => cl.id === contract.clientId) : null;
+				const lawyer = lawyers.find(l => l.id === service.advogadoId);
+
+				document.getElementById('oficinaModal').dataset.serviceId = serviceId; // Armazena o ID para edição
+				document.getElementById('oficinaContent').innerHTML = `
+					<div class="bg-slate-700 p-4 rounded-lg mb-4">
+						<h4 class="font-semibold text-white mb-2">Informações do Serviço</h4>
+						<p class="text-slate-300"><strong>Descrição:</strong> ${service.description}</p>
+						<p class="text-slate-300"><strong>Status:</strong> ${Utils.getStatusBadge(service.status)}</p>
+						<p class="text-slate-300"><strong>Advogado:</strong> ${lawyer ? lawyer.name : 'N/A'}</p>
+						<p class="text-slate-300"><strong>Início:</strong> ${Utils.formatDate(service.startDate)}</p>
+						<p class="text-slate-300"><strong>Previsão:</strong> ${Utils.formatDate(service.endDate)}</p>
+					</div>
+					<div class="bg-slate-700 p-4 rounded-lg">
+						<h4 class="font-semibold text-white mb-2">Contrato Associado</h4>
+						<p class="text-slate-300"><strong>Contrato:</strong> ${contract ? contract.description : 'N/A'}</p>
+						<p class="text-slate-300"><strong>Cliente:</strong> ${client ? client.name : 'N/A'}</p>
+						${contract ? `<button onclick="app.viewContractDetails('${contract.id}')" class="mt-3 btn-primary px-4 py-2 rounded-lg text-white text-sm">
+							Ver Detalhes do Contrato
+						</button>` : ''}
+					</div>
+				`;
+				Utils.openModal('oficinaModal');
+			}
+
+			handleServiceDragStart(event, serviceId) {
+				event.dataTransfer.setData('text/plain', serviceId);
+				event.currentTarget.classList.add('dragging');
+			}
+
+			async handleServiceDrop(event) {
+				event.preventDefault();
+				const serviceId = event.dataTransfer.getData('text/plain');
+				const newStatus = event.currentTarget.dataset.status;
+				const draggedCard = document.querySelector('.kanban-card.dragging');
+				if (draggedCard) {
+					draggedCard.classList.remove('dragging');
 				}
 
-				if (batch.length > 0) {
-					await Promise.all(batch); // Executa todas as atualizações em paralelo
-					showNotification(`${batch.length} contratos atualizados com sucesso!`, 'success');
-					await loadContracts(); // Recarrega os contratos após a correção
-				} else {
-					showNotification('Nenhuma correção aplicada.', 'info');
+				if (!serviceId || !newStatus) return;
+
+				Utils.showLoading();
+				try {
+					await this.firebaseService.updateDocument('services', serviceId, { status: newStatus });
+					Utils.showNotification(`Serviço movido para "${newStatus}"!`, 'success');
+				} catch (error) {
+					Utils.showNotification('Erro ao mover serviço: ' + error.message, 'error');
+					console.error("Service drag/drop error:", error);
+				} finally {
+					Utils.hideLoading();
 				}
+			}
+
+			updateLawyerSelects() {
+				const selectServiceAdvogado = document.getElementById('serviceAdvogado');
+				const selectAdvogadoFilter = document.getElementById('advogadoFilter');
+				const selectServiceAdvogadoFilter = document.getElementById('serviceAdvogadoFilter');
+
+				[selectServiceAdvogado, selectAdvogadoFilter, selectServiceAdvogadoFilter].forEach(select => {
+					if (select) {
+						const currentSelected = select.value;
+						select.innerHTML = '<option value="">Selecione um advogado</option>';
+						lawyers.forEach(lawyer => {
+							select.innerHTML += `<option value="${lawyer.id}" ${lawyer.id === currentSelected ? 'selected' : ''}>${lawyer.name}</option>`;
+						});
+					}
+				});
+			}
+
+			updateServiceTypeSelects() {
+				const selectServicosAdvogadoFilter = document.getElementById('servicosAdvogadoFilter');
+				if (selectServicosAdvogadoFilter) {
+					const currentSelected = selectServicosAdvogadoFilter.value;
+					selectServicosAdvogadoFilter.innerHTML = '<option value="">Todos Serviços</option>';
+					this.serviceTypes.forEach(type => {
+						selectServicosAdvogadoFilter.innerHTML += `<option value="${type}" ${type === currentSelected ? 'selected' : ''}>${type}</option>`;
+					});
+				}
+			}
+
+			// 
+			// RELATÓRIOS
+			// 
+			generateAndShowReport() {
+				const month = parseInt(document.getElementById('reportMonth').value);
+				const year = parseInt(document.getElementById('reportYear').value);
+				
+				const reportContent = this.reportHandler.generateMonthlyReport(month, year);
+				document.getElementById('reportContent').innerHTML = reportContent;
+				
+				Utils.openModal('reportModal');
+			}
+
+			// 
+			// LIXEIRA
+			// 
+			async restoreItem(itemId) {
+				Utils.confirmAction('Tem certeza que deseja restaurar este item?', async () => {
+					Utils.showLoading();
+					try {
+						const item = trashItems.find(t => t.id === itemId);
+						if (item) {
+							await this.firebaseService.addDocument(item.type + 's', item.data); // Adiciona de volta à coleção original
+							await this.firebaseService.deleteDocument('trash', itemId);
+							Utils.showNotification('Item restaurado com sucesso!', 'success');
+						}
+					} catch (error) {
+						Utils.showNotification('Erro ao restaurar item: ' + error.message, 'error');
+						console.error("Restore item error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
+			}
+
+			async permanentlyDeleteItem(itemId) {
+				Utils.confirmAction('ATENÇÃO: Esta ação é irreversível. Tem certeza que deseja remover permanentemente este item?', async () => {
+					Utils.showLoading();
+					try {
+						await this.firebaseService.deleteDocument('trash', itemId);
+						Utils.showNotification('Item removido permanentemente!', 'success');
+					} catch (error) {
+						Utils.showNotification('Erro ao remover item permanentemente: ' + error.message, 'error');
+						console.error("Permanent delete item error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
+			}
+
+			// 
+			// CONFIGURAÇÕES
+			// 
+			async addAdvogado() {
+				const newAdvogadoName = document.getElementById('newAdvogadoName').value.trim();
+				if (!newAdvogadoName) {
+					Utils.showNotification('O nome do advogado não pode ser vazio.', 'warning');
+					return;
+				}
+				Utils.showLoading();
+				try {
+					await this.firebaseService.addDocument('lawyers', { name: newAdvogadoName });
+					document.getElementById('newAdvogadoName').value = '';
+					Utils.showNotification('Advogado adicionado com sucesso!', 'success');
+				} catch (error) {
+					Utils.showNotification('Erro ao adicionar advogado: ' + error.message, 'error');
+					console.error("Add lawyer error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			removeAdvogado(lawyerId) {
+				Utils.confirmAction('Tem certeza que deseja remover este advogado?', async () => {
+					Utils.showLoading();
+					try {
+						await this.firebaseService.deleteDocument('lawyers', lawyerId);
+						Utils.showNotification('Advogado removido com sucesso!', 'success');
+					} catch (error) {
+						Utils.showNotification('Erro ao remover advogado: ' + error.message, 'error');
+						console.error("Remove lawyer error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
+			}
+
+			async addServiceType() {
+				const newServiceType = document.getElementById('newServiceType').value.trim();
+				if (!newServiceType) {
+					Utils.showNotification('O tipo de serviço não pode ser vazio.', 'warning');
+					return;
+				}
+				if (this.serviceTypes.includes(newServiceType)) {
+					Utils.showNotification('Este tipo de serviço já existe.', 'warning');
+					return;
+				}
+				Utils.showLoading();
+				try {
+					const updatedServiceTypes = [...this.serviceTypes, newServiceType];
+					await this.firebaseService.updateDocument('settings', 'general', { serviceTypes: updatedServiceTypes });
+					document.getElementById('newServiceType').value = '';
+					Utils.showNotification('Tipo de serviço adicionado com sucesso!', 'success');
+				} catch (error) {
+					Utils.showNotification('Erro ao adicionar tipo de serviço: ' + error.message, 'error');
+					console.error("Add service type error:", error);
+				} finally {
+					Utils.hideLoading();
+				}
+			}
+
+			removeServiceType(typeToRemove) {
+				Utils.confirmAction('Tem certeza que deseja remover este tipo de serviço?', async () => {
+					Utils.showLoading();
+					try {
+						const updatedServiceTypes = this.serviceTypes.filter(type => type !== typeToRemove);
+						await this.firebaseService.updateDocument('settings', 'general', { serviceTypes: updatedServiceTypes });
+						Utils.showNotification('Tipo de serviço removido com sucesso!', 'success');
+					} catch (error) {
+						Utils.showNotification('Erro ao remover tipo de serviço: ' + error.message, 'error');
+						console.error("Remove service type error:", error);
+					} finally {
+						Utils.hideLoading();
+					}
+				});
 			}
 		}
 
-		window.openWorkshopModal = async () => {
-			const workshopContent = document.getElementById('workshopContent');
-			workshopContent.innerHTML = `
-				<div class="loading-spinner mx-auto"></div>
-				<p class="text-center text-slate-400 mt-4">Verificando inconsistências...</p>
-			`;
-			openModal('workshopModal');
-
-			const correctionCalculator = new CorrectionCalculator(contracts, clients);
-			const missingPaymentAmounts = correctionCalculator.checkAndFixPaymentAmounts();
-			const invalidClientContracts = correctionCalculator.checkInvalidClients();
-
-			let html = `
-				<h4 class="text-xl font-semibold text-white mb-4">Resultados da Verificação</h4>
-			`;
-
-			if (missingPaymentAmounts.length > 0) {
-				html += `
-					<div class="bg-yellow-900/20 border border-yellow-600 p-4 rounded-lg mb-4">
-						<p class="text-yellow-400 font-semibold mb-2">
-							<i class="fas fa-exclamation-circle mr-2"></i>
-							${missingPaymentAmounts.length} Parcelas com 'paymentAmount' ausente:
-						</p>
-						<ul class="list-disc list-inside text-slate-300 space-y-1">
-							${missingPaymentAmounts.map(c => `<li>${c.description}</li>`).join('')}
-						</ul>
-						<button id="applyPaymentAmountFix" class="mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">
-							Aplicar Correção (Payment Amount)
-						</button>
-					</div>
-				`;
-			} else {
-				html += `
-					<div class="bg-green-900/20 border border-green-600 p-4 rounded-lg mb-4">
-						<p class="text-green-400 font-semibold">
-							<i class="fas fa-check-circle mr-2"></i>
-							Nenhuma parcela com 'paymentAmount' ausente encontrada.
-						</p>
-					</div>
-				`;
-			}
-
-			if (invalidClientContracts.length > 0) {
-				html += `
-					<div class="bg-red-900/20 border border-red-600 p-4 rounded-lg mb-4">
-						<p class="text-red-400 font-semibold mb-2">
-							<i class="fas fa-times-circle mr-2"></i>
-							${invalidClientContracts.length} Contratos com cliente inválido:
-						</p>
-						<ul class="list-disc list-inside text-slate-300 space-y-1">
-							${invalidClientContracts.map(c => `<li>${c.description}</li>`).join('')}
-						</ul>
-						<p class="text-sm text-slate-400 mt-2">
-							<strong>Atenção:</strong> Contratos com clientes inválidos podem precisar de correção manual ou exclusão.
-						</p>
-					</div>
-				`;
-			} else {
-				html += `
-					<div class="bg-green-900/20 border border-green-600 p-4 rounded-lg mb-4">
-						<p class="text-green-400 font-semibold">
-							<i class="fas fa-check-circle mr-2"></i>
-							Nenhum contrato com cliente inválido encontrado.
-						</p>
-					</div>
-				`;
-			}
-
-			if (missingPaymentAmounts.length === 0 && invalidClientContracts.length === 0) {
-				html += `
-					<div class="bg-blue-900/20 border border-blue-600 p-4 rounded-lg">
-						<p class="text-blue-400 font-semibold">
-							<i class="fas fa-info-circle mr-2"></i>
-							Nenhuma inconsistência crítica encontrada no momento.
-						</p>
-					</div>
-				`;
-			}
-
-			workshopContent.innerHTML = html;
-
-			if (missingPaymentAmounts.length > 0) {
-				document.getElementById('applyPaymentAmountFix').addEventListener('click', async () => {
-					await correctionCalculator.applyCorrections(missingPaymentAmounts);
-					closeModal();
-					showNotification('Correções de "paymentAmount" aplicadas!', 'success');
-					renderSection(currentSection); // Recarrega a seção atual
-				});
-			}
-		};
-
 		// 
-		// LIXEIRA (Exemplo de funcionalidade avançada)
+		// INITIALIZATION
 		// 
+		const authService = new AuthService(auth);
+		const firebaseService = new FirebaseService(db);
+		const reportHandler = new ReportHandler();
+		const analyticsHandler = new AnalyticsHandler();
+		const correctionCalculator = new CorrectionCalculator();
+		const domBuilder = new DOMBuilder(); // Passa a instância do app depois
+		const app = new App(authService, firebaseService, domBuilder, reportHandler, analyticsHandler, correctionCalculator);
+		domBuilder.app = app; // Injeta a instância do app no domBuilder
 
-		window.openTrashModal = async () => {
-			const trashContent = document.getElementById('trashContent');
-			trashContent.innerHTML = `
-				<div class="loading-spinner mx-auto"></div>
-				<p class="text-center text-slate-400 mt-4">Carregando itens excluídos...</p>
-			`;
-			openModal('trashModal');
+		// Expor funções globalmente para onclick no HTML
+		window.app = app;
 
-			try {
-				const q = query(collection(db, 'trash'), orderBy('deletedAt', 'desc'));
-				const querySnapshot = await getDocs(q);
-				const trashItems = [];
-				querySnapshot.forEach((doc) => {
-					trashItems.push({ id: doc.id, ...doc.data() });
-				});
-
-				let html = `
-					<h4 class="text-xl font-semibold text-white mb-4">Itens Excluídos Recentemente</h4>
-				`;
-
-				if (trashItems.length === 0) {
-					html += `
-						<div class="bg-blue-900/20 border border-blue-600 p-4 rounded-lg">
-							<p class="text-blue-400 font-semibold text-center">
-								<i class="fas fa-box-open mr-2"></i>
-								A lixeira está vazia.
-							</p>
-						</div>
-					`;
-				} else {
-					html += `
-						<div class="overflow-x-auto">
-							<table class="w-full">
-								<thead class="table-header">
-									<tr>
-										<th class="px-4 py-3 text-left text-white">Tipo</th>
-										<th class="px-4 py-3 text-left text-white">Nome/Descrição</th>
-										<th class="px-4 py-3 text-center text-white">Excluído em</th>
-										<th class="px-4 py-3 text-center text-white">Ações</th>
-									</tr>
-								</thead>
-								<tbody>
-					`;
-					trashItems.forEach(item => {
-						html += `
-							<tr class="table-row">
-								<td class="px-4 py-3 text-slate-300">${item.type}</td>
-								<td class="px-4 py-3 text-slate-200 font-medium">${item.name || item.description || 'N/A'}</td>
-								<td class="px-4 py-3 text-center text-slate-300">${formatDate(item.deletedAt)}</td>
-								<td class="px-4 py-3 text-center">
-									<button onclick="window.restoreItem('${item.id}')" class="btn-action text-green-400 hover:text-green-300 mx-1" title="Restaurar">
-										<i class="fas fa-undo"></i>
-									</button>
-									<button onclick="window.permanentlyDeleteItem('${item.id}')" class="btn-action text-red-400 hover:text-red-300 mx-1" title="Excluir Permanentemente">
-										<i class="fas fa-times"></i>
-									</button>
-								</td>
-							</tr>
-						`;
-					});
-					html += `
-								</tbody>
-							</table>
-						</div>
-					`;
-				}
-				trashContent.innerHTML = html;
-			} catch (error) {
-				showNotification('Erro ao carregar lixeira: ' + error.message, 'error');
-				closeModal();
+		// Auth State Change Listener
+		authService.onAuthStateChanged(async (user) => {
+			if (user) {
+				currentUser = user;
+				isAdmin = ADMIN_USERS.includes(user.email);
+				document.getElementById('userEmail').textContent = user.email;
+				Utils.hideAuthOverlay();
+				Utils.hideLoading();
+				app.renderSection(currentSection); // Renderiza a seção atual após login
+			} else {
+				currentUser = null;
+				isAdmin = false;
+				Utils.showAuthOverlay();
+				Utils.hideLoading();
 			}
-		};
+		});
 
-		window.restoreItem = async (itemId) => {
-			if (!confirm('Tem certeza que deseja restaurar este item?')) return;
-
-			try {
-				const itemDoc = await getDoc(doc(db, 'trash', itemId));
-				if (!itemDoc.exists()) throw new Error('Item na lixeira não encontrado.');
-				const itemData = itemDoc.data();
-
-				if (itemData.type === 'client') {
-					await addDoc(collection(db, 'clients'), { ...itemData, deletedAt: deleteField() });
-					await deleteDoc(doc(db, 'trash', itemId));
-					showNotification('Cliente restaurado com sucesso!', 'success');
-					await loadClients();
-				} else if (itemData.type === 'contract') {
-					await addDoc(collection(db, 'contracts'), { ...itemData, deletedAt: deleteField() });
-					await deleteDoc(doc(db, 'trash', itemId));
-					showNotification('Contrato restaurado com sucesso!', 'success');
-					await loadContracts();
-				} else {
-					throw new Error('Tipo de item desconhecido para restauração.');
-				}
-				
-				closeModal();
-				window.openTrashModal(); // Recarrega a lixeira
-				renderSection(currentSection); // Recarrega a seção atual
-			} catch (error) {
-				showNotification('Erro ao restaurar item: ' + error.message, 'error');
-			}
-		};
-
-		window.permanentlyDeleteItem = async (itemId) => {
-			if (!confirm('ATENÇÃO: Tem certeza que deseja EXCLUIR PERMANENTEMENTE este item? Esta ação não pode ser desfeita.')) return;
-
-			try {
-				await deleteDoc(doc(db, 'trash', itemId));
-				showNotification('Item excluído permanentemente!', 'success');
-				closeModal();
-				window.openTrashModal(); // Recarrega a lixeira
-			} catch (error) {
-				showNotification('Erro ao excluir permanentemente: ' + error.message, 'error');
-			}
-		};
-
-
-		// Expor funções globalmente
-		window.openClientModal = () => {
-			document.getElementById('clientModalTitle').textContent = 'Novo Cliente';
-			document.getElementById('clientForm').reset();
-			document.getElementById('clientId').value = '';
-			openModal('clientModal');
-		};
-
-		window.editClient = editClient;
-		window.deleteClient = deleteClient;
-
-		window.openContractModal = () => {
-			document.getElementById('contractModalTitle').textContent = 'Novo Contrato';
-			document.getElementById('contractForm').reset();
-			document.getElementById('contractId').value = '';
-			const today = new Date().toISOString().split('T')[0];
-			document.getElementById('contractStartDate').value = today;
-			document.getElementById('contractFirstParcel').value = today;
-			openModal('contractModal');
-		};
-
-		window.editContract = editContract;
-		window.deleteContract = deleteContract;
-		window.viewContractDetails = viewContractDetails;
-
-		window.generateAndShowReport = generateAndShowReport;
-
+		// Initial Load
+		document.addEventListener('DOMContentLoaded', () => {
+			Utils.showLoading();
+			// O estado de autenticação será verificado pelo onAuthStateChanged
+			// que então chamará app.renderSection()
+		});
 	</script>
 </body>
 </html>
