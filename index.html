@@ -1824,8 +1824,6 @@
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
 				// ⚠️ CORREÇÃO 2: DETECTAR INADIMPLENTES
-const defaulters = []; // Array para clientes inadimplentes
-
 // ⚠️ CORREÇÃO 2 CORRIGIDA: DETECTAR INADIMPLENTES
 const defaulters = []; // Array para clientes inadimplentes
 
@@ -1850,6 +1848,7 @@ allContracts.forEach(contract => {
                     daysOverdue: daysOverdue,
                     status: 'Vencida e não paga'
                 });
+            }
         }
     });
 });
