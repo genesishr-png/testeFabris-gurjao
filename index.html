@@ -1823,8 +1823,32 @@
 				
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
-				
-				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
+				// ⚠️ CORREÇÃO 2: DETECTAR INADIMPLENTES
+const defaulters = []; // Array para clientes inadimplentes
+
+allContracts.forEach(contract => {
+    (contract.parcels || []).forEach(parcel => {
+        // Se a parcela NÃO foi paga e está vencida no período do relatório
+        if (parcel.status !== 'Paga') {
+            const dueDate = new Date(parcel.dueDate);
+            if (dueDate >= startDate && dueDate <= endDate) {
+                const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
+                defaulters.push({
+                    clientName: contract.clientName,
+                    clientPhone: contract.clientPhone || 'N/A',
+                    contractDescription: (contract.serviceTypes || []).map(s => s.name).join(', ') || 'Contrato',
+                    parcelNumber: parcel.number,
+                    totalParcels: contract.parcels.length,
+                    value: parcel.value,
+                    dueDate: parcel.dueDate,
+                    daysOverdue: daysOverdue > 0 ? daysOverdue : 0,
+                    status: daysOverdue > 0 ? 'Vencida' : 'A vencer'
+                });
+            }
+        }
+    });
+});
+				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth, defaulters };
 			}
 			// [FIM DA ALTERAÇÃO]
 			
@@ -4095,6 +4119,30 @@
 						detailsHtml += `<li class="flex justify-between items-center bg-gray-700/50 p-3 rounded-md"><div><p class="font-semibold text-white">${p.clientName}</p><p class="text-xs text-gray-400">${p.type} - ${Utils.formatDate(p.date)}</p></div><span class="font-semibold text-green-400 text-lg">${Utils.formatCurrency(p.value)}</span></li>`;
 					});
 					detailsHtml += '</ul>';
+					// ⚠️ SEÇÃO DE INADIMPLENTES
+let defaultersHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Clientes Inadimplentes</h4>';
+
+if (income.defaulters && income.defaulters.length > 0) {
+    defaultersHtml += '<div class="bg-red-900/20 border-l-4 border-red-600 p-4 rounded-lg mt-4"><ul class="space-y-2 text-sm">';
+    income.defaulters.forEach(d => {
+        defaultersHtml += `<li class="flex justify-between items-center bg-red-900/30 p-3 rounded-md">
+            <div>
+                <p class="font-semibold text-white">${d.clientName}</p>
+                <p class="text-xs text-gray-400">${d.contractDescription} - Parcela ${d.parcelNumber}/${d.totalParcels}</p>
+                <p class="text-xs text-gray-400">Vencimento: ${Utils.formatDate(d.dueDate)}</p>
+            </div>
+            <div class="text-right">
+                <span class="font-semibold text-red-400 text-lg">${Utils.formatCurrency(d.value)}</span>
+                <p class="text-xs text-red-300 font-bold">${d.daysOverdue} dias</p>
+            </div>
+        </li>`;
+    });
+    defaultersHtml += '</ul></div>';
+} else {
+    defaultersHtml += '<p class="text-sm text-gray-400 mt-2 bg-green-900/20 p-3 rounded-lg">✅ Nenhum cliente inadimplente neste período!</p>';
+}
+
+detailsHtml += defaultersHtml;
 				} else {
 					detailsHtml += '<p class="text-sm text-gray-400 mt-2">Nenhum recebimento neste período.</p>';
 				}
