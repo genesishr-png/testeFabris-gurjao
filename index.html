@@ -12,400 +12,373 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 	<style>
 		/* --- ESTILOS GERAIS --- */
-		body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; overflow: hidden; }
-		body::after { content: ''; position: fixed; z-index: -2; top: 0; left: 0; right: 0; bottom: 0; background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center; opacity: 0.15; }
+		body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #d1d5db; overflow: hidden; }
+		body::after { content: ''; position: fixed; z-index: -2; top: 0; left: 0; right: 0; bottom: 0; background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center; opacity: 0.12; }
 		
-		/* Scrollbars */
-		::-webkit-scrollbar { width: 8px; height: 8px; }
-		::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-		::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-		
-		/* Cards & UI */
-		.dark-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
-		.dark-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); }
-		
-		/* MODAIS (CORRIGIDO: Removido display:flex duplicado que causava o erro) */
-		.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; backdrop-filter: blur(3px); }
+		/* MODAIS - CORREÇÃO CRÍTICA */
+		.modal-backdrop { display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); z-index: 9000; backdrop-filter: blur(2px); }
+		/* Importante: O modal começa display: none. O JS muda para display: flex */
 		.modal { 
-			display: none; /* PADRÃO: Oculto */
+			display: none; 
 			position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; 
 			max-height: 90vh; width: 90%; max-width: 800px; 
-			background-color: #1f2937; border: 1px solid #4b5563; border-radius: 0.75rem; 
-			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-			flex-direction: column; /* Prepara para quando o JS ativar o flex */
+			background-color: #1f2937; border: 1px solid #374151; border-radius: 0.5rem; 
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+			flex-direction: column; /* Prepara o layout para quando estiver visível */
 		}
-		.modal-header { flex-shrink: 0; padding: 1rem 1.5rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); }
+		.modal-header { flex-shrink: 0; padding: 1.25rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); }
 		.modal-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
 		.modal-footer { flex-shrink: 0; padding: 1rem 1.5rem; border-top: 1px solid #374151; background: rgba(31, 41, 55, 0.95); display: flex; justify-content: flex-end; gap: 0.5rem; }
 
-		/* Inputs */
-		input, select, textarea, .form-input {
-			width: 100%; background-color: #374151; border: 1px solid #4b5563; color: #ffffff;
-			padding: 0.6rem 0.75rem; border-radius: 0.5rem; outline: none; transition: all 0.2s; color-scheme: dark;
+		/* Scrollbars */
+		::-webkit-scrollbar { width: 8px; }
+		::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+		::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+		/* UI Components */
+		.dark-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); transition: transform 0.2s; }
+		.dark-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+		
+		/* Inputs (Estilo Geral do Sistema) */
+		.form-input, select, textarea, input[type="text"], input[type="number"], input[type="date"] {
+			width: 100%; background-color: #1f2937; border: 1px solid #4b5563; color: #9ca3af;
+			padding: 8px 12px; border-radius: 6px; font-size: 14px; transition: all 0.2s; outline: none; color-scheme: dark;
 		}
-		input:focus, select:focus, textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-		input:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; background-color: #1f2937; }
-		label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: #9ca3af; font-weight: 500; }
+		.form-input:focus, select:focus, textarea:focus, input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+		.form-input:disabled { opacity: 0.7; cursor: not-allowed; }
+
+		/* Inputs ESPECÍFICOS do Login (Restaurados para o original) */
+		#login-form input {
+			background-color: rgba(255, 255, 255, 0.1); 
+			border: 1px solid rgba(255, 255, 255, 0.2); 
+			color: white; 
+			padding: 0.75rem 1rem 0.75rem 2.5rem; /* Padding esquerdo maior para ícone */
+		}
+		#login-form input:focus { ring: 2px solid #3b82f6; border-color: transparent; }
+		#login-form label { color: #f3f4f6; margin-bottom: 0.5rem; display: block; font-size: 0.875rem; font-weight: 500; }
 
 		/* Navegação */
-		.sidebar-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #d1d5db; cursor: pointer; transition: all 0.2s; }
-		.sidebar-nav-item:hover, .sidebar-nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+		.sidebar-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #d1d5db; transition: all 0.2s; cursor: pointer; }
+		.sidebar-nav-item:hover { background-color: #4338ca; color: white; }
+		.sidebar-nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.5); }
 		
 		/* Kanban & Listas */
-		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 4px; }
-		.service-tag { display: inline-flex; align-items: center; background: #4b5563; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; margin: 0 4px 4px 0; border: 1px solid #6b7280; color: white; }
-		
-		/* Botões */
-		.btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; }
-		.btn-primary { background: #4f46e5; color: white; } .btn-primary:hover { background: #4338ca; }
-		.btn-secondary { background: #4b5563; color: white; } .btn-secondary:hover { background: #374151; }
-		.btn-danger { background: #dc2626; color: white; } .btn-danger:hover { background: #b91c1c; }
-		.btn-success { background: #16a34a; color: white; } .btn-success:hover { background: #15803d; }
+		.kanban-column { min-width: 320px; }
+		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 8px; }
+		.service-tag { display: inline-flex; justify-content: space-between; align-items: center; background-color: #374151; color: #d1d5db; padding: 4px 10px; border-radius: 12px; font-size: 14px; margin-right: 4px; margin-bottom: 4px; }
+		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
 
-		.sort-button { background: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
-		.sort-button.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+		/* Botões Gerais */
+		.btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+		.btn-primary { background: linear-gradient(to right, #4f46e5, #4338ca); color: white; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3); }
+		.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+		.btn-secondary { background-color: #4b5563; color: white; } .btn-secondary:hover { background-color: #374151; }
+		.btn-danger { background: linear-gradient(to right, #dc2626, #b91c1c); color: white; }
+		.btn-success { background: linear-gradient(to right, #16a34a, #15803d); color: white; }
 
-		/* Filtro Global */
+		/* Botão de Filtro Estilizado (Glassmorphism) */
 		.pretty-select-wrapper { position: relative; }
-		.pretty-select { appearance: none; background: rgba(31, 41, 55, 0.8); border: 1px solid #6366f1; color: #e0e7ff; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 999px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); }
-		.pretty-select:hover { background: rgba(55, 65, 81, 0.9); }
+		.pretty-select { appearance: none; background: rgba(31, 41, 55, 0.6); border: 1px solid #6366f1; color: #e0e7ff; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 9999px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.2s; }
+		.pretty-select:hover { background: rgba(55, 65, 81, 0.8); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
 		.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #818cf8; }
 
 		/* Checkboxes Centralizados */
-		.checkbox-group-centered {
-			display: flex; justify-content: center; align-items: center; gap: 2rem;
-			background-color: rgba(31, 41, 55, 0.5); padding: 1rem; border-radius: 0.75rem; border: 1px solid #4b5563; margin-bottom: 1.5rem;
-		}
+		.checkbox-group-centered { display: flex; justify-content: center; align-items: center; gap: 2rem; background-color: rgba(31, 41, 55, 0.5); padding: 1rem; border-radius: 0.75rem; border: 1px solid #4b5563; margin-bottom: 1.5rem; }
 		.checkbox-item-custom { display: flex; align-items: center; cursor: pointer; user-select: none; }
 		.checkbox-item-custom input { width: 1.2rem; height: 1.2rem; margin-right: 0.5rem; cursor: pointer; accent-color: #4f46e5; }
 		.checkbox-item-custom label { margin-bottom: 0; cursor: pointer; color: #e2e8f0; font-size: 0.95rem; }
 
 		/* Lista da Oficina Geométrica */
-		.setting-list-item { 
-			display: flex; justify-content: space-between; align-items: center; 
-			background-color: #1f2937; border: 1px solid #374151; padding: 0.75rem 1rem; 
-			border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.2s ease-in-out;
-		}
+		.setting-list-item { display: flex; justify-content: space-between; align-items: center; background-color: #1f2937; border: 1px solid #374151; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.2s; }
 		.setting-list-item:hover { border-color: #6366f1; background-color: #252f3e; transform: translateX(2px); }
 		.setting-list-item span { font-weight: 500; color: #f3f4f6; font-size: 0.9rem; }
-		.setting-list-remove-btn { 
-			background: rgba(220, 38, 38, 0.15); color: #f87171; width: 32px; height: 32px; border-radius: 6px; 
-			display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid rgba(220, 38, 38, 0.2); cursor: pointer;
-		}
+		.setting-list-remove-btn { background: rgba(220, 38, 38, 0.15); color: #f87171; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid rgba(220, 38, 38, 0.2); cursor: pointer; }
 		.setting-list-remove-btn:hover { background: #dc2626; color: white; border-color: #dc2626; }
 
-		/* Ranking Tables */
-		.ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; margin-top: 10px; }
+		/* Parcel Cards e Rankings */
+		.parcel-card-vencida { border-left-color: #ef4444; } .parcel-card-vencida .parcel-value { color: #f87171; }
+		.parcel-card-avencer { border-left-color: #f59e0b; } .parcel-card-avencer .parcel-value { color: #fbbf24; }
+		.ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; }
 		.ranking-table th { text-align: left; padding: 0 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
-		.ranking-table td { background: #2d3748; padding: 0.75rem 1rem; vertical-align: middle; border-top: 1px solid #374151; border-bottom: 1px solid #374151; }
+		.ranking-table td { background: #2d3748; padding: 0.75rem 1rem; border-top: 1px solid #374151; border-bottom: 1px solid #374151; }
 		.ranking-table tr td:first-child { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; border-left: 1px solid #374151; font-weight: bold; width: 40px; text-align: center; }
-		.ranking-table tr td:last-child { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-right: 1px solid #374151; text-align: right; font-family: monospace; }
-		.ranking-table .rank-1 { color: #fbbf24; } .ranking-table .rank-2 { color: #e5e7eb; } .ranking-table .rank-3 { color: #d97706; }
+		.ranking-table tr td:last-child { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-right: 1px solid #374151; text-align: right; }
+		.rank-1 { color: #34d399; } .rank-2 { color: #60a5fa; } .rank-3 { color: #f59e0b; }
 
 		/* Utils */
-		#loading-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.95); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.25rem; }
+		#loading-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.2rem; transition: opacity 0.3s; }
 		#app-container, .admin-only { display: none; }
 		body.is-admin .admin-only:not(.hidden) { display: block; }
 		body.is-admin .flex.admin-only:not(.hidden) { display: flex; }
 		.notification-item { background: #374151; padding: 12px; border-radius: 8px; border-left: 4px solid #4f46e5; margin-bottom: 8px; cursor: pointer; }
-		.notification-item.is-read { background: #1f2937; border-left-color: #4b5563; opacity: 0.6; }
+		.notification-item.is-read { background: #1f2937; border-left-color: #4b5563; opacity: 0.8; }
+		.sort-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+		.sort-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
+		
 		@keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } }
 		.animate-blob { animation: blob 7s infinite; }
 	</style>
 </head>
 <body>
 	<div id="notifications"></div>
-	<div id="loading-overlay"><i class="fas fa-spinner fa-spin mr-3"></i> A carregar sistema...</div>
+	<div id="loading-overlay"><i class="fas fa-spinner fa-spin mr-3"></i> A carregar...</div>
 
-	<!-- LOGIN -->
-	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden px-4">
-		<div class="absolute inset-0 opacity-10 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
-		<div class="absolute w-96 h-96 bg-blue-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob top-0 left-1/4"></div>
-		<div class="absolute w-96 h-96 bg-indigo-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000 bottom-0 right-1/4"></div>
-		<div class="relative z-10 w-full max-w-md bg-gray-800/80 backdrop-blur-xl border border-gray-700 p-8 rounded-2xl shadow-2xl">
-			<div class="text-center mb-8"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-20 mx-auto mb-4 drop-shadow-lg"><h1 class="text-2xl font-bold text-white">Acesso Restrito</h1></div>
-			<form id="login-form" class="space-y-4">
-				<div><label>Email</label><input type="email" id="login-email" class="w-full" required></div>
-				<div><label>Senha</label><input type="password" id="login-password" class="w-full" required></div>
-				<div id="auth-error" class="hidden text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-900/50"></div>
-				<button type="submit" id="login-submit-button" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition">Entrar</button>
-			</form>
+	<!-- LOGIN ORIGINAL RESTAURADO -->
+	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
+		<div class="absolute inset-0 opacity-5"><div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div></div>
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
+		<div class="relative z-10 w-full max-w-md">
+			<div class="mb-8 text-center">
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-24 mx-auto mb-6 drop-shadow-lg">
+				<h1 class="text-3xl font-bold text-white mb-2">Sistema Financeiro</h1>
+				<p class="text-gray-300 text-sm">Gestão profissional para advocacia</p>
+			</div>
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<form id="login-form" class="space-y-5">
+					<div>
+						<label for="login-email">Email</label>
+						<div class="relative">
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email" id="login-email" placeholder="seu@email.com" required>
+						</div>
+					</div>
+					<div>
+						<label for="login-password">Senha</label>
+						<div class="relative">
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password" id="login-password" placeholder="••••••••" required>
+						</div>
+					</div>
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm"></div>
+					<button type="submit" id="login-submit-button" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+					</button>
+				</form>
+				<div class="mt-6 text-center text-gray-400 text-xs"><p>Acesso restrito a utilizadores autorizados</p></div>
+			</div>
 		</div>
 	</div>
 
 	<!-- APP CONTAINER -->
 	<div id="app-container" class="flex h-screen">
-		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/95 backdrop-blur border-r border-gray-800 p-4 z-20">
-			<div class="mb-8 text-center"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-16 mx-auto opacity-90"></div>
-			<nav class="flex-1 space-y-2">
-				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active"><i class="fas fa-chart-line w-5 text-center"></i> Painel</a>
-				<a onclick="window.App.showPage('page-parcelas')" id="tab-parcelas" class="sidebar-nav-item"><i class="fas fa-file-invoice-dollar w-5 text-center"></i> Parcelas</a>
-				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item"><i class="fas fa-tasks w-5 text-center"></i> Serviços</a>
-				<a onclick="window.App.showPage('page-performance')" id="tab-performance" class="sidebar-nav-item admin-only"><i class="fas fa-trophy w-5 text-center"></i> Performance</a>
-				<a onclick="window.App.showPage('page-relatorios')" id="tab-relatorios" class="sidebar-nav-item admin-only"><i class="fas fa-file-alt w-5 text-center"></i> Relatórios</a>
-				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item"><i class="fas fa-trash w-5 text-center"></i> Lixeira</a>
-				<div class="border-t border-gray-700 my-2 pt-2 admin-only"><a onclick="window.App.showPage('page-oficina')" id="tab-oficina" class="sidebar-nav-item"><i class="fas fa-cogs w-5 text-center"></i> Oficina</a></div>
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
+			<div class="flex-shrink-0 mb-8"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-20 mx-auto opacity-90"></div>
+			<nav class="flex-1 space-y-3">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active"><i class="fas fa-tachometer-alt w-5 text-center"></i><span>Painel Principal</span></a>
+				<a onclick="window.App.showPage('page-parcelas')" id="tab-parcelas" class="sidebar-nav-item"><i class="fas fa-file-invoice-dollar w-5 text-center"></i><span>Parcelas</span></a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item"><i class="fas fa-tasks w-5 text-center"></i><span>Serviços</span></a>
+				<a onclick="window.App.showPage('page-performance')" id="tab-performance" class="sidebar-nav-item admin-only"><i class="fas fa-rocket w-5 text-center"></i><span>Performance</span></a>
+				<a onclick="window.App.showPage('page-relatorios')" id="tab-relatorios" class="sidebar-nav-item admin-only"><i class="fas fa-chart-pie w-5 text-center"></i><span>Relatórios</span></a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item"><i class="fas fa-trash-alt w-5 text-center"></i><span>Lixeira</span></a>
+				<div class="border-t border-gray-700 pt-3 mt-3 admin-only"><a onclick="window.App.showPage('page-oficina')" id="tab-oficina" class="sidebar-nav-item admin-only"><i class="fas fa-cogs w-5 text-center"></i><span>Oficina</span></a></div>
 			</nav>
-			<div class="border-t border-gray-800 pt-4 flex items-center gap-3">
-				<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white"><i class="fas fa-user"></i></div>
-				<div class="overflow-hidden"><span id="user-display-name" class="text-sm font-medium block truncate">Usuário</span><button id="logout-button" class="text-xs text-red-400 hover:text-red-300">Sair</button></div>
+			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
+				<div class="flex items-center gap-3 p-2 rounded-lg">
+					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white"><i class="fas fa-user"></i></div>
+					<div><span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span><button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button></div>
+				</div>
 			</div>
 		</aside>
 
-		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-20 md:pb-0 relative bg-gray-900/50">
-			<header class="sticky top-0 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 p-4 z-10 flex justify-between items-center shadow-md">
-				<h1 id="page-title" class="text-xl font-bold text-white hidden md:block">Painel</h1>
-				<div class="flex items-center gap-4 w-full md:w-auto justify-end">
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6 flex justify-between items-center">
+				<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+				<div class="flex items-center gap-4">
 					<div class="pretty-select-wrapper">
 						<select id="globalDateFilter" class="pretty-select"><option value="novos">✨ Atuais (Novos)</option><option value="legado">📜 Legado (Antigos)</option></select>
 						<i class="fas fa-calendar-check select-icon"></i>
 					</div>
 					<div class="relative">
-						<button id="notification-bell" class="p-2 text-gray-400 hover:text-white relative"><i class="fas fa-bell text-xl"></i><span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900"></span></button>
-						<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
-							<div class="p-3 border-b border-gray-700 flex justify-between"><h3 class="font-bold text-white">Notificações</h3><button id="clear-notifications-button" class="text-xs text-indigo-400">Ler todas</button></div>
-							<div id="notification-list" class="max-h-64 overflow-y-auto p-2 space-y-1"><div class="text-center p-4 text-gray-500 text-sm">Sem notificações.</div></div>
+						<button id="notification-bell" class="p-2 text-gray-300 hover:text-white"><i class="fas fa-bell text-xl"></i><span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900"></span></button>
+						<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 md:w-96 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+							<div class="flex justify-between items-center p-3 bg-gray-900/50 border-b border-gray-700"><h3 class="font-semibold text-white">Notificações</h3><button id="clear-notifications-button" class="text-xs text-indigo-400 hover:text-indigo-300">Marcar todas como lidas</button></div>
+							<div id="notification-list" class="max-h-80 overflow-y-auto space-y-2 p-2"><div id="notification-list-empty" class="hidden p-4 text-center"><i class="fas fa-check-circle text-gray-500 text-3xl mb-2"></i><p>Nenhuma notificação nova.</p></div></div>
 						</div>
 					</div>
-					<button id="mobile-menu-toggle" class="md:hidden text-white text-xl"><i class="fas fa-bars"></i></button>
+					<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white"><i class="fas fa-bars text-xl"></i></button>
 				</div>
 			</header>
 
 			<div class="p-4 md:p-8 flex-1">
-				
-				<!-- DASHBOARD -->
 				<div id="page-dashboard">
 					<div class="flex flex-wrap gap-4 mb-8">
-						<button onclick="window.App.openContractModal()" class="btn btn-primary shadow-lg"><i class="fas fa-plus"></i> Novo Contrato</button>
-						<button onclick="window.App.openReportModal()" class="admin-only btn btn-success shadow-lg" style="background-color: #0d9488;"><i class="fas fa-chart-pie"></i> Relatório Mensal</button>
+						<button onclick="window.App.openContractModal()" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Novo Contrato</button>
+						<button onclick="window.App.openReportModal()" class="admin-only btn btn-success"><i class="fas fa-chart-line"></i> Relatório Mensal</button>
 					</div>
-
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-						<div class="dark-card p-5 rounded-xl"><p class="text-gray-400 text-sm font-medium">A Receber (30 dias)</p><p id="dash-a-receber" class="text-2xl font-bold text-green-400 mt-1">R$ 0,00</p></div>
-						<div class="dark-card p-5 rounded-xl"><p class="text-gray-400 text-sm font-medium">Vencido (Corrigido)</p><p id="dash-vencido" class="text-2xl font-bold text-red-400 mt-1">R$ 0,00</p></div>
-						<div class="dark-card p-5 rounded-xl"><p class="text-gray-400 text-sm font-medium">Recebido (Mês)</p><p id="dash-recebido" class="text-2xl font-bold text-indigo-400 mt-1">R$ 0,00</p></div>
-						<div class="dark-card p-5 rounded-xl"><p class="text-gray-400 text-sm font-medium">Contratos Ativos</p><p id="dash-contratos" class="text-2xl font-bold text-white mt-1">0</p></div>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3><p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3><p id="dash-vencido" class="text-3xl font-bold text-red-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3><p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3><p id="dash-contratos" class="text-3xl font-bold text-white"></p></div>
 					</div>
-
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-8">
-						<div class="kanban-column dark-card rounded-xl p-4 flex flex-col h-full"><h3 class="text-red-400 font-bold mb-4 flex items-center gap-2"><i class="fas fa-exclamation-circle"></i> Vencidas</h3><div id="kanban-vencidas" class="kanban-content space-y-3 flex-1"></div></div>
-						<div class="kanban-column dark-card rounded-xl p-4 flex flex-col h-full"><h3 class="text-yellow-400 font-bold mb-4 flex items-center gap-2"><i class="fas fa-clock"></i> A Vencer</h3><div id="kanban-a-vencer" class="kanban-content space-y-3 flex-1"></div></div>
-						<div class="kanban-column dark-card rounded-xl p-4 flex flex-col h-full"><h3 class="text-gray-400 font-bold mb-4 flex items-center gap-2"><i class="fas fa-check-circle"></i> Pagas (Mês)</h3><div id="kanban-pagas" class="kanban-content space-y-3 flex-1"></div></div>
+					<div class="mb-4 border-b border-gray-700"><h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas</h2></div>
+					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1"><h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3><div id="kanban-vencidas" class="kanban-content space-y-3"></div></div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1"><h3 class="font-bold text-lg mb-4 text-yellow-400 flex items-center gap-2"><i class="far fa-clock"></i>A Vencer</h3><div id="kanban-a-vencer" class="kanban-content space-y-3"></div></div>
+						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1"><h3 class="font-bold text-lg mb-4 text-gray-400 flex items-center gap-2"><i class="fas fa-check-circle"></i>Pagas</h3><div id="kanban-pagas" class="kanban-content space-y-3"></div></div>
 					</div>
-
-					<div id="exito-section" class="mb-8 hidden"><h3 class="text-xl font-bold text-white mb-4">Êxitos Pendentes</h3><div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-4 pb-2"></div></div>
-
-					<div>
-						<div class="flex justify-between items-center mb-4 flex-wrap gap-4">
-							<h2 class="text-xl font-bold text-white">Contratos</h2>
-							<div class="flex items-center gap-3">
-								<button onclick="window.App.exportContractsCSV()" class="text-sm text-green-400 hover:text-green-300"><i class="fas fa-download"></i> CSV</button>
+					<div id="exito-section" class="mt-12 hidden"><div class="mb-4 border-b border-gray-700"><h2 class="text-2xl font-semibold mb-4 text-white">Êxito Pendente</h2></div><div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4 items-start"></div></div>
+					<div class="mt-12">
+						<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-4 gap-4">
+							<h2 class="text-2xl font-semibold text-white">Meus Contratos</h2>
+							<div class="flex flex-wrap items-center gap-4">
+								<button onclick="window.App.exportContractsCSV()" class="btn btn-success text-sm"><i class="fas fa-file-csv"></i> Exportar (CSV)</button>
 								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only"></select>
-								<div id="contractSortButtons" class="flex gap-1"></div>
+								<div class="flex items-center gap-2"><span class="text-sm text-gray-400">Mostrar:</span><div id="contractStatusFilterButtons" class="flex gap-1"></div></div>
+								<div class="flex items-center gap-2"><span class="text-sm text-gray-400">Ordenar por:</span><div id="contractSortButtons" class="flex gap-1"></div></div>
 							</div>
 						</div>
-						<input type="text" id="searchInput" placeholder="Pesquisar contrato..." class="w-full bg-gray-800 border-gray-700 rounded-lg p-3 text-white mb-4 focus:ring-2 focus:ring-indigo-500">
+						<div class="mb-4"><input type="text" id="searchInput" placeholder="🔎 Pesquisar..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white"></div>
 						<div id="contractListContainer"></div>
-						<div id="paginationContainer" class="flex justify-center gap-2 mt-6"></div>
+						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8"></div>
 					</div>
 				</div>
 
-				<!-- OUTRAS PÁGINAS -->
 				<div id="page-parcelas" class="hidden">
-					<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-white">Todas as Parcelas</h2><input type="text" id="parcelasSearchInput" placeholder="Buscar..." class="bg-gray-800 border-gray-700 p-2 rounded text-white"></div>
-					<div class="flex gap-2 mb-4 justify-end"><span class="text-sm text-gray-500 self-center">Ordenar:</span><div id="parcelasSortButtons" class="flex gap-1"></div></div>
-					<div id="parcelasListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4"><h2 class="text-2xl font-semibold text-white">Todas as Parcelas</h2><div class="flex flex-wrap items-center gap-4"><input type="text" id="parcelasSearchInput" placeholder="🔎 Pesquisar..." class="form-input"><div class="flex items-center gap-2"><span class="text-sm text-gray-400">Ordenar por:</span><div id="parcelasSortButtons" class="flex gap-1"></div></div></div></div>
+					<div id="parcelasListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 				</div>
 
 				<div id="page-servicos" class="hidden">
-					<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-white">Serviços</h2><input type="text" id="servicosSearchInput" placeholder="Buscar..." class="bg-gray-800 border-gray-700 p-2 rounded text-white"></div>
-					<div class="flex gap-2 mb-4 justify-end flex-wrap"><select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only"></select><div id="servicosSortButtons" class="flex gap-1"></div></div>
-					<div id="servicosListContainer" class="space-y-4"></div>
+					<div class="flex flex-wrap justify-between items-center mb-4 gap-4"><h2 class="text-2xl font-semibold text-white">Serviços</h2><div class="flex flex-wrap items-center gap-4"><select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only"></select><div class="flex items-center gap-2"><span class="text-sm text-gray-400">Ordenar:</span><div id="servicosSortButtons" class="flex gap-1"></div></div><input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="form-input"></div></div>
+					<div id="servicosListContainer" class="space-y-8"></div>
 				</div>
 
 				<div id="page-performance" class="hidden admin-only">
-					<h2 class="text-2xl font-bold text-white mb-6">Performance</h2>
-					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4 font-semibold uppercase text-xs tracking-wider">Faturação por Advogado</h3><div class="h-64"><canvas id="adminChartFaturamento"></canvas></div></div>
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4 font-semibold uppercase text-xs tracking-wider">Contratos Ativos</h3><div class="h-64"><canvas id="adminChartContratos"></canvas></div></div>
-					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-						<div class="dark-card p-6 rounded-xl border border-gray-700"><h3 class="text-white font-bold mb-4 text-lg">Ranking Financeiro</h3><table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>#</th><th>Nome</th><th>Valor</th></tr></thead><tbody></tbody></table></div>
-						<div class="dark-card p-6 rounded-xl border border-gray-700"><h3 class="text-white font-bold mb-4 text-lg">Ranking Contratos</h3><table class="ranking-table" id="adminTableContratos"><thead><tr><th>#</th><th>Nome</th><th>Qtd</th></tr></thead><tbody></tbody></table></div>
+					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4"><h2 class="text-2xl font-semibold text-white">Performance</h2></div>
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+						<div class="space-y-8">
+							<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Contratos Ativos</h3><div class="relative" style="height: 350px;"><canvas id="adminChartContratos"></canvas></div></div>
+							<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação (Ano)</h3><div class="relative" style="height: 350px;"><canvas id="adminChartFaturamento"></canvas></div></div>
+						</div>
+						<div class="space-y-8">
+							<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Ranking Financeiro</h3><table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>Rank</th><th>Advogado</th><th>Valor</th></tr></thead><tbody></tbody></table></div>
+							<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Ranking Contratos</h3><table class="ranking-table" id="adminTableContratos"><thead><tr><th>Rank</th><th>Advogado</th><th>Qtd</th></tr></thead><tbody></tbody></table></div>
+						</div>
 					</div>
 				</div>
 
 				<div id="page-relatorios" class="hidden admin-only">
-					<div class="flex flex-wrap justify-between items-center mb-6 bg-gray-800 p-4 rounded-xl">
-						<h2 class="text-xl font-bold text-white">Relatórios Avançados</h2>
-						<div class="flex gap-2 items-center">
-							<input type="date" id="reportStartDate" class="bg-gray-700 border-gray-600 rounded p-1 text-sm text-white">
-							<span class="text-gray-500">até</span>
-							<input type="date" id="reportEndDate" class="bg-gray-700 border-gray-600 rounded p-1 text-sm text-white">
-							<button onclick="window.App.generateAdvancedReport()" class="btn btn-primary text-xs">Gerar</button>
-							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="btn btn-danger text-xs" disabled>PDF</button>
+					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
+						<h2 class="text-2xl font-semibold text-white">Relatórios Avançados</h2>
+						<div class="flex flex-wrap items-center gap-4">
+							<div><label class="text-sm text-gray-400">De:</label><input type="date" id="reportStartDate" class="filter-select ml-2"></div>
+							<div><label class="text-sm text-gray-400">Até:</label><input type="date" id="reportEndDate" class="filter-select ml-2"></div>
+							<button onclick="window.App.generateAdvancedReport()" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Gerar</button>
+							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="btn btn-danger" disabled><i class="fas fa-file-pdf"></i> PDF</button>
 						</div>
 					</div>
 					<div id="advancedReportContainer" class="space-y-8 hidden">
-						<div id="report-kpis" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-							<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-2">Evolução</h3><div class="h-64"><canvas id="advReportTimelineChart"></canvas></div></div>
-							<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-2">Novos Contratos</h3><div class="h-64"><canvas id="advReportNewContractsChart"></canvas></div></div>
-						</div>
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-2">Distribuição</h3><div class="h-64 mx-auto max-w-md"><canvas id="advReportByAdvogadoChart"></canvas></div></div>
+						<div id="report-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="dark-card p-6 rounded-lg"><h3 class="text-gray-300 mb-4">Evolução</h3><div class="h-64"><canvas id="advReportTimelineChart"></canvas></div></div><div class="dark-card p-6 rounded-lg"><h3 class="text-gray-300 mb-4">Novos Contratos</h3><div class="h-64"><canvas id="advReportNewContractsChart"></canvas></div></div></div>
+						<div class="dark-card p-6 rounded-lg"><h3 class="text-gray-300 mb-4">Faturação por Advogado</h3><div class="h-64 mx-auto max-w-lg"><canvas id="advReportByAdvogadoChart"></canvas></div></div>
 					</div>
-					<div id="advancedReportEmpty" class="text-center py-20 text-gray-500"><i class="fas fa-chart-area fa-3x mb-4"></i><p>Selecione um período para visualizar.</p></div>
+					<div id="advancedReportEmpty" class="text-center py-10 text-gray-500"><i class="fas fa-chart-pie fa-3x mb-3"></i><p>Selecione um período.</p></div>
 				</div>
 
 				<div id="page-lixeira" class="hidden">
-					<h2 class="text-2xl font-bold text-white mb-6">Lixeira</h2>
-					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+					<h2 class="text-2xl font-semibold text-white mb-4">Lixeira</h2>
+					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
 				</div>
 
 				<div id="page-oficina" class="hidden admin-only">
-					<h2 class="text-2xl font-bold text-white mb-6">Oficina</h2>
-					<div class="dark-card p-8 rounded-xl max-w-lg mx-auto border border-gray-700 shadow-2xl">
-						<h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><i class="fas fa-user-shield text-indigo-500"></i> Gerenciar Advogados</h3>
-						<form id="formAddAdvogado" class="flex gap-3 mb-6">
-							<input type="text" id="inputAdvogadoName" class="form-input flex-1 bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Nome do Advogado..." required>
-							<button type="submit" class="btn btn-primary px-4 aspect-square rounded-lg shadow-lg hover:shadow-indigo-500/20 transition-all"><i class="fas fa-plus"></i></button>
-						</form>
-						<div class="bg-gray-800/50 rounded-xl p-4 max-h-[400px] overflow-y-auto border border-gray-700/50">
-							<div id="advogadoSettingsList" class="space-y-2"></div>
-						</div>
-						<p class="text-xs text-gray-500 mt-4 text-center">Use o botão vermelho para remover um advogado da lista.</p>
+					<h2 class="text-2xl font-semibold text-white mb-6">Oficina</h2>
+					<div class="dark-card shadow-lg p-6 rounded-lg max-w-lg mx-auto">
+						<h3 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-users-cog text-indigo-400"></i> Gerenciar Advogados</h3>
+						<form id="formAddAdvogado" class="flex gap-2 mb-4"><input type="text" id="inputAdvogadoName" placeholder="Nome..." class="form-input flex-1" required><button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button></form>
+						<div id="advogadoSettingsList" class="space-y-2 max-h-80 overflow-y-auto"></div>
 					</div>
 				</div>
-
 			</div>
 		</main>
 
-		<nav class="md:hidden fixed bottom-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around p-2 z-30">
-			<a onclick="window.App.showPage('page-dashboard')" class="text-gray-400 flex flex-col items-center text-xs"><i class="fas fa-home text-lg mb-1"></i>Painel</a>
-			<a onclick="window.App.showPage('page-parcelas')" class="text-gray-400 flex flex-col items-center text-xs"><i class="fas fa-dollar-sign text-lg mb-1"></i>$$</a>
-			<a onclick="window.App.showPage('page-servicos')" class="text-gray-400 flex flex-col items-center text-xs"><i class="fas fa-check text-lg mb-1"></i>Jobs</a>
-			<a onclick="window.App.showPage('page-relatorios')" class="text-gray-400 flex flex-col items-center text-xs admin-only"><i class="fas fa-chart-pie text-lg mb-1"></i>Rel</a>
+		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
+			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active"><i class="fas fa-tachometer-alt text-xl"></i><span class="text-xs">Painel</span></a>
+			<a onclick="window.App.showPage('page-parcelas')" id="mobile-tab-parcelas" class="mobile-nav-item"><i class="fas fa-file-invoice-dollar text-xl"></i><span class="text-xs">$$</span></a>
+			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item"><i class="fas fa-tasks text-xl"></i><span class="text-xs">Jobs</span></a>
+			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only"><i class="fas fa-chart-pie text-xl"></i><span class="text-xs">Rel</span></a>
 		</nav>
 	</div>
 
-	<!-- MODAIS (Estrutura Corrigida) -->
+	<!-- MODAIS CORRIGIDOS (DISPLAY: NONE DEFAULT) -->
 	<div id="modalDisplayName" class="modal">
-		<div class="modal-header"><h2 class="text-xl font-bold text-white">Bem-vindo(a)!</h2></div>
-		<div class="modal-body text-center">
-			<p class="text-gray-400 mb-6">Como gostaria de ser chamado?</p>
-			<form id="formDisplayName"><input id="inputDisplayName" class="w-full mb-4" required><button type="submit" class="w-full btn btn-primary">Começar</button></form>
-		</div>
+		<div class="modal-header"><h2 class="text-2xl font-bold text-white">Bem-vindo!</h2></div>
+		<div class="modal-body"><p class="text-gray-400 mb-4">Como gostaria de ser chamado?</p><form id="formDisplayName"><input id="inputDisplayName" class="form-input mb-4" required><button type="submit" class="w-full btn btn-primary">Salvar</button></form></div>
 	</div>
 
 	<div id="modalContrato" class="modal">
-		<div class="modal-header"><h2 id="modalContratoTitle" class="text-lg font-bold text-white">Novo Contrato</h2><button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<div class="modal-header"><h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Contrato</h2><button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formContrato" class="flex-1 flex flex-col overflow-hidden">
 			<div class="modal-body space-y-4">
 				<input type="hidden" id="contractId"><input type="hidden" id="financialDataChanged" value="false">
-				<div class="grid grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div><label>Cliente</label><input id="clienteNome" class="form-input" required></div>
 					<div><label>Advogado</label><select id="advogadoResponsavel" class="form-input" required></select></div>
 				</div>
-				<div class="bg-gray-800 p-3 rounded border border-gray-600">
-					<label class="mb-2 block font-bold text-indigo-400">Serviços</label>
+				<div class="bg-gray-900/50 p-3 rounded border border-gray-700">
+					<label>Serviços</label>
 					<div id="servicosContainer" class="flex flex-wrap gap-2 mb-2"></div>
-					<div class="flex gap-2">
-						<input id="contratoServicoInput" placeholder="Ex: Divórcio..." class="form-input flex-1">
-						<input type="date" id="contratoPrazoInput" class="form-input w-36">
-						<button type="button" id="addServiceButton" class="btn btn-primary text-xs">Adicionar</button>
-					</div>
+					<div class="flex gap-2"><input id="contratoServicoInput" placeholder="Nome..." class="form-input flex-1"><input type="date" id="contratoPrazoInput" class="form-input w-36"><button type="button" id="addServiceButton" class="btn btn-primary">Add</button></div>
 				</div>
-				<div class="grid grid-cols-2 gap-4">
-					<div><label>Tipo Pgto</label><select id="contratoTipoPagamento" class="form-input"><option>Parcelado</option><option>Pró-labore</option><option>Entrada única</option></select></div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div><label>Pagamento</label><select id="contratoTipoPagamento" class="form-input"><option>Parcelado</option><option>Pró-labore</option><option>Entrada única</option></select></div>
 					<div><label>Obs</label><input id="contratoObservacoes" class="form-input"></div>
 				</div>
-				
-				<div class="admin-only border-t border-gray-600 pt-4 mt-2">
-					<div id="financial-warning" class="hidden bg-yellow-900/30 text-yellow-200 p-2 rounded text-xs mb-2">Financeiro bloqueado (parcialmente pago).</div>
-					
-					<!-- CHECKBOXES CENTRALIZADOS (CORREÇÃO PEDIDA) -->
+				<div class="admin-only space-y-4 border-t border-gray-700 pt-4">
+					<div id="financial-warning" class="hidden p-3 bg-yellow-900/30 border border-yellow-700 rounded text-yellow-300 text-sm">Financeiro bloqueado.</div>
 					<div class="checkbox-group-centered">
-						<div class="checkbox-item-custom">
-							<input type="checkbox" id="contratoEspecial">
-							<label for="contratoEspecial">Modo Manual</label>
-						</div>
-						<div class="checkbox-item-custom">
-							<input type="checkbox" id="contratoJaQuitado">
-							<label for="contratoJaQuitado">Já Quitado</label>
-						</div>
+						<div class="checkbox-item-custom"><input type="checkbox" id="contratoEspecial"><label for="contratoEspecial">Manual</label></div>
+						<div class="checkbox-item-custom"><input type="checkbox" id="contratoJaQuitado"><label for="contratoJaQuitado">Já Quitado</label></div>
 					</div>
-
-					<div id="financial-fields-standard" class="space-y-3">
-						<div class="grid grid-cols-2 gap-4">
-							<div><label>Total (R$)</label><input type="number" step="0.01" id="valorTotal" class="form-input"></div>
-							<div><label>Parcelas</label><input type="number" id="numParcelas" value="1" class="form-input"></div>
-						</div>
+					<div id="financial-fields-standard" class="space-y-4">
+						<div class="grid grid-cols-2 gap-4"><div><label>Total (R$)</label><input type="number" step="0.01" id="valorTotal" class="form-input"></div><div><label>Parcelas</label><input type="number" id="numParcelas" value="1" class="form-input"></div></div>
 						<div><label>1º Vencimento</label><input type="date" id="vencimentoPrimeiraParcela" class="form-input"></div>
 					</div>
-					<div id="financial-fields-special" class="hidden space-y-2">
-						<div class="flex gap-2"><input type="number" id="parcelaValorManual" placeholder="R$" class="form-input"><input type="date" id="parcelaVencimentoManual" class="form-input"><button type="button" id="addManualParcelButton" class="btn btn-primary text-xs">Add</button></div>
-						<div id="manualParcelList" class="bg-gray-900 p-2 rounded max-h-32 overflow-y-auto"></div>
+					<div id="financial-fields-special" class="hidden space-y-4">
+						<div class="flex gap-2"><input type="number" id="parcelaValorManual" placeholder="R$" class="form-input"><input type="date" id="parcelaVencimentoManual" class="form-input"><button type="button" id="addManualParcelButton" class="btn btn-primary">Add</button></div>
+						<div id="manualParcelList" class="space-y-1 max-h-40 overflow-y-auto bg-gray-900/50 p-2 rounded"></div>
 					</div>
-					<div class="mt-3"><label>Êxito (opcional)</label><input id="taxaExito" class="form-input" placeholder="Ex: 20% ou R$ 5.000"></div>
+					<div><label>Êxito</label><input id="taxaExito" class="form-input" placeholder="Ex: 20%"></div>
 				</div>
 			</div>
-			<div class="modal-footer">
-				<button type="button" onclick="window.App.closeModal('modalContrato')" class="btn btn-secondary">Cancelar</button>
-				<button type="submit" class="btn btn-primary">Salvar</button>
-			</div>
+			<div class="modal-footer"><button type="button" onclick="window.App.closeModal('modalContrato')" class="btn btn-secondary">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
 		</form>
 	</div>
 
-	<div id="modalPagamento" class="modal md:w-1/3">
-		<div class="modal-header"><h2 class="font-bold text-white">Pagamento</h2><button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white">&times;</button></div>
+	<div id="modalPagamento" class="modal w-11/12 md:w-1/3">
+		<div class="modal-header"><h2 class="text-2xl font-bold text-white">Pagamento</h2><button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formPagamento" class="flex-1 flex flex-col">
-			<div class="modal-body space-y-4">
-				<div id="pagamentoInfo" class="bg-gray-800 p-3 rounded text-sm text-gray-200 border border-gray-600"></div>
-				<input type="hidden" id="pagamentoContractId"><input type="hidden" id="pagamentoParcelIndex">
-				<div><label>Valor Pago (R$)</label><input type="number" step="0.01" id="pagamentoValor" class="form-input" required></div>
-				<div><label>Data Pagamento</label><input type="date" id="pagamentoData" class="form-input" required></div>
-			</div>
+			<div class="modal-body space-y-4"><div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded text-white"></div><input type="hidden" id="pagamentoContractId"><input type="hidden" id="pagamentoParcelIndex"><div><label>Valor Pago</label><input type="number" step="0.01" id="pagamentoValor" class="form-input" required></div><div><label>Data</label><input type="date" id="pagamentoData" class="form-input" required></div></div>
 			<div class="modal-footer"><button type="button" onclick="window.App.closeModal('modalPagamento')" class="btn btn-secondary">Cancelar</button><button type="submit" class="btn btn-success">Confirmar</button></div>
 		</form>
 	</div>
 
-	<div id="modalExito" class="modal md:w-1/3">
-		<div class="modal-header"><h2 class="font-bold text-white">Receber Êxito</h2><button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white">&times;</button></div>
+	<div id="modalExito" class="modal w-11/12 md:w-1/3">
+		<div class="modal-header"><h2 class="text-2xl font-bold text-white">Receber Êxito</h2><button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formExito" class="flex-1 flex flex-col">
-			<div class="modal-body space-y-4">
-				<div id="exitoInfo" class="bg-gray-800 p-3 rounded text-sm text-gray-200 border border-gray-600"></div>
-				<input type="hidden" id="exitoContractId">
-				<div class="admin-only"><label>Valor Líquido (R$)</label><input type="number" step="0.01" id="exitoValorRecebido" class="form-input" required></div>
-			</div>
+			<div class="modal-body space-y-4"><div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded"></div><input type="hidden" id="exitoContractId"><div class="admin-only"><label>Valor Recebido</label><input type="number" step="0.01" id="exitoValorRecebido" class="form-input" required></div></div>
 			<div class="modal-footer"><button type="button" onclick="window.App.closeModal('modalExito')" class="btn btn-secondary">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
 		</form>
 	</div>
 
-	<div id="modalCliente" class="modal md:w-2/3">
-		<div class="modal-header"><h2 id="clienteModalTitle" class="font-bold text-white"></h2><button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white">&times;</button></div>
-		<div id="clienteModalContent" class="modal-body space-y-4"></div>
+	<div id="modalCliente" class="modal w-11/12 md:w-2/3">
+		<div class="modal-header"><h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2><button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<div id="clienteModalContent" class="modal-body space-y-6"></div>
 	</div>
 
-	<div id="modalRelatorio" class="modal md:w-2/3 admin-only">
-		<div class="modal-header"><h2 class="font-bold text-white">Relatório Mensal</h2><button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white">&times;</button></div>
+	<div id="modalRelatorio" class="modal w-11/12 md:w-2/3 admin-only">
+		<div class="modal-header"><h2 class="text-2xl font-bold text-white">Relatório Mensal</h2><button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<div class="modal-body">
-			<div class="flex gap-4 mb-4">
-				<div class="flex-1"><label>Mês</label><select id="reportMonth" class="form-input"></select></div>
-				<div class="flex-1"><label>Ano</label><select id="reportYear" class="form-input"></select></div>
-			</div>
-			<div class="flex gap-2 mb-6">
-				<button onclick="window.App.generateAndShowReport()" class="flex-1 btn btn-primary" style="background-color: #0d9488;">Visualizar</button>
-				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 btn btn-primary" style="background-color: #7c3aed;">Gráficos</button>
-				<button onclick="window.App.exportReportCSV()" class="flex-1 btn btn-success">CSV</button>
-			</div>
+			<div class="flex gap-4 mb-4"><div class="flex-1"><label>Mês</label><select id="reportMonth" class="form-input"></select></div><div class="flex-1"><label>Ano</label><select id="reportYear" class="form-input"></select></div></div>
+			<div class="flex gap-4 mb-6"><button onclick="window.App.generateAndShowReport()" class="flex-1 btn btn-primary">Relatório</button><button onclick="window.App.showAnalyticsInModal()" class="flex-1 btn btn-primary" style="background-color: #7c3aed;">Gráficos</button><button onclick="window.App.exportReportCSV()" class="flex-1 btn btn-success">CSV</button></div>
 			<div id="reportResult" class="space-y-4"></div>
-			<div id="reportChartsContainer" class="hidden grid grid-cols-2 gap-4"><div class="dark-card p-4 rounded"><canvas id="actualIncomeChartModal"></canvas></div><div class="dark-card p-4 rounded"><canvas id="projectedIncomeChartModal"></canvas></div></div>
+			<div id="reportChartsContainer" class="hidden space-y-8"><div class="dark-card p-6 rounded-lg"><canvas id="actualIncomeChartModal"></canvas></div><div class="dark-card p-6 rounded-lg"><canvas id="projectedIncomeChartModal"></canvas></div></div>
 		</div>
 	</div>
 
 	<div id="modal-backdrop" class="modal-backdrop"></div>
 
-	<!-- LÓGICA DO SISTEMA -->
 	<script type="module">
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -456,7 +429,7 @@
 		class AuthService {
 			constructor(app) { this.app = app; this.auth = null; this.firebaseConfig = { apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4", authDomain: "fabrisgurjao.firebaseapp.com", projectId: "fabrisgurjao", storageBucket: "fabrisgurjao.firebasestorage.app", messagingSenderId: "466702265991", appId: "1:466702265991:web:78c4d98b47cab537921222", measurementId: "G-E99R5TFMQK" }; }
 			initialize() { const app = initializeApp(this.firebaseConfig); this.auth = getAuth(app); this.app.firebaseService.setDB(getFirestore(app)); onAuthStateChanged(this.auth, u => this.app.handleAuthStateChange(u)); }
-			async login(e, p) { const b=document.getElementById('login-submit-button'); if(b)b.disabled=true;b.textContent="Autenticando..."; try{ await signInWithEmailAndPassword(this.auth, e, p); }catch{ document.getElementById('auth-error').classList.remove('hidden'); document.getElementById('auth-error').textContent='Credenciais inválidas.'; }finally{ if(b){b.disabled=false;b.textContent="Entrar";} } }
+			async login(e, p) { const b=document.getElementById('login-submit-button'); if(b)b.disabled=true;b.textContent="Autenticando..."; try{ await signInWithEmailAndPassword(this.auth, e, p); }catch{ document.getElementById('auth-error').classList.remove('hidden'); document.getElementById('auth-error').textContent='Credenciais inválidas.'; }finally{ if(b){b.disabled=false;b.textContent="Entrar no Sistema";} } }
 			async logout() { await signOut(this.auth); }
 			async updateUserProfile(n) { try{ await updateProfile(this.auth.currentUser, {displayName:n}); return true; }catch{ return false; } }
 		}
@@ -583,16 +556,7 @@
 			createNotificationItem(n) { const d = this.el('div', { cls: `notification-item ${n.isRead?'is-read':''}`, html: `<p class="text-sm text-white">${Utils.sanitizeText(n.message)}</p><div class="text-xs text-gray-500 mt-1">${Utils.timeAgo(n.timestamp?.toDate())}</div>` }); d.onclick=()=>{if(!n.isRead) window.App.markNotificationsAsRead([n.id]); window.App.closeNotificationDropdown();}; return d; }
 			createServiceTag(n,d,s) { const t=this.el('div',{cls:'service-tag'}); t.dataset.name=n; t.dataset.deadline=d; t.dataset.status=s; t.innerHTML=`<span>${n}${d?` <small class="text-gray-400">(${Utils.formatDate(d)})</small>`:''}</span><span class="ml-2 cursor-pointer hover:text-red-400 font-bold" onclick="this.parentElement.remove()">&times;</span>`; document.getElementById('servicosContainer').appendChild(t); }
 			createManualParcelListItem(v,d,i) { return this.el('div', { cls: 'parcel-list-item', html: `<span>${Utils.formatCurrency(v)} - ${Utils.formatDate(d)}</span><button type="button" class="text-red-400 hover:text-red-300 font-bold" onclick="window.App.handleRemoveManualParcel(${i})">&times;</button>` }); }
-			
-			// [CORREÇÃO 2 & 3] Lista Geométrica da Oficina
-			createSettingListItem(n) { 
-				return this.el('div', { 
-					cls: 'setting-list-item', 
-					html: `<span class="font-medium text-white">${Utils.sanitizeText(n)}</span>
-						   <button class="setting-list-remove-btn" onclick="window.App.handleRemoveAdvogado('${Utils.sanitizeText(n)}')"><i class="fas fa-times"></i></button>` 
-				}); 
-			}
-
+			createSettingListItem(n) { return this.el('div', { cls: 'setting-list-item', html: `<span class="font-medium text-white">${Utils.sanitizeText(n)}</span><button class="setting-list-remove-btn" onclick="window.App.handleRemoveAdvogado('${Utils.sanitizeText(n)}')"><i class="fas fa-times"></i></button>` }); }
 			createExitoCard(c) { return this.card(`<p class="font-bold text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')}</p><div class="my-4 text-center"><p class="text-sm text-gray-400">Bonificação</p><p class="text-2xl font-semibold text-indigo-400">${c.successFee || 'N/A'}</p></div><button onclick="window.App.openExitoModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg text-sm">Receber</button>`, 'border-l-4 border-indigo-500 w-80 flex-shrink-0'); }
 			createServicoCard(c, sp, fp) {
 				const html = `<div class="flex justify-between items-start"><h3 class="font-bold text-xl text-indigo-300 mb-4">${c.clientName}</h3><p class="text-sm text-gray-400"><i class="fas fa-user-tie mr-1"></i> ${c.advogadoResponsavel}</p></div>
@@ -601,8 +565,6 @@
 				<div class="border-t border-gray-700 pt-3"><h4 class="font-semibold text-sm mb-2 text-gray-400">Serviços:</h4><ul class="space-y-1">${(c.serviceTypes||[]).map((s,i) => `<li class="flex items-center justify-between p-2 rounded hover:bg-gray-700/50"><span class="${s.status==='Concluído'?'text-gray-500 line-through':'text-gray-300'} text-sm">${s.name}</span><div class="flex gap-2 text-xs">${s.status!=='Concluído'?`<button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Em Andamento')" class="text-yellow-400 hover:underline">Iniciar</button><button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Concluído')" class="text-teal-400 hover:underline">Fim</button>`:`<span class="text-teal-500 font-bold">✓</span>`}</div></li>`).join('')}</ul></div>`;
 				return this.card(html);
 			}
-			
-			// ATUALIZADO: MELHORIA VISUAL NA TABELA DE RANKING
 			createRankingRow(r, l, v) { 
 				const cls = r === 1 ? 'rank-1' : (r === 2 ? 'rank-2' : (r === 3 ? 'rank-3' : 'rank-other'));
 				const medal = r === 1 ? '🥇' : (r === 2 ? '🥈' : (r === 3 ? '🥉' : ''));
@@ -612,7 +574,6 @@
 						   <td class="${cls}">${v}</td>` 
 				}); 
 			}
-
 			renderPaginationControls(cont, total, pages, curr) {
 				cont.innerHTML = ''; if(pages <= 1) return;
 				const btn = (i, t, d, a) => { const b = this.el('button', { cls: `pagination-button px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white mx-1 ${a?'bg-indigo-600 hover:bg-indigo-600':''}`, text: t||(i+1) }); if(d) b.disabled=true; else b.onclick=()=>window.App.changeContractPage(i); return b; };
@@ -656,23 +617,15 @@
 				document.getElementById('formPagamento').addEventListener('submit', this.handlePaymentSubmit.bind(this));
 				document.getElementById('formExito').addEventListener('submit', this.handleExitoSubmit.bind(this));
 				document.getElementById('formAddAdvogado').addEventListener('submit', this.handleAddAdvogado.bind(this));
-				
-				// AQUI: Listener correto para adicionar serviço
-				const addSvcBtn = document.getElementById('addServiceButton');
-				if(addSvcBtn) addSvcBtn.addEventListener('click', this.handleAddServiceTag.bind(this));
-				
+				const addSvcBtn = document.getElementById('addServiceButton'); if(addSvcBtn) addSvcBtn.addEventListener('click', this.handleAddServiceTag.bind(this));
 				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
-				const addParcelBtn = document.getElementById('addManualParcelButton');
-				if(addParcelBtn) addParcelBtn.addEventListener('click', this.handleAddManualParcel.bind(this));
-				
+				const addParcelBtn = document.getElementById('addManualParcelButton'); if(addParcelBtn) addParcelBtn.addEventListener('click', this.handleAddManualParcel.bind(this));
 				document.getElementById('searchInput').addEventListener('input', Utils.debounce(() => this.resetAndRenderContractList(), 300));
 				document.getElementById('servicosSearchInput').addEventListener('input', Utils.debounce(() => this.renderServicosPage(), 300));
 				document.getElementById('parcelasSearchInput').addEventListener('input', Utils.debounce(() => this.renderParcelasPage(), 300));
-				
 				document.getElementById('globalDateFilter').addEventListener('change', (e) => { this.globalDateFilter = e.target.value; Utils.showToast(`Visualizando: ${e.target.options[e.target.selectedIndex].text}`); this.render(); });
-
 				document.getElementById('mobile-menu-toggle').addEventListener('click', () => { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); this.backdrop.style.display = s.classList.contains('hidden') ? 'none' : 'block'; });
-				if(this.backdrop) this.backdrop.addEventListener('click', () => { if (this.openModalId) this.closeModal(this.openModalId); document.getElementById('sidebar').classList.add('hidden'); this.closeNotificationDropdown(); });
+				if(this.backdrop) this.backdrop.addEventListener('click', () => { if (this.openModalId && this.openModalId !== 'modalDisplayName') this.closeModal(this.openModalId); document.getElementById('sidebar').classList.add('hidden'); this.closeNotificationDropdown(); });
 				document.getElementById('notification-bell').addEventListener('click', (e) => { e.stopPropagation(); this.notificationDropdown.classList.toggle('hidden'); });
 				document.getElementById('clear-notifications-button').addEventListener('click', () => this.markNotificationsAsRead());
 				document.addEventListener('click', (e) => { if (!this.notificationDropdown.classList.contains('hidden') && !e.target.closest('#notification-bell') && !this.notificationDropdown.contains(e.target)) this.closeNotificationDropdown(); });
@@ -708,23 +661,15 @@
 			getFilteredContracts(includeDeleted = false) {
 				let contracts = this.database.contracts;
 				if (!this.isUserAdmin) contracts = contracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName);
-				
-				// Filtro de Data Robusto (Correção para contratos antigos sem data)
 				contracts = contracts.filter(c => {
 					let refDate = null;
 					if (c.parcels && c.parcels.length > 0) {
 						const sorted = [...c.parcels].sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
 						refDate = new Date(sorted[0].dueDate);
-					} else if (c.createdAt) {
-						refDate = new Date(c.createdAt);
-					}
-					
-					// Se não tiver data nenhuma (contrato muito antigo importado errado), assume como Legado (2000)
+					} else if (c.createdAt) { refDate = new Date(c.createdAt); }
 					if (!refDate || isNaN(refDate.getTime())) refDate = new Date('2000-01-01');
-
 					return this.globalDateFilter === 'novos' ? refDate >= CUTOFF_DATE : refDate < CUTOFF_DATE;
 				});
-
 				if (!includeDeleted) contracts = contracts.filter(c => !c.isDeleted);
 				return contracts;
 			}
@@ -733,7 +678,6 @@
 				if (document.getElementById('app-container').style.display !== 'flex') return;
 				const pid = this.currentPageId || 'page-dashboard';
 				if (!this.currentPageId) this.showPage(pid);
-
 				if (pid === 'page-dashboard') { this.renderKanban(); this.renderContractList(); }
 				else if (pid === 'page-parcelas') this.renderParcelasPage();
 				else if (pid === 'page-servicos') this.renderServicosPage();
@@ -748,10 +692,8 @@
 				const contracts = this.getFilteredContracts(false);
 				const kVenc = document.getElementById('kanban-vencidas'), kAvenc = document.getElementById('kanban-a-vencer'), kPagas = document.getElementById('kanban-pagas'), kExito = document.getElementById('kanban-exito-wrapper');
 				const fVenc = document.createDocumentFragment(), fAvenc = document.createDocumentFragment(), fPagas = document.createDocumentFragment(), fExito = document.createDocumentFragment();
-				
 				const hoje = new Date(); hoje.setHours(0,0,0,0); const d1 = new Date(hoje.getFullYear(), hoje.getMonth(), 1); const d30 = new Date(); d30.setDate(hoje.getDate()+30);
 				let t30 = 0, tVenc = 0, hasExito = 0;
-
 				contracts.forEach(c => {
 					const rem = (c.parcels||[]).reduce((s,p)=>p.status==='Pendente'?s+p.value:s,0);
 					(c.parcels||[]).forEach((p,i) => {
@@ -764,11 +706,9 @@
 					});
 					if (c.successFee && !c.successFeePaymentDate && (c.parcels||[]).every(p=>p.status==='Paga')) { fExito.append(this.domBuilder.createExitoCard(c)); hasExito++; }
 				});
-
 				kVenc.innerHTML=''; kAvenc.innerHTML=''; kPagas.innerHTML=''; kExito.innerHTML='';
 				kVenc.append(fVenc); kAvenc.append(fAvenc); kPagas.append(fPagas);
 				if(hasExito>0) { kExito.append(fExito); document.getElementById('exito-section').classList.remove('hidden'); } else document.getElementById('exito-section').classList.add('hidden');
-				
 				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), this.getFilteredContracts(true)).totalGeral;
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(t30);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(tVenc);
@@ -787,14 +727,11 @@
 					const matchText = c.clientName.toLowerCase().includes(search) || (c.serviceTypes||[]).some(x=>x.name.toLowerCase().includes(search));
 					return matchAdv && matchText;
 				});
-
 				if (this.currentContractSort === 'name-asc') list.sort((a,b)=>a.clientName.localeCompare(b.clientName));
 				else if (this.currentContractSort === 'value-desc') list.sort((a,b)=>(b.totalValue||0)-(a.totalValue||0));
-
 				const total = list.length; const pages = Math.ceil(total/CONTRACTS_PER_PAGE);
 				if (this.contractListPage >= pages && pages > 0) this.contractListPage = pages - 1;
 				const pgList = list.slice(this.contractListPage*CONTRACTS_PER_PAGE, (this.contractListPage+1)*CONTRACTS_PER_PAGE);
-
 				container.innerHTML = '';
 				if (total === 0) { container.innerHTML = `<div class="dark-card p-4 rounded text-center text-gray-400">Nenhum contrato encontrado neste período.</div>`; this.domBuilder.renderPaginationControls(document.getElementById('paginationContainer'), 0, 0, 0); return; }
 				const grid = this.domBuilder.el('div', { cls: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' });
@@ -821,7 +758,6 @@
 				if (this.currentParcelasSort === 'days-asc') list.sort((a, b) => a.diffDays - b.diffDays);
 				else if (this.currentParcelasSort === 'value-desc') list.sort((a, b) => b.valorCorrigido - a.valorCorrigido);
 				else if (this.currentParcelasSort === 'name-asc') list.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
-
 				container.innerHTML = '';
 				if (list.length === 0) container.innerHTML = `<div class="col-span-3 text-center py-10"><i class="fas fa-check-circle fa-3x text-green-500 mb-2"></i><p>Tudo em dia!</p></div>`;
 				else list.forEach(item => container.append(this.domBuilder.createParcelaCard(item)));
@@ -839,7 +775,6 @@
 				});
 				if (this.currentServicosSort === 'name-asc') active.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				else if (this.currentServicosSort === 'adv-asc') active.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
-				
 				let hasItems = false;
 				active.forEach(c => {
 					const total = (c.serviceTypes||[]).length;
@@ -863,30 +798,13 @@
 				const m = parseInt(document.getElementById('reportMonth').value);
 				const y = parseInt(document.getElementById('reportYear').value);
 				const data = this.reportHandler.calculateMonthlyIncome(y, m, this.getFilteredContracts(true));
-				
-				let html = `<div class="grid grid-cols-2 gap-4 text-center mb-6">
-					<div class="dark-card p-4 rounded">Total Parc.<br><b class="text-white text-xl">${Utils.formatCurrency(data.totalParcelas)}</b></div>
-					<div class="dark-card p-4 rounded">Total Êxito<br><b class="text-indigo-400 text-xl">${Utils.formatCurrency(data.totalExito)}</b></div>
-				</div>
-				<div class="bg-green-900/20 border border-green-700 p-4 text-center rounded mb-6"><h3 class="font-bold text-green-400 text-2xl">${Utils.formatCurrency(data.totalGeral)}</h3><p class="text-xs">RECEBIDO EM ${m + 1}/${y}</p></div>`;
-
+				let html = `<div class="grid grid-cols-2 gap-4 text-center mb-6"><div class="dark-card p-4 rounded">Total Parc.<br><b class="text-white text-xl">${Utils.formatCurrency(data.totalParcelas)}</b></div><div class="dark-card p-4 rounded">Total Êxito<br><b class="text-indigo-400 text-xl">${Utils.formatCurrency(data.totalExito)}</b></div></div><div class="bg-green-900/20 border border-green-700 p-4 text-center rounded mb-6"><h3 class="font-bold text-green-400 text-2xl">${Utils.formatCurrency(data.totalGeral)}</h3><p class="text-xs">RECEBIDO EM ${m + 1}/${y}</p></div>`;
 				html += `<h4 class="text-green-400 font-bold text-xs uppercase border-b border-gray-700 pb-1 mb-2">Quem Pagou</h4>`;
-				if (data.detailedPayments.length > 0) {
-					html += `<div class="space-y-1 mb-6">`;
-					data.detailedPayments.forEach(p => html += `<div class="flex justify-between bg-gray-800 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-gray-500">(${p.type})</span></div><div class="text-green-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`);
-					html += `</div>`;
-				} else html += `<p class="text-xs text-gray-500 italic mb-6">Nenhum recebimento.</p>`;
-
+				if (data.detailedPayments.length > 0) { html += `<div class="space-y-1 mb-6">`; data.detailedPayments.forEach(p => html += `<div class="flex justify-between bg-gray-800 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-gray-500">(${p.type})</span></div><div class="text-green-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`); html += `</div>`; } else html += `<p class="text-xs text-gray-500 italic mb-6">Nenhum recebimento.</p>`;
 				const pendingTotal = data.pendingPayments.reduce((acc,curr)=>acc+curr.value,0);
 				html += `<h4 class="text-red-400 font-bold text-xs uppercase border-b border-gray-700 pb-1 mb-2 flex justify-between"><span>Quem Não Pagou</span><span>Total: ${Utils.formatCurrency(pendingTotal)}</span></h4>`;
-				if (data.pendingPayments.length > 0) {
-					html += `<div class="space-y-1">`;
-					data.pendingPayments.forEach(p => html += `<div class="flex justify-between bg-red-900/10 border border-red-900/30 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-red-300">Venc: ${Utils.formatDate(p.date)}</span></div><div class="text-red-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`);
-					html += `</div>`;
-				} else html += `<p class="text-xs text-gray-500 italic">Nenhuma pendência.</p>`;
-
-				document.getElementById('reportResult').innerHTML = html;
-				document.getElementById('reportResult').classList.remove('hidden'); document.getElementById('reportChartsContainer').classList.add('hidden');
+				if (data.pendingPayments.length > 0) { html += `<div class="space-y-1">`; data.pendingPayments.forEach(p => html += `<div class="flex justify-between bg-red-900/10 border border-red-900/30 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-red-300">Venc: ${Utils.formatDate(p.date)}</span></div><div class="text-red-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`); html += `</div>`; } else html += `<p class="text-xs text-gray-500 italic">Nenhuma pendência.</p>`;
+				document.getElementById('reportResult').innerHTML = html; document.getElementById('reportResult').classList.remove('hidden'); document.getElementById('reportChartsContainer').classList.add('hidden');
 			}
 
 			exportReportPDF() {
@@ -908,24 +826,16 @@
 			renderAdvancedReportCharts(data) {
 				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
 				const sortedMonths = Object.keys(data.byMonth).sort();
-				const timelineLabels = sortedMonths.map(key => {
-					const [year, month] = key.split('-');
-					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
-				});
+				const timelineLabels = sortedMonths.map(key => { const [year, month] = key.split('-'); return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' }); });
 				const timelineData = sortedMonths.map(key => data.byMonth[key]);
 				this.analyticsHandler.renderChart('advReportTimelineChart', 'line', timelineLabels, timelineData, 'Faturação', '#4ade80');
-				
 				const byAdvCtx = document.getElementById('advReportByAdvogadoChart').getContext('2d');
 				const advLabels = Object.keys(data.byAdvogado);
 				const advData = Object.values(data.byAdvogado);
 				this.analyticsHandler.renderPie('advReportByAdvogadoChart', advLabels, advData, 'Por Advogado');
-
 				const newContractsCtx = document.getElementById('advReportNewContractsChart').getContext('2d');
 				const sortedContractMonths = Object.keys(data.newContractsByMonth).sort();
-				const contractLabels = sortedContractMonths.map(key => {
-					const [year, month] = key.split('-');
-					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
-				});
+				const contractLabels = sortedContractMonths.map(key => { const [year, month] = key.split('-'); return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' }); });
 				const contractData = sortedContractMonths.map(key => data.newContractsByMonth[key]);
 				this.analyticsHandler.renderChart('advReportNewContractsChart', 'bar', contractLabels, contractData, 'Novos Contratos', '#8b5cf6');
 			}
@@ -937,9 +847,8 @@
 				const e = new Date(document.getElementById('reportEndDate').value + 'T23:59:59');
 				const data = this.reportHandler.calculateIncomeByDateRange(s, e, this.getFilteredContracts(true));
 				this.currentAdvancedReportData = data;
-				if (data.totalGeral === 0 && data.totalContratos === 0) {
-					document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true;
-				} else {
+				if (data.totalGeral === 0 && data.totalContratos === 0) { document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true; }
+				else {
 					document.getElementById('advancedReportContainer').classList.remove('hidden'); document.getElementById('advancedReportEmpty').classList.add('hidden'); document.getElementById('exportPdfButton').disabled = false;
 					document.getElementById('report-kpis').innerHTML = `<div class="dark-card p-4 rounded text-center">Faturação<br><b class="text-2xl text-green-400">${Utils.formatCurrency(data.totalGeral)}</b></div><div class="dark-card p-4 rounded text-center">Novos<br><b class="text-2xl text-blue-400">${data.totalContratos}</b></div><div class="dark-card p-4 rounded text-center">Pendentes<br><b class="text-2xl text-red-400">${Utils.formatCurrency(data.pendingPayments.reduce((a,b)=>a+b.value,0))}</b></div><div class="dark-card p-4 rounded text-center">Êxito<br><b class="text-2xl text-indigo-400">${Utils.formatCurrency(data.totalExito)}</b></div>`;
 					this.renderAdvancedReportCharts(data);
