@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Sistema de Gestão Financeira - Advocacia</title>
+	<title>Sistema Financeiro Jurídico</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,420 +11,208 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 	<style>
-		/* [SEÇÃO 1: Estilos Gerais] */
-		body {
-			font-family: 'Inter', sans-serif;
-			position: relative;
-			background-color: #0f172a;
-			color: #d1d5db;
-			overflow-y: hidden; 
-		}
-		body::after {
-			content: '';
-			position: fixed;
-			z-index: -2;
-			top: 0; left: 0; right: 0; bottom: 0;
-			background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg');
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-position: center center;
-			opacity: 0.12;
-		}
-		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 9000; }
-		
-		.modal { 
-			display: none; 
-			position: fixed; 
-			top: 50%; left: 50%; 
-			transform: translate(-50%, -50%); 
-			z-index: 9001; 
-			max-height: 90vh; 
-			border: 1px solid #374151;
-			box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.4);
-		}
+		body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #d1d5db; overflow-y: hidden; }
+		body::after { content: ''; position: fixed; z-index: -2; top: 0; left: 0; right: 0; bottom: 0; background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center; opacity: 0.12; }
+		.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9000; }
+		.modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; max-height: 90vh; border: 1px solid #374151; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
 		.modal-body { overflow-y: auto; max-height: 70vh; }
-
 		.kanban-column { min-width: 320px; }
 		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 8px; }
-		::-webkit-scrollbar { width: 8px; }
-		::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-		::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-		
-		.service-tag { display: inline-flex; justify-content: space-between; align-items: center; background-color: #374151; color: #d1d5db; padding: 4px 10px; border-radius: 12px; font-size: 14px; margin-right: 4px; margin-bottom: 4px; width: 100%; }
-		.service-tag-small { display: inline-block; background-color: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
-		.service-tag .remove-tag { margin-left: 8px; cursor: pointer; font-weight: bold; }
-		
-		/* Sidebar & Nav Styles */
-		.sidebar-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #d1d5db; transition: all 0.2s ease-in-out; cursor: pointer; }
-		.sidebar-nav-item:hover { background-color: #4338ca; color: #ffffff; }
-		.sidebar-nav-item.active { background-color: #4f46e5; color: #ffffff; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.5); }
-		
-		.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 0.75rem 0.5rem; color: #9ca3af; transition: all 0.2s ease-in-out; }
-		.mobile-nav-item:hover { color: #6366f1; }
-		.mobile-nav-item.active { color: #6366f1; background-color: rgba(79, 70, 229, 0.1); }
-		
-		.progress-bar-bg { background-color: #374151; border-radius: 9999px; overflow: hidden; }
-		.progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
+		::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+		.service-tag { display: inline-flex; justify-content: space-between; align-items: center; background: #374151; padding: 4px 10px; border-radius: 12px; font-size: 14px; margin: 0 4px 4px 0; }
+		.service-tag-small { display: inline-block; background: #374151; color: #9ca3af; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin: 0 4px 4px 0; }
+		.sidebar-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #d1d5db; transition: all 0.2s; cursor: pointer; }
+		.sidebar-nav-item:hover, .sidebar-nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4); }
+		.mobile-nav-item { display: flex; flex-direction: column; align-items: center; padding: 0.75rem 0.5rem; color: #9ca3af; }
+		.mobile-nav-item.active { color: #6366f1; background: rgba(79, 70, 229, 0.1); }
 		.dark-card { background-color: #1f2937; }
-		
-		.sort-button, .filter-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-		.sort-button:hover, .filter-button:hover { background-color: #4b5563; color: white; }
-		.sort-button.active, .filter-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; }
-		
-		.filter-select { background-color: #1f2937; border: 1px solid #4b5563; color: #9ca3af; padding: 8px 12px; border-radius: 6px; font-size: 14px; transition: all 0.2s ease-in-out; color-scheme: dark; }
-		.filter-select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); outline: none; }
-		.filter-select:disabled { background-color: #4b5563; opacity: 0.7; cursor: not-allowed; }
-		
-		#loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.2rem; transition: opacity 0.3s; }
-		#app-container { display: none; }
-		.admin-only { display: none; }
+		.filter-select { background: #1f2937; border: 1px solid #4b5563; color: #9ca3af; padding: 8px 12px; border-radius: 6px; color-scheme: dark; }
+		.sort-button { background: #374151; border: 1px solid #4b5563; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+		.sort-button.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+		#loading-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.9); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; transition: opacity 0.3s; }
+		#app-container, .admin-only { display: none; }
 		body.is-admin .admin-only:not(.hidden) { display: block; }
 		body.is-admin .flex.admin-only:not(.hidden) { display: flex; }
-		body.is-admin .grid.admin-only:not(.hidden) { display: grid; }
-		body.is-admin .admin-only.mobile-nav-item { display: flex; }
-		body:not(.is-admin) .non-admin-hidden { display: none; }
+		.notification-item { background: #374151; padding: 12px; border-radius: 8px; border-left: 4px solid #4f46e5; cursor: pointer; margin-bottom: 8px; }
+		.notification-item.is-read { background: #1f2937; border-left-color: #4b5563; opacity: 0.7; }
+		.ranking-table { width: 100%; border-collapse: collapse; }
+		.ranking-table th, .ranking-table td { padding: 12px 16px; border-bottom: 1px solid #374151; text-align: left; }
+		.ranking-table th { background: #374151; color: #d1d5db; }
+		.ranking-table .rank-1 { color: #34d399; font-weight: 700; }
+		.ranking-table .rank-2 { color: #60a5fa; font-weight: 600; }
+		.ranking-table .rank-3 { color: #f59e0b; font-weight: 500; }
+		.parcel-card-vencida { border-left-color: #ef4444; } .parcel-card-vencida .parcel-value { color: #f87171; }
+		.parcel-card-avencer { border-left-color: #f59e0b; } .parcel-card-avencer .parcel-value { color: #fbbf24; }
+		.setting-list-item { display: flex; justify-content: space-between; padding: 8px; background: #374151; margin-bottom: 4px; border-radius: 6px; }
+		.parcel-list-item { display: flex; justify-content: space-between; padding: 6px; background: #374151; margin-bottom: 4px; border-radius: 6px; font-size: 13px; }
+		
+		/* [NOVO] Estilo Bonito para o Select de Data */
+		.pretty-select-wrapper { position: relative; display: inline-block; }
+		.pretty-select {
+			appearance: none;
+			background-color: rgba(31, 41, 55, 0.8); /* gray-800 com transparência */
+			border: 1px solid #6366f1; /* indigo-500 */
+			color: #e0e7ff; /* indigo-100 */
+			padding: 8px 36px 8px 16px;
+			border-radius: 9999px;
+			font-size: 0.875rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+			backdrop-filter: blur(4px);
+		}
+		.pretty-select:hover { background-color: rgba(55, 65, 81, 0.9); border-color: #818cf8; box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+		.pretty-select:focus { outline: none; ring: 2px solid #a5b4fc; }
+		.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #818cf8; }
 
-		@keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
-		.notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); z-index: 11000; animation: slideIn 0.3s ease; }
-		@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-		
-		@media (max-width: 768px) { .kanban-column { min-width: 100%; } }
-
-		/* Paginação */
-		.pagination-button { background-color: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 6px 12px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-		.pagination-button:hover:not(:disabled) { background-color: #4b5563; color: white; }
-		.pagination-button.active { background-color: #4f46e5; border-color: #4f46e5; color: white; cursor: default; }
-		.pagination-button:disabled { opacity: 0.5; cursor: not-allowed; }
-		#paginationContainer span { padding: 6px 4px; font-size: 14px; color: #6b7280; }
-		
-		/* UX/Transições */
-		.modal button { transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-		.modal button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-		
-		/* Animação Login */
 		@keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } }
 		.animate-blob { animation: blob 7s infinite; }
-
-		/* Notificações */
-		#notification-list .notification-item { background-color: #374151; padding: 12px; border-radius: 8px; transition: background-color 0.2s; border-left: 4px solid #4f46e5; cursor: pointer; }
-		#notification-list .notification-item:hover { background-color: #4b5563; }
-		#notification-list .notification-item.is-read { background-color: #1f2937; border-left-color: #4b5563; opacity: 0.8; }
-		#notification-list .notification-item p { font-size: 14px; color: #d1d5db; }
-		#notification-list .notification-item .time { font-size: 12px; color: #9ca3af; margin-top: 4px; }
-		#notification-list-empty { padding: 24px; text-align: center; font-size: 14px; color: #9ca3af; }
-
-		.chartjs-tooltip { opacity: 0; pointer-events: none; position: absolute; transition: all .1s ease; }
-
-		/* Ranking Table */
-		.ranking-table { width: 100%; border-collapse: collapse; }
-		.ranking-table th, .ranking-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #374151; }
-		.ranking-table th { background-color: #374151; color: #d1d5db; font-size: 14px; font-weight: 600; }
-		.ranking-table td { font-size: 14px; color: #9ca3af; }
-		.ranking-table tr:hover td { background-color: #1f2937; }
-		.ranking-table .rank-1 { font-weight: 700; font-size: 16px; color: #34d399; }
-		.ranking-table .rank-2 { font-weight: 600; font-size: 15px; color: #60a5fa; }
-		.ranking-table .rank-3 { font-weight: 500; color: #f59e0b; }
-
-		/* Parcel Cards */
-		.parcel-card-vencida { border-left-color: #ef4444; }
-		.parcel-card-vencida .parcel-value { color: #f87171; }
-		.parcel-card-avencer { border-left-color: #f59e0b; }
-		.parcel-card-avencer .parcel-value { color: #fbbf24; }
-
-		/* Oficina */
-		.setting-list-item { display: flex; justify-content: space-between; align-items: center; background-color: #374151; padding: 8px 12px; border-radius: 6px; font-size: 14px; color: #d1d5db; }
-		.setting-list-item:nth-child(even) { background-color: #3e4c5f; }
-		.setting-list-remove-btn { background-color: #ef4444; color: white; border: none; border-radius: 9999px; width: 24px; height: 24px; font-weight: bold; font-size: 12px; cursor: pointer; transition: background-color 0.2s; display: flex; align-items: center; justify-content: center; }
-		.setting-list-remove-btn:hover { background-color: #dc2626; }
-		.form-input { width: 100%; background-color: #1f2937; border: 1px solid #4b5563; color: #d1d5db; padding: 8px 12px; border-radius: 6px; font-size: 14px; transition: all 0.2s ease-in-out; }
-		.form-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); outline: none; }
-		.form-button { background-color: #4f46e5; color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-		.form-button:hover { background-color: #4338ca; }
-		
-		/* Contrato Especial - Lista Manual */
-		.parcel-list-item { display: flex; justify-content: space-between; align-items: center; background-color: #374151; padding: 6px 10px; border-radius: 6px; font-size: 14px; color: #d1d5db; }
-		.parcel-list-item span { font-weight: 500; }
-		.parcel-list-remove-btn { background-color: #ef4444; color: white; border: none; border-radius: 9999px; width: 20px; height: 20px; font-weight: bold; font-size: 10px; cursor: pointer; transition: background-color 0.2s; display: flex; align-items: center; justify-content: center; }
-		.parcel-list-remove-btn:hover { background-color: #dc2626; }
-
-		/* [NOVO] Estilo do Dropdown Global */
-		#globalDateFilter {
-			background-color: #374151;
-			color: #fff;
-			border: 1px solid #4b5563;
-			padding: 0.5rem;
-			border-radius: 0.5rem;
-			font-size: 0.875rem;
-			cursor: pointer;
-			margin-right: 1rem;
-		}
-		#globalDateFilter:focus {
-			outline: none;
-			border-color: #6366f1;
-		}
-
 	</style>
 </head>
 <body class="text-gray-300">
 	<div id="notifications"></div>
-
-	<div id="loading-overlay">
-		<i class="fas fa-spinner fa-spin mr-3"></i> A ligar...
-	</div>
+	<div id="loading-overlay"><i class="fas fa-spinner fa-spin mr-3"></i> A carregar...</div>
 
 	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden px-4">
-		<div class="absolute inset-0 opacity-5">
-			<div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
-		</div>
+		<div class="absolute inset-0 opacity-5"><div class="absolute inset-0 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div></div>
 		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
 		<div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style="animation-delay: 2s;"></div>
 		<div class="relative z-10 w-full max-w-md">
 			<div class="mb-8 text-center">
-				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-24 mx-auto mb-6 drop-shadow-lg" />
+				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logo" class="h-24 mx-auto mb-6 drop-shadow-lg" />
 				<h1 class="text-3xl font-bold text-white mb-2">Sistema Financeiro</h1>
-				<p class="text-gray-300 text-sm">Gestão profissional para advocacia</p>
 			</div>
 			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
 				<form id="login-form" class="space-y-5">
-					<div>
-						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">Email</label>
-						<div class="relative">
-							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
-							<input type="email" id="login-email" placeholder="seu@email.com" class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
-						</div>
-					</div>
-					<div>
-						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">Senha</label>
-						<div class="relative">
-							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
-							<input type="password" id="login-password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" required />
-						</div>
-					</div>
+					<div><label class="block text-sm font-medium text-gray-100 mb-2">Email</label><input type="email" id="login-email" placeholder="seu@email.com" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 transition" required /></div>
+					<div><label class="block text-sm font-medium text-gray-100 mb-2">Senha</label><input type="password" id="login-password" placeholder="••••••••" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 transition" required /></div>
 					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm"></div>
-					<button type="submit" id="login-submit-button" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
-						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
-						<span id="login-button-text">Entrar no Sistema</span>
-					</button>
+					<button type="submit" id="login-submit-button" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:shadow-lg transition mt-6">Entrar</button>
 				</form>
-				<div class="mt-6 text-center text-gray-400 text-xs"><p>Acesso restrito a utilizadores autorizados</p></div>
 			</div>
 		</div>
 	</div>
-    <div id="app-container" class="flex h-screen">
-		
-		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 transition-all duration-300 z-20">
-			<div class="flex-shrink-0 mb-8">
-				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" alt="Logótipo Fabris e Gurjão" class="h-20 mx-auto opacity-90" />
-			</div>
-			
-			<nav class="flex-1 space-y-3">
-				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active">
-					<i class="fas fa-tachometer-alt w-5 text-center"></i><span>Painel Principal</span>
-				</a>
-				<a onclick="window.App.showPage('page-parcelas')" id="tab-parcelas" class="sidebar-nav-item">
-					<i class="fas fa-file-invoice-dollar w-5 text-center"></i><span>Parcelas</span>
-				</a>
-				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item">
-					<i class="fas fa-tasks w-5 text-center"></i><span>Serviços</span>
-				</a>
-				<a onclick="window.App.showPage('page-performance')" id="tab-performance" class="sidebar-nav-item admin-only">
-					<i class="fas fa-rocket w-5 text-center"></i><span>Performance</span>
-				</a>
-				<a onclick="window.App.showPage('page-relatorios')" id="tab-relatorios" class="sidebar-nav-item admin-only">
-					<i class="fas fa-chart-pie w-5 text-center"></i><span>Relatórios</span>
-				</a>
-				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item">
-					<i class="fas fa-trash-alt w-5 text-center"></i><span>Lixeira</span>
-				</a>
-				<div class="border-t border-gray-700 pt-3 mt-3 admin-only">
-					<a onclick="window.App.showPage('page-oficina')" id="tab-oficina" class="sidebar-nav-item admin-only">
-						<i class="fas fa-cogs w-5 text-center"></i><span>Oficina</span>
-					</a>
+	<div id="app-container" class="flex h-screen">
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/50 backdrop-blur-lg border-r border-gray-700/50 p-4 z-20 transition-all">
+			<div class="mb-8"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-20 mx-auto opacity-90" /></div>
+			<nav class="flex-1 space-y-2">
+				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active"><i class="fas fa-tachometer-alt w-5 text-center"></i><span>Painel</span></a>
+				<a onclick="window.App.showPage('page-parcelas')" id="tab-parcelas" class="sidebar-nav-item"><i class="fas fa-file-invoice-dollar w-5 text-center"></i><span>Parcelas</span></a>
+				<a onclick="window.App.showPage('page-servicos')" id="tab-servicos" class="sidebar-nav-item"><i class="fas fa-tasks w-5 text-center"></i><span>Serviços</span></a>
+				<a onclick="window.App.showPage('page-performance')" id="tab-performance" class="sidebar-nav-item admin-only"><i class="fas fa-rocket w-5 text-center"></i><span>Performance</span></a>
+				<a onclick="window.App.showPage('page-relatorios')" id="tab-relatorios" class="sidebar-nav-item admin-only"><i class="fas fa-chart-pie w-5 text-center"></i><span>Relatórios</span></a>
+				<a onclick="window.App.showPage('page-lixeira')" id="tab-lixeira" class="sidebar-nav-item"><i class="fas fa-trash-alt w-5 text-center"></i><span>Lixeira</span></a>
+				<div class="border-t border-gray-700 pt-2 mt-2 admin-only">
+					<a onclick="window.App.showPage('page-oficina')" id="tab-oficina" class="sidebar-nav-item"><i class="fas fa-cogs w-5 text-center"></i><span>Oficina</span></a>
 				</div>
 			</nav>
-
-			<div class="mt-auto flex-shrink-0 border-t border-gray-700 pt-4">
-				<div class="flex items-center gap-3 p-2 rounded-lg">
-					<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white"><i class="fas fa-user"></i></div>
-					<div>
-						<span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span>
-						<button id="logout-button" class="text-xs text-red-400 hover:text-red-300 transition-colors">Sair</button>
-					</div>
-				</div>
+			<div class="mt-auto border-t border-gray-700 pt-4 flex items-center gap-3 p-2">
+				<div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-white"><i class="fas fa-user"></i></div>
+				<div><span id="user-display-name" class="text-sm text-gray-200 font-medium block"></span><button id="logout-button" class="text-xs text-red-400 hover:text-red-300">Sair</button></div>
 			</div>
 		</aside>
 
 		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-24 md:pb-0">
-			
-			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 md:p-6">
-				<div class="flex justify-between items-center">
-					<h1 id="page-title" class="text-2xl md:text-3xl font-bold text-white">Painel Principal</h1>
+			<header class="sticky top-0 bg-gray-900/30 backdrop-blur-md border-b border-gray-700/50 p-4 z-10 flex justify-between items-center">
+				<h1 id="page-title" class="text-2xl font-bold text-white">Painel Principal</h1>
+				<div class="flex items-center gap-4">
 					
-					<div class="flex items-center gap-4">
-						<select id="globalDateFilter">
-							<option value="novos">Novos (A partir de Set/25)</option>
-							<option value="legado">Legado (Antigos)</option>
+					<div class="pretty-select-wrapper">
+						<select id="globalDateFilter" class="pretty-select">
+							<option value="novos">✨ Atuais (Novos)</option>
+							<option value="legado">📜 Legado (Antigos)</option>
 						</select>
+						<i class="fas fa-calendar-check select-icon"></i>
+					</div>
 
-						<div class="relative">
-							<button id="notification-bell" class="p-2 text-gray-300 hover:text-white transition-colors">
-								<i class="fas fa-bell text-xl"></i>
-								<span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900"></span>
-							</button>
-							<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 md:w-96 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
-								<div class="flex justify-between items-center p-3 bg-gray-900/50 border-b border-gray-700">
-									<h3 class="font-semibold text-white">Notificações</h3>
-									<button id="clear-notifications-button" class="text-xs text-indigo-400 hover:text-indigo-300">Marcar todas como lidas</button>
-								</div>
-								<div id="notification-list" class="max-h-80 overflow-y-auto space-y-2 p-2">
-									<div id="notification-list-empty" class="hidden"><i class="fas fa-check-circle text-gray-500 text-3xl mb-2"></i><p>Nenhuma notificação nova.</p></div>
-								</div>
+					<div class="relative">
+						<button id="notification-bell" class="p-2 text-gray-300 hover:text-white"><i class="fas fa-bell text-xl"></i><span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span></button>
+						<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+							<div class="flex justify-between p-3 border-b border-gray-700"><h3 class="font-semibold text-white">Notificações</h3><button id="clear-notifications-button" class="text-xs text-indigo-400">Limpar</button></div>
+							<div id="notification-list" class="max-h-64 overflow-y-auto p-2">
+								<div id="notification-list-empty" class="hidden text-center p-4 text-gray-500">Nada novo.</div>
 							</div>
 						</div>
-						
-						<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
-							<i class="fas fa-bars text-xl"></i>
-						</button>
 					</div>
+					<button id="mobile-menu-toggle" class="md:hidden text-white text-xl"><i class="fas fa-bars"></i></button>
 				</div>
 			</header>
 
 			<div class="p-4 md:p-8 flex-1">
-				
 				<div id="page-dashboard">
 					<div class="flex flex-wrap gap-4 mb-8">
-						<button onclick="window.App.openContractModal()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-							<i class="fas fa-plus-circle"></i> Novo Contrato
-						</button>
-						<button onclick="window.App.openReportModal()" class="admin-only bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2">
-							<i class="fas fa-chart-line"></i> Relatório Mensal
-						</button>
+						<button onclick="window.App.openContractModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-lg flex items-center gap-2"><i class="fas fa-plus-circle"></i> Novo Contrato</button>
+						<button onclick="window.App.openReportModal()" class="admin-only bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-5 rounded-lg shadow-lg flex items-center gap-2"><i class="fas fa-chart-line"></i> Relatório Mensal</button>
 					</div>
 
-					<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
-							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
-						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
-							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
-						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-							<h3 class="text-lg font-semibold text-gray-400">Recebido (Este Mês)</h3>
-							<p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p>
-						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-							<h3 class="text-lg font-semibold text-gray-400">Meus Contratos Ativos</h3>
-							<p id="dash-contratos" class="text-3xl font-bold text-white"></p>
-						</div>
-					</div>
-					<div class="mb-4 border-b border-gray-700">
-						<h2 class="text-2xl font-semibold mb-4 text-white">Situação das Parcelas (Meus Contratos)</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-gray-400 font-semibold">A Receber (30d)</h3><p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-gray-400 font-semibold">Vencido (Corrigido)</h3><p id="dash-vencido" class="text-3xl font-bold text-red-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-gray-400 font-semibold">Recebido (Mês)</h3><p id="dash-recebido" class="text-3xl font-bold text-indigo-400"></p></div>
+						<div class="dark-card p-6 rounded-lg shadow-lg"><h3 class="text-gray-400 font-semibold">Contratos Ativos</h3><p id="dash-contratos" class="text-3xl font-bold text-white"></p></div>
 					</div>
 
-					<div id="kanban-board" class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
-						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
-							<h3 class="font-bold text-lg mb-4 text-red-400 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i>Vencidas</h3>
-							<div id="kanban-vencidas" class="kanban-content space-y-3"></div>
-						</div>
-						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
-							<h3 class="font-bold text-lg mb-4 text-yellow-400 flex items-center gap-2"><i class="far fa-clock"></i>A Vencer (Próx. 30 dias)</h3>
-							<div id="kanban-a-vencer" class="kanban-content space-y-3"></div>
-						</div>
-						<div class="kanban-column dark-card shadow-lg rounded-lg p-4 flex-1">
-							<h3 class="font-bold text-lg mb-4 text-gray-400 flex items-center gap-2"><i class="fas fa-check-circle"></i>Pagas (Este Mês)</h3>
-							<div id="kanban-pagas" class="kanban-content space-y-3"></div>
-						</div>
+					<div class="mb-4 border-b border-gray-700"><h2 class="text-xl font-semibold text-white mb-2">Situação Financeira</h2></div>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4">
+						<div class="kanban-column dark-card rounded-lg p-4"><h3 class="text-red-400 font-bold mb-4"><i class="fas fa-exclamation-triangle"></i> Vencidas</h3><div id="kanban-vencidas" class="kanban-content space-y-3"></div></div>
+						<div class="kanban-column dark-card rounded-lg p-4"><h3 class="text-yellow-400 font-bold mb-4"><i class="far fa-clock"></i> A Vencer (30d)</h3><div id="kanban-a-vencer" class="kanban-content space-y-3"></div></div>
+						<div class="kanban-column dark-card rounded-lg p-4"><h3 class="text-gray-400 font-bold mb-4"><i class="fas fa-check-circle"></i> Pagas (Mês)</h3><div id="kanban-pagas" class="kanban-content space-y-3"></div></div>
 					</div>
 
-					<div id="exito-section" class="mt-12">
-						<div class="mb-4 border-b border-gray-700">
-							<h2 class="text-2xl font-semibold mb-4 text-white">Bonificações de Êxito Pendentes</h2>
-						</div>
-						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4 items-start"></div>
+					<div id="exito-section" class="mt-8 hidden">
+						<div class="mb-4 border-b border-gray-700"><h2 class="text-xl font-semibold text-white">Êxitos Pendentes</h2></div>
+						<div id="kanban-exito-wrapper" class="flex overflow-x-auto space-x-6 pb-4"></div>
 					</div>
 
 					<div class="mt-12">
-						<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-4 gap-4">
-							<h2 class="text-2xl font-semibold text-white">Meus Contratos</h2>
-							<div class="flex flex-wrap items-center gap-4">
-								<button onclick="window.App.exportContractsCSV()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-3 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2 text-sm">
-									<i class="fas fa-file-csv"></i> Exportar (CSV)
-								</button>
-								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
-								<div class="flex items-center gap-2">
-									<span class="text-sm text-gray-400">Mostrar:</span>
-									<div id="contractStatusFilterButtons" class="flex gap-1"></div>
-								</div>
-								<div class="flex items-center gap-2">
-									<span class="text-sm text-gray-400">Ordenar por:</span>
-									<div id="contractSortButtons" class="flex gap-1"></div>
-								</div>
+						<div class="flex flex-wrap justify-between items-center mb-4 border-b border-gray-700 pb-2">
+							<h2 class="text-xl font-semibold text-white">Lista de Contratos</h2>
+							<div class="flex gap-4 items-center">
+								<button onclick="window.App.exportContractsCSV()" class="text-green-400 text-sm hover:underline"><i class="fas fa-file-csv"></i> CSV</button>
+								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only"></select>
+								<div id="contractStatusFilterButtons" class="flex gap-1"></div>
+								<div id="contractSortButtons" class="flex gap-1"></div>
 							</div>
 						</div>
-						<div class="mb-4">
-							<input type="text" id="searchInput" placeholder="🔎 Pesquisar por cliente ou tipo de serviço..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
-						</div>
+						<input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white mb-4">
 						<div id="contractListContainer"></div>
-						<div id="paginationContainer" class="flex justify-center items-center gap-2 mt-8"></div>
+						<div id="paginationContainer" class="flex justify-center gap-2 mt-8"></div>
 					</div>
-				</div> 
-				
-				<div id="page-parcelas" class="hidden">
-					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-						<h2 class="text-2xl font-semibold text-white">Controle de Parcelas Pendentes</h2>
-						<div class="flex flex-wrap items-center gap-4">
-							<input type="text" id="parcelasSearchInput" placeholder="🔎 Pesquisar por cliente..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
-							<div class="flex items-center gap-2">
-								<span class="text-sm text-gray-400">Ordenar por:</span>
-								<div id="parcelasSortButtons" class="flex gap-1"></div>
-							</div>
+				</div>
+				</div> <div id="page-parcelas" class="hidden">
+					<div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+						<h2 class="text-xl font-semibold text-white">Controle de Parcelas</h2>
+						<div class="flex gap-4 items-center flex-wrap">
+							<input type="text" id="parcelasSearchInput" placeholder="Pesquisar cliente..." class="bg-gray-900 border border-gray-700 p-2 rounded text-white">
+							<div class="flex items-center gap-2"><span class="text-xs text-gray-500">Ordenar:</span><div id="parcelasSortButtons" class="flex gap-1"></div></div>
 						</div>
 					</div>
-					<div id="parcelasListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+					<div id="parcelasListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 				</div>
 
 				<div id="page-servicos" class="hidden">
-					<div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-						<h2 class="text-2xl font-semibold text-white">Controlo de Produção de Serviços</h2>
-						<div class="flex flex-wrap items-center gap-4">
-							<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
-							<div class="flex items-center gap-2">
-								<span class="text-sm text-gray-400">Ordenar por:</span>
-								<div id="servicosSortButtons" class="flex gap-1"></div>
-							</div>
-							<input type="text" id="servicosSearchInput" placeholder="🔎 Pesquisar..." class="w-full md:w-auto p-2 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
+					<div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+						<h2 class="text-xl font-semibold text-white">Produção de Serviços</h2>
+						<div class="flex gap-4 items-center flex-wrap">
+							<select id="servicosAdvogadoFilter" onchange="window.App.renderServicosPage()" class="filter-select admin-only"></select>
+							<div class="flex items-center gap-2"><span class="text-xs text-gray-500">Ordenar:</span><div id="servicosSortButtons" class="flex gap-1"></div></div>
+							<input type="text" id="servicosSearchInput" placeholder="Pesquisar..." class="bg-gray-900 border border-gray-700 p-2 rounded text-white">
 						</div>
 					</div>
-					<div id="servicosListContainer" class="space-y-8"></div>
+					<div id="servicosListContainer" class="space-y-6"></div>
 				</div>
 
 				<div id="page-performance" class="hidden admin-only">
-					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
-						<h2 class="text-2xl font-semibold text-white">Performance Gerencial</h2>
-						<p class="text-gray-400 -mt-4">Visão geral do desempenho da equipa (todos os dados).</p>
-					</div>
+					<div class="mb-6 border-b border-gray-700 pb-2"><h2 class="text-xl font-semibold text-white">Performance</h2></div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-						<div class="space-y-8">
-							<div class="dark-card shadow-lg p-6 rounded-lg">
-								<h3 class="text-lg font-semibold text-gray-300 mb-4">Contratos Ativos por Advogado</h3>
-								<div class="relative" style="height: 350px; max-width: 500px; margin: auto;"><canvas id="adminChartContratos"></canvas></div>
-							</div>
-							<div class="dark-card shadow-lg p-6 rounded-lg">
-								<h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação (Recebida) por Advogado (Ano)</h3>
-								<div class="relative" style="height: 350px;"><canvas id="adminChartFaturamento"></canvas></div>
-							</div>
+						<div class="space-y-6">
+							<div class="dark-card p-4 rounded-lg shadow"><h3 class="text-gray-300 font-bold mb-4">Contratos Ativos</h3><div class="h-64"><canvas id="adminChartContratos"></canvas></div></div>
+							<div class="dark-card p-4 rounded-lg shadow"><h3 class="text-gray-300 font-bold mb-4">Faturação (Ano)</h3><div class="h-64"><canvas id="adminChartFaturamento"></canvas></div></div>
 						</div>
-						<div class="space-y-8">
-							<div class="dark-card shadow-lg p-6 rounded-lg">
-								<h3 class="text-lg font-semibold text-gray-300 mb-4">Ranking de Faturação (Ano Atual)</h3>
-								<table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>Rank</th><th>Advogado(a)</th><th>Valor Recebido</th></tr></thead><tbody></tbody></table>
-							</div>
-							<div class="dark-card shadow-lg p-6 rounded-lg">
-								<h3 class="text-lg font-semibold text-gray-300 mb-4">Ranking de Contratos (Ativos)</h3>
-								<table class="ranking-table" id="adminTableContratos"><thead><tr><th>Rank</th><th>Advogado(a)</th><th>Nº de Contratos</th></tr></thead><tbody></tbody></table>
-							</div>
+						<div class="space-y-6">
+							<div class="dark-card p-4 rounded-lg shadow"><h3 class="text-gray-300 font-bold mb-4">Ranking Financeiro</h3><table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>#</th><th>Nome</th><th>Valor</th></tr></thead><tbody></tbody></table></div>
+							<div class="dark-card p-4 rounded-lg shadow"><h3 class="text-gray-300 font-bold mb-4">Ranking Contratos</h3><table class="ranking-table" id="adminTableContratos"><thead><tr><th>#</th><th>Nome</th><th>Qtd</th></tr></thead><tbody></tbody></table></div>
 						</div>
 					</div>
 				</div>
@@ -433,203 +221,166 @@
 					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
 						<h2 class="text-2xl font-semibold text-white">Relatórios Avançados</h2>
 						<div class="flex flex-wrap items-center gap-4">
-							<div><label for="reportStartDate" class="text-sm text-gray-400">De:</label><input type="date" id="reportStartDate" class="filter-select ml-2"></div>
-							<div><label for="reportEndDate" class="text-sm text-gray-400">Até:</label><input type="date" id="reportEndDate" class="filter-select ml-2"></div>
-							<button onclick="window.App.generateAdvancedReport()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Gerar Relatório</button>
-							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-200 transform hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2" disabled><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+							<input type="date" id="reportStartDate" class="filter-select">
+							<span class="text-gray-500">até</span>
+							<input type="date" id="reportEndDate" class="filter-select">
+							<button onclick="window.App.generateAdvancedReport()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow"><i class="fas fa-sync-alt"></i> Gerar</button>
+							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow" disabled><i class="fas fa-file-pdf"></i> PDF</button>
 						</div>
 					</div>
-					<div id="advancedReportContainer" class="space-y-8"><div id="report-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real (Linha do Tempo)</h3><div class="relative" style="height: 350px;"><canvas id="advReportTimelineChart"></canvas></div></div><div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Novos Contratos (Mensal)</h3><div class="relative" style="height: 350px;"><canvas id="advReportNewContractsChart"></canvas></div></div></div><div class="grid grid-cols-1 gap-8"><div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação por Advogado</h3><div class="relative" style="height: 400px; max-width: 600px; margin: auto;"><canvas id="advReportByAdvogadoChart"></canvas></div></div></div></div>
-					<div id="advancedReportEmpty" class="hidden text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-chart-pie fa-3x mb-3"></i><p class="font-bold text-xl">Nenhum dado encontrado.</p><p class="text-sm">Ajuste as datas ou aguarde novos registos.</p></div></div>
+					<div id="advancedReportContainer" class="space-y-8">
+						<div id="report-kpis" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+							<div class="dark-card p-4 rounded-lg"><h3 class="text-gray-300 mb-2">Linha do Tempo</h3><div class="h-64"><canvas id="advReportTimelineChart"></canvas></div></div>
+							<div class="dark-card p-4 rounded-lg"><h3 class="text-gray-300 mb-2">Novos Contratos</h3><div class="h-64"><canvas id="advReportNewContractsChart"></canvas></div></div>
+						</div>
+						<div class="dark-card p-4 rounded-lg"><h3 class="text-gray-300 mb-2">Por Advogado</h3><div class="h-64 max-w-lg mx-auto"><canvas id="advReportByAdvogadoChart"></canvas></div></div>
+					</div>
+					<div id="advancedReportEmpty" class="hidden text-center py-10 text-gray-500"><i class="fas fa-chart-pie fa-3x mb-2"></i><p>Selecione as datas para gerar.</p></div>
 				</div>
 
 				<div id="page-lixeira" class="hidden">
-					<div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-semibold text-white">Lixeira de Contratos</h2></div>
-					<p class="text-gray-400 mb-6">Contratos excluídos são mantidos aqui. Pode restaurá-los ou excluí-los permanentemente.</p>
-					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+					<h2 class="text-xl font-semibold text-white mb-4">Lixeira</h2>
+					<div id="lixeiraListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
 				</div>
 
 				<div id="page-oficina" class="hidden admin-only">
-					<div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-gray-700 pb-4">
-						<h2 class="text-2xl font-semibold text-white">Oficina de Configurações</h2>
-						<p class="text-gray-400 -mt-4">Área para gerir as configurações centrais do sistema.</p>
-					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-						<div class="dark-card shadow-lg p-6 rounded-lg">
-							<h3 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2"><i class="fas fa-users-cog text-indigo-400"></i> Gerenciador de Advogados</h3>
-							<p class="text-sm text-gray-400 mb-4">Os nomes adicionados aqui aparecerão automaticamente nos formulários e filtros.</p>
-							<form id="formAddAdvogado" class="flex gap-2 mb-4">
-								<input type="text" id="inputAdvogadoName" placeholder="Nome do(a) novo(a) Advogado(a)" class="form-input flex-1" required>
-								<button type="submit" class="form-button flex-shrink-0"><i class="fas fa-plus"></i> Adicionar</button>
-							</form>
-							<div class="space-y-2 max-h-80 overflow-y-auto" id="advogadoSettingsList"></div>
-						</div>
+					<h2 class="text-xl font-semibold text-white mb-4">Oficina de Configurações</h2>
+					<div class="dark-card p-6 rounded-lg max-w-lg">
+						<h3 class="font-bold text-indigo-400 mb-4"><i class="fas fa-users-cog"></i> Advogados</h3>
+						<form id="formAddAdvogado" class="flex gap-2 mb-4">
+							<input type="text" id="inputAdvogadoName" placeholder="Nome..." class="form-input" required>
+							<button type="submit" class="form-button">Add</button>
+						</form>
+						<div id="advogadoSettingsList" class="max-h-60 overflow-y-auto space-y-1"></div>
 					</div>
 				</div>
 
-			</div> 
+			</div>
 		</main>
-		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-lg border-t border-gray-700/50 flex justify-around z-30">
-			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active"><i class="fas fa-tachometer-alt text-xl"></i><span class="text-xs mt-1">Painel</span></a>
-			<a onclick="window.App.showPage('page-parcelas')" id="mobile-tab-parcelas" class="mobile-nav-item"><i class="fas fa-file-invoice-dollar text-xl"></i><span class="text-xs mt-1">Parcelas</span></a>
-			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item"><i class="fas fa-tasks text-xl"></i><span class="text-xs mt-1">Serviços</span></a>
-			<a onclick="window.App.showPage('page-performance')" id="mobile-tab-performance" class="mobile-nav-item admin-only"><i class="fas fa-rocket text-xl"></i><span class="text-xs mt-1">Perf.</span></a>
-			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only"><i class="fas fa-chart-pie text-xl"></i><span class="text-xs mt-1">Relat.</span></a>
-			<a onclick="window.App.showPage('page-lixeira')" id="mobile-tab-lixeira" class="mobile-nav-item"><i class="fas fa-trash-alt text-xl"></i><span class="text-xs mt-1">Lixeira</span></a>
-			<a onclick="window.App.showPage('page-oficina')" id="mobile-tab-oficina" class="mobile-nav-item admin-only"><i class="fas fa-cogs text-xl"></i><span class="text-xs mt-1">Oficina</span></a>
+
+		<nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur border-t border-gray-700 flex justify-around z-30">
+			<a onclick="window.App.showPage('page-dashboard')" id="mobile-tab-dashboard" class="mobile-nav-item active"><i class="fas fa-tachometer-alt"></i><span class="text-[10px]">Painel</span></a>
+			<a onclick="window.App.showPage('page-parcelas')" id="mobile-tab-parcelas" class="mobile-nav-item"><i class="fas fa-file-invoice-dollar"></i><span class="text-[10px]">Parcelas</span></a>
+			<a onclick="window.App.showPage('page-servicos')" id="mobile-tab-servicos" class="mobile-nav-item"><i class="fas fa-tasks"></i><span class="text-[10px]">Serviços</span></a>
+			<a onclick="window.App.showPage('page-relatorios')" id="mobile-tab-relatorios" class="mobile-nav-item admin-only"><i class="fas fa-chart-pie"></i><span class="text-[10px]">Relat.</span></a>
 		</nav>
 	</div>
-    <div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalDisplayNameTitle">
-		<div class="p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalDisplayNameTitle" class="text-2xl font-bold text-white">Bem-vindo(a)!</h2>
-		</div>
-		<div class="p-6 modal-body">
-			<p class="text-gray-400 mb-4">Percebemos que é o seu primeiro acesso. Como gostaria de ser chamado(a)?</p>
+
+	<div id="modalDisplayName" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3">
+		<div class="p-4 border-b border-gray-700"><h2 class="text-xl font-bold text-white">Bem-vindo(a)!</h2></div>
+		<div class="p-6">
 			<form id="formDisplayName">
-				<div class="mb-4">
-					<label for="inputDisplayName" class="block text-sm font-medium text-gray-400 mb-2">O seu Nome de Exibição</label>
-					<input type="text" id="inputDisplayName" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
-				</div>
-				<button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar e Entrar</button>
+				<label class="block text-sm text-gray-400 mb-1">Seu Nome</label>
+				<input type="text" id="inputDisplayName" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white mb-4" required>
+				<button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded">Salvar</button>
 			</form>
 		</div>
 	</div>
 
-	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
-		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
-			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
-		</div>
+	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 flex flex-col">
+		<div class="p-4 border-b border-gray-700 flex justify-between items-center"><h2 id="modalContratoTitle" class="text-xl font-bold text-white">Novo Contrato</h2><button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formContrato" class="flex flex-col flex-1 overflow-hidden">
-			<div class="p-6 space-y-4 overflow-y-auto modal-body">
-				<input type="hidden" id="contractId">
-				<input type="hidden" id="financialDataChanged" value="false">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div><label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label><input type="text" id="clienteNome" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required></div>
-					<div><label for="advogadoResponsavel" class="block text-sm font-medium text-gray-400 mb-1">Advogado Responsável</label><select id="advogadoResponsavel" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required></select></div>
+			<div class="p-6 overflow-y-auto modal-body space-y-4">
+				<input type="hidden" id="contractId"><input type="hidden" id="financialDataChanged" value="false">
+				<div class="grid grid-cols-2 gap-4">
+					<div><label class="text-sm text-gray-400">Cliente</label><input type="text" id="clienteNome" class="form-input" required></div>
+					<div><label class="text-sm text-gray-400">Advogado</label><select id="advogadoResponsavel" class="form-input" required></select></div>
 				</div>
-				<div>
-					<label class="block text-sm font-medium text-gray-400 mb-1">Adicionar Serviços</label>
-					<div id="servicosContainerWrapper" class="mt-1 p-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm">
-						<div id="servicosContainer" class="flex flex-wrap items-center gap-1 w-full mb-2"></div>
-						<div class="flex gap-2">
-							<input type="text" id="contratoServicoInput" class="flex-grow outline-none bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white" placeholder="Nome do Serviço...">
-							<input type="date" id="contratoPrazoInput" class="bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-400 px-3 py-2" style="color-scheme: dark;">
-							<button type="button" id="addServiceButton" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-3 rounded-lg">Adicionar</button>
-						</div>
+				<div class="bg-gray-900/50 p-3 rounded border border-gray-700">
+					<label class="text-sm text-gray-400">Serviços</label>
+					<div id="servicosContainer" class="flex flex-wrap gap-2 mb-2"></div>
+					<div class="flex gap-2">
+						<input type="text" id="contratoServicoInput" class="form-input flex-1" placeholder="Nome serviço...">
+						<input type="date" id="contratoPrazoInput" class="form-input w-32">
+						<button type="button" id="addServiceButton" class="bg-indigo-600 px-3 rounded text-white text-sm">Add</button>
 					</div>
 				</div>
-				<div>
-					<label for="contratoTipoPagamento" class="block text-sm font-medium text-gray-400 mb-1">Modalidade de Pagamento</label>
-					<select id="contratoTipoPagamento" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200">
-						<option>Parcelado</option><option>Pró-labore</option><option>Entrada única</option>
-					</select>
-				</div>
-				<div><label for="contratoObservacoes" class="block text-sm font-medium text-gray-400 mb-1">Observações</label><textarea id="contratoObservacoes" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" placeholder="Detalhes da negociação..."></textarea></div>
+				<div><label class="text-sm text-gray-400">Pagamento</label><select id="contratoTipoPagamento" class="form-input"><option>Parcelado</option><option>Pró-labore</option><option>Entrada única</option></select></div>
+				<div><label class="text-sm text-gray-400">Obs</label><textarea id="contratoObservacoes" rows="2" class="form-input"></textarea></div>
 				
-				<div class="admin-only space-y-4">
-					<div id="financial-warning" class="hidden p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-300 text-sm"><i class="fas fa-exclamation-triangle mr-2"></i> Os campos financeiros estão bloqueados pois este contrato já possui parcelas pagas.</div>
-					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros</h3>
-					<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
-						<label for="contratoEspecial" class="flex items-center"><input type="checkbox" id="contratoEspecial" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm font-medium text-gray-300">Contrato Especial (Manual)</span></label>
-					</div>
-					<div id="financial-fields-standard" class="space-y-4">
-						<div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700">
-							<label for="contratoJaQuitado" class="flex items-center"><input type="checkbox" id="contratoJaQuitado" class="h-4 w-4 bg-gray-700 border-gray-600 rounded text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm font-medium text-gray-300">Já quitado (gera 1 parcela paga)</span></label>
+				<div class="admin-only border-t border-gray-700 pt-4">
+					<div id="financial-warning" class="hidden text-yellow-400 text-xs mb-2"><i class="fas fa-exclamation-triangle"></i> Financeiro bloqueado (já possui pagamentos).</div>
+					<div class="flex items-center mb-2"><input type="checkbox" id="contratoEspecial" class="mr-2"><label for="contratoEspecial" class="text-sm text-gray-300">Modo Manual (Datas Variadas)</label></div>
+					
+					<div id="financial-fields-standard" class="space-y-3">
+						<div class="flex items-center mb-2"><input type="checkbox" id="contratoJaQuitado" class="mr-2"><label for="contratoJaQuitado" class="text-sm text-gray-300">Já Quitado</label></div>
+						<div class="grid grid-cols-2 gap-4">
+							<div><label class="text-xs text-gray-400">Valor Total</label><input type="number" step="0.01" id="valorTotal" class="form-input"></div>
+							<div><label class="text-xs text-gray-400">Qtd Parcelas</label><input type="number" id="numParcelas" value="1" class="form-input"></div>
 						</div>
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<div><label for="valorTotal" class="block text-sm font-medium text-gray-400 mb-1">Valor Fixo Total (R$)</label><input type="number" step="0.01" id="valorTotal" placeholder="0 se for só êxito" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200"></div>
-							<div><label for="numParcelas" class="block text-sm font-medium text-gray-400 mb-1">N° de Parcelas</label><input type="number" id="numParcelas" placeholder="1 para 'À Vista'" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" value="1"></div>
-						</div>
-						<div><label for="vencimentoPrimeiraParcela" class="block text-sm font-medium text-gray-400 mb-1">Vencimento da 1ª Parcela</label><input type="date" id="vencimentoPrimeiraParcela" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" style="color-scheme: dark;"></div>
+						<div><label class="text-xs text-gray-400">1º Vencimento</label><input type="date" id="vencimentoPrimeiraParcela" class="form-input"></div>
 					</div>
-					<div id="financial-fields-special" class="hidden space-y-4">
-						<p class="text-sm text-gray-400">Insira as parcelas uma a uma.</p>
-						<div class="flex flex-col md:flex-row gap-2">
-							<div class="flex-1"><label for="parcelaValorManual" class="block text-xs font-medium text-gray-400 mb-1">Valor</label><input type="number" step="0.01" id="parcelaValorManual" class="form-input"></div>
-							<div class="flex-1"><label for="parcelaVencimentoManual" class="block text-xs font-medium text-gray-400 mb-1">Vencimento</label><input type="date" id="parcelaVencimentoManual" class="form-input" style="color-scheme: dark;"></div>
-							<button type="button" id="addManualParcelButton" class="form-button self-end mt-4 md:mt-0">Adicionar</button>
+
+					<div id="financial-fields-special" class="hidden space-y-2">
+						<div class="flex gap-2">
+							<input type="number" id="parcelaValorManual" placeholder="Valor" class="form-input">
+							<input type="date" id="parcelaVencimentoManual" class="form-input">
+							<button type="button" id="addManualParcelButton" class="bg-indigo-600 px-3 rounded text-white text-sm">Add</button>
 						</div>
-						<div id="manualParcelList" class="space-y-1 max-h-40 overflow-y-auto p-2 bg-gray-900/50 rounded-md border border-gray-700"></div>
+						<div id="manualParcelList" class="max-h-32 overflow-y-auto"></div>
 					</div>
-					<div><label for="taxaExito" class="block text-sm font-medium text-gray-400 mb-1">Taxa de Êxito</label><input type="text" id="taxaExito" placeholder="Ex: 20%" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200"></div>
+					<div class="mt-2"><label class="text-xs text-gray-400">Êxito</label><input type="text" id="taxaExito" class="form-input"></div>
 				</div>
 			</div>
-			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
-				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
-				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
+			<div class="p-4 border-t border-gray-700 flex justify-end gap-2">
+				<button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+				<button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Salvar</button>
 			</div>
 		</form>
 	</div>
-
-	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalPagamentoTitle">
-		<div class="flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalPagamentoTitle" class="text-2xl font-bold text-white">Registar Pagamento</h2>
-			<button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
-		</div>
+	<div id="modalPagamento" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3">
+		<div class="p-4 border-b border-gray-700 flex justify-between items-center"><h2 class="text-xl font-bold text-white">Registar Pagamento</h2><button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formPagamento">
 			<div class="p-6 space-y-4 modal-body">
-				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded-md text-white"></div>
-				<div><label for="pagamentoValor" class="block text-sm font-medium text-gray-400 mb-1">Valor Pago (R$)</label><input type="number" step="0.01" id="pagamentoValor" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required></div>
-				<div><label for="pagamentoData" class="block text-sm font-medium text-gray-400 mb-1">Data do Pagamento</label><input type="date" id="pagamentoData" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200" required style="color-scheme: dark;"></div>
+				<div id="pagamentoInfo" class="mb-4 bg-gray-700 p-3 rounded text-sm text-gray-300"></div>
+				<div><label class="text-sm text-gray-400">Valor Pago (R$)</label><input type="number" step="0.01" id="pagamentoValor" class="form-input" required></div>
+				<div><label class="text-sm text-gray-400">Data Pagamento</label><input type="date" id="pagamentoData" class="form-input" required></div>
 				<input type="hidden" id="pagamentoContractId"><input type="hidden" id="pagamentoParcelIndex">
 			</div>
-			<div class="flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
-				<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
-				<button type="submit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Confirmar</button>
+			<div class="p-4 border-t border-gray-700 flex justify-end gap-2">
+				<button type="button" onclick="window.App.closeModal('modalPagamento')" class="bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+				<button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Confirmar</button>
 			</div>
 		</form>
 	</div>
 
-	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="clienteModalTitle">
-		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="clienteModalTitle" class="text-2xl font-bold text-white"></h2>
-			<button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
-		</div>
-		<div id="clienteModalContent" class="p-6 space-y-6 overflow-y-auto modal-body"></div>
+	<div id="modalCliente" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-2/3 flex flex-col">
+		<div class="p-4 border-b border-gray-700 flex justify-between items-center"><h2 id="clienteModalTitle" class="text-xl font-bold text-white"></h2><button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<div id="clienteModalContent" class="p-6 overflow-y-auto modal-body space-y-4"></div>
 	</div>
 
-	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 admin-only overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalRelatorioTitle">
-		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalRelatorioTitle" class="text-2xl font-bold text-white">Relatório Mensal</h2>
-			<button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
-		</div>
+	<div id="modalRelatorio" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-2/3 admin-only flex flex-col">
+		<div class="p-4 border-b border-gray-700 flex justify-between items-center"><h2 class="text-xl font-bold text-white">Relatório Mensal</h2><button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<div class="p-6 overflow-y-auto modal-body">
 			<div class="flex gap-4 mb-4">
-				<div class="flex-1"><label for="reportMonth" class="block text-sm font-medium text-gray-400 mb-1">Mês</label><select id="reportMonth" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select></div>
-				<div class="flex-1"><label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label><select id="reportYear" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200"></select></div>
+				<div class="flex-1"><label class="text-sm text-gray-400">Mês</label><select id="reportMonth" class="form-input"></select></div>
+				<div class="flex-1"><label class="text-sm text-gray-400">Ano</label><select id="reportYear" class="form-input"></select></div>
 			</div>
-			<div class="flex gap-4 mb-6">
-				<button onclick="window.App.generateAndShowReport()" class="flex-1 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"><i class="fas fa-file-invoice-dollar mr-2"></i> Relatório</button>
-				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"><i class="fas fa-chart-bar mr-2"></i> Gráficos</button>
-				<button onclick="window.App.exportReportCSV()" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"><i class="fas fa-file-csv mr-2"></i> CSV</button>
+			<div class="flex gap-2 mb-6">
+				<button onclick="window.App.generateAndShowReport()" class="flex-1 bg-teal-600 text-white font-bold py-2 rounded shadow hover:bg-teal-700">Ver Relatório</button>
+				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-purple-600 text-white font-bold py-2 rounded shadow hover:bg-purple-700">Gráficos</button>
+				<button onclick="window.App.exportReportCSV()" class="flex-1 bg-green-600 text-white font-bold py-2 rounded shadow hover:bg-green-700">CSV</button>
 			</div>
 			<div id="reportResult" class="space-y-4"></div>
-			<div id="reportChartsContainer" class="hidden space-y-8">
-				<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Faturação Real</h3><div class="relative" style="height: 350px;"><canvas id="actualIncomeChartModal"></canvas></div></div>
-				<div class="dark-card shadow-lg p-6 rounded-lg"><h3 class="text-lg font-semibold text-gray-300 mb-4">Projeção</h3><div class="relative" style="height: 350px;"><canvas id="projectedIncomeChartModal"></canvas></div></div>
+			<div id="reportChartsContainer" class="hidden grid grid-cols-2 gap-4">
+				<div class="dark-card p-4 rounded"><h3 class="text-gray-300 mb-2">Real</h3><div class="h-64"><canvas id="actualIncomeChartModal"></canvas></div></div>
+				<div class="dark-card p-4 rounded"><h3 class="text-gray-300 mb-2">Projeção</h3><div class="h-64"><canvas id="projectedIncomeChartModal"></canvas></div></div>
 			</div>
 		</div>
 	</div>
 
-	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3 overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="modalExitoTitle">
-		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
-			<h2 id="modalExitoTitle" class="text-2xl font-bold text-white">Registar Êxito</h2>
-			<button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
-		</div>
+	<div id="modalExito" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/3">
+		<div class="p-4 border-b border-gray-700 flex justify-between items-center"><h2 class="text-xl font-bold text-white">Registar Êxito</h2><button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formExito">
-			<div class="p-6 space-y-4 modal-body">
-				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded-md"></div>
-				<div class="admin-only">
-					<label for="exitoValorRecebido" class="block text-sm font-medium text-gray-400 mb-1">Valor Líquido Recebido (R$)</label>
-					<input type="number" step="0.01" id="exitoValorRecebido" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm text-white transition-all duration-200" placeholder="Ex: 9500.00" required>
-				</div>
-				<p class="mb-4 text-gray-400 non-admin-hidden">Confirme o recebimento do valor de êxito.</p>
+			<div class="p-6 modal-body space-y-4">
+				<div id="exitoInfo" class="mb-4 bg-gray-700 p-3 rounded text-sm"></div>
+				<div class="admin-only"><label class="text-sm text-gray-400">Valor Líquido (R$)</label><input type="number" step="0.01" id="exitoValorRecebido" class="form-input" required></div>
 				<input type="hidden" id="exitoContractId">
 			</div>
-			<div class="flex-shrink-0 flex justify-end p-4 bg-gray-900/50 border-t border-gray-700">
-				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2 transition-all duration-200">Cancelar</button>
-				<button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Guardar</button>
+			<div class="p-4 border-t border-gray-700 flex justify-end gap-2">
+				<button type="button" onclick="window.App.closeModal('modalExito')" class="bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+				<button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Salvar</button>
 			</div>
 		</form>
 	</div>
@@ -639,155 +390,130 @@
 	<script type="module">
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, orderBy, limit, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		const ADMIN_USERS = ["dra. renata fabris","darc", "dr. felipe gurjão", "lilian"];
 		const CONTRACTS_PER_PAGE = 12;
-		// [NOVO] Data de corte: 01 de Setembro de 2025 (UTC)
-		const CUTOFF_DATE = new Date('2025-09-01T00:00:00Z');
+		const CUTOFF_DATE = new Date('2025-09-01T00:00:00Z'); // Data de Corte para Novos/Legado
 
 		const Utils = {
 			toastContainer: null,
 			initToast() {
 				let el = document.getElementById('notifications');
-				if (!el) {
-					el = document.createElement('div'); el.id = 'toast-container-fallback';
-					el.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:11000;display:flex;flex-direction:column;gap:8px;';
-					document.body.appendChild(el);
-				}
+				if (!el) { el = document.createElement('div'); el.id = 'toast-fallback'; el.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:11000;display:flex;flex-direction:column;gap:8px;'; document.body.appendChild(el); }
 				this.toastContainer = el;
 			},
-			showToast(message, type = 'info') {
+			showToast(msg, type = 'info') {
 				if (!this.toastContainer) this.initToast();
-				const n = document.createElement('div');
-				n.className = 'px-4 py-3 rounded-lg shadow-lg text-sm';
+				const n = document.createElement('div'); n.className = 'px-4 py-3 rounded-lg shadow-lg text-sm text-white animate-bounce';
 				n.style.background = type === 'error' ? '#7f1d1d' : (type === 'success' ? '#065f46' : '#374151');
-				n.style.color = '#fff'; n.textContent = message;
-				this.toastContainer.appendChild(n); setTimeout(() => n.remove(), 2500);
+				n.textContent = msg; this.toastContainer.appendChild(n); setTimeout(() => n.remove(), 3000);
 			},
 			debounce(fn, ms = 300) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; },
 			sanitizeText(s) { if (s == null) return ''; return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;').trim(); },
-			sanitizeForFirestoreId(name) { if (!name) return 'unknown_user'; return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, '_').toLowerCase(); },
+			sanitizeForFirestoreId(n) { if (!n) return 'unknown'; return n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, '_').toLowerCase(); },
 			parseNumber(n) { const v = Number(n); return Number.isFinite(v) ? v : 0; },
-			confirm(message) {
-				return new Promise((resolve) => {
-					let modal = document.getElementById('confirmModal');
-					if (!modal) {
-						modal = document.createElement('div'); modal.id = 'confirmModal';
-						modal.innerHTML = `<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:12000"><div class="dark-card" style="width:100%;max-width:420px;border-radius:12px;border:1px solid #374151;padding:16px;background:#111827"><p id="confirmMessage" class="text-gray-200 mb-4"></p><div class="flex justify-end gap-2"><button id="confirmCancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg">Cancelar</button><button id="confirmOk" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">Confirmar</button></div></div></div>`;
-						document.body.appendChild(modal);
-					}
-					modal.querySelector('#confirmMessage').textContent = message; modal.style.display = 'block';
-					modal.querySelector('#confirmCancel').onclick = () => { modal.style.display = 'none'; resolve(false); };
-					modal.querySelector('#confirmOk').onclick = () => { modal.style.display = 'none'; resolve(true); };
+			confirm(msg) {
+				return new Promise(res => {
+					let m = document.getElementById('confirmModal');
+					if (!m) { m = document.createElement('div'); m.id='confirmModal'; m.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:12000;display:flex;align-items:center;justify-content:center"><div class="dark-card p-6 rounded-lg max-w-sm w-full"><p id="cfmMsg" class="text-white mb-4"></p><div class="flex justify-end gap-2"><button id="cfmNo" class="bg-gray-600 text-white px-4 py-2 rounded">Não</button><button id="cfmYes" class="bg-red-600 text-white px-4 py-2 rounded">Sim</button></div></div></div>`; document.body.appendChild(m); }
+					m.querySelector('#cfmMsg').textContent=msg; m.style.display='flex';
+					m.querySelector('#cfmNo').onclick=()=>{m.style.display='none';res(false)}; m.querySelector('#cfmYes').onclick=()=>{m.style.display='none';res(true)};
 				});
 			},
-			formatCurrency(value) { return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
-			formatDate(dateStr) { if (!dateStr) return ''; const date = new Date(dateStr); const d = date.getUTCDate(), m = date.getUTCMonth() + 1, y = date.getUTCFullYear(); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; },
-			timeAgo(dateInput) { if (!dateInput) return ''; const date = (dateInput instanceof Date) ? dateInput : new Date(dateInput); const now = new Date(); const seconds = Math.floor((now.getTime() - date.getTime()) / 1000); let interval = seconds / 31536000; if (interval > 1) return `há ${Math.floor(interval)} ano(s)`; interval = seconds / 2592000; if (interval > 1) return `há ${Math.floor(interval)} mes(es)`; interval = seconds / 86400; if (interval > 1) return `há ${Math.floor(interval)} dia(s)`; interval = seconds / 3600; if (interval > 1) return `há ${Math.floor(interval)} hora(s)`; interval = seconds / 60; if (interval > 1) return `há ${Math.floor(interval)} min(s)`; return `há ${Math.floor(seconds)} seg(s)`; }
+			formatCurrency(v) { return (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
+			formatDate(d) { if (!d) return ''; const dt = new Date(d); return `${String(dt.getUTCDate()).padStart(2,'0')}/${String(dt.getUTCMonth()+1).padStart(2,'0')}/${dt.getUTCFullYear()}`; },
+			timeAgo(d) { if (!d) return ''; const sec = Math.floor((new Date()-new Date(d))/1000); if(sec<60) return 'agora'; const m=Math.floor(sec/60); if(m<60) return `${m}m atrás`; const h=Math.floor(m/60); if(h<24) return `${h}h atrás`; return `${Math.floor(h/24)}d atrás`; }
 		};
 
 		class CorrectionCalculator {
-			constructor() {
-				this.IPCA_TABLE = { "2023-01": 0.53, "2023-02": 0.84, "2023-03": 0.71, "2023-04": 0.61, "2023-05": 0.23, "2023-06": -0.08, "2023-07": 0.12, "2023-08": 0.23, "2023-09": 0.26, "2023-10": 0.24, "2023-11": 0.28, "2023-12": 0.56, "2024-01": 0.42, "2024-02": 0.83, "2024-03": 0.16, "2024-04": 0.38, "2024-05": 0.46, "2024-06": 0.36, "2024-07": 0.16, "2024-08": 0.24, "2024-09": 0.26, "2024-10": 0.42, "2024-11": 0.53, "2024-12": 0.48, "2025-01": 0.55, "2025-02": 0.78, "2025-03": 0.21, "2025-04": 0.35, "2025-05": 0.40, "2025-06": 0.26, "2025-07": 0.22, "2025-08": 0.31, "2025-09": 0.33, "2025-10": 0.40 };
-			}
-			toUTCDate(y, m, d) { const dt = new Date(Date.UTC(y, m, d)); dt.setUTCHours(0,0,0,0); return dt; }
-			diffMonths_30_360(fromDate, toDate) {
-				let y1 = fromDate.getUTCFullYear(), m1 = fromDate.getUTCMonth() + 1, d1 = fromDate.getUTCDate();
-				let y2 = toDate.getUTCFullYear(), m2 = toDate.getUTCMonth() + 1, d2 = toDate.getUTCDate();
-				if (d1 === 31) d1 = 30; if (d2 === 31 && d1 === 30) d2 = 30;
-				return Math.max(0, (y2 - y1) * 12 + (m2 - m1) + (d2 - d1) / 30);
-			}
-			getIPCAAccumulatedFactor(vencDate, refDate) {
-				let factor = 1.0; let currentDate = new Date(Date.UTC(vencDate.getUTCFullYear(), vencDate.getUTCMonth(), 1)); const endDate = new Date(Date.UTC(refDate.getUTCFullYear(), refDate.getUTCMonth(), 1));
-				while (currentDate < endDate) {
-					const key = `${currentDate.getUTCFullYear()}-${String(currentDate.getUTCMonth() + 1).padStart(2, '0')}`;
-					if (this.IPCA_TABLE[key] !== undefined) factor *= (1 + this.IPCA_TABLE[key] / 100);
-					currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
-				}
-				return factor;
-			}
-			calcularValorCorrigido(valorOriginal, dataVencimento, dataReferencia = new Date()) {
-				const ref = this.toUTCDate(dataReferencia.getUTCFullYear(), dataReferencia.getUTCMonth(), dataReferencia.getUTCDate());
-				const vRaw = new Date(dataVencimento); const venc = this.toUTCDate(vRaw.getUTCFullYear(), vRaw.getUTCMonth(), vRaw.getUTCDate());
-				if (ref <= venc) return valorOriginal;
-				const ipcaFactor = this.getIPCAAccumulatedFactor(venc, ref);
-				const meses = this.diffMonths_30_360(venc, ref);
-				return valorOriginal * ipcaFactor * (1 + 0.01 * meses);
-			}
+			constructor() { this.IPCA = { "2023-01":0.53, "2023-02":0.84, "2023-03":0.71, "2023-04":0.61, "2023-05":0.23, "2023-06":-0.08, "2023-07":0.12, "2023-08":0.23, "2023-09":0.26, "2023-10":0.24, "2023-11":0.28, "2023-12":0.56, "2024-01":0.42, "2024-02":0.83, "2024-03":0.16, "2024-04":0.38, "2024-05":0.46, "2024-06":0.36, "2024-07":0.16, "2024-08":0.24, "2024-09":0.26, "2024-10":0.42, "2024-11":0.53, "2024-12":0.48, "2025-01":0.55, "2025-02":0.78, "2025-03":0.21, "2025-04":0.35, "2025-05":0.40, "2025-06":0.26, "2025-07":0.22, "2025-08":0.31, "2025-09":0.33, "2025-10":0.40 }; }
+			toUTC(y,m,d){ const t=new Date(Date.UTC(y,m,d)); t.setUTCHours(0,0,0,0); return t; }
+			diff(d1,d2){ let y=(d2.getUTCFullYear()-d1.getUTCFullYear())*12+(d2.getUTCMonth()-d1.getUTCMonth()); return Math.max(0, y + (d2.getUTCDate()-d1.getUTCDate())/30); }
+			getFactor(v,r){ let f=1.0, c=new Date(Date.UTC(v.getUTCFullYear(),v.getUTCMonth(),1)); while(c<new Date(Date.UTC(r.getUTCFullYear(),r.getUTCMonth(),1))){ const k=`${c.getUTCFullYear()}-${String(c.getUTCMonth()+1).padStart(2,'0')}`; if(this.IPCA[k]) f*=(1+this.IPCA[k]/100); c.setUTCMonth(c.getUTCMonth()+1); } return f; }
+			calcularValorCorrigido(val, dv, dr=new Date()){ const r=this.toUTC(dr.getUTCFullYear(),dr.getUTCMonth(),dr.getUTCDate()), v=new Date(dv), vt=this.toUTC(v.getUTCFullYear(),v.getUTCMonth(),v.getUTCDate()); if(r<=vt) return val; return val * this.getFactor(vt,r) * (1 + 0.01 * this.diff(vt,r)); }
 		}
 
 		class AuthService {
-			constructor(app) {
-				this.app = app; this.auth = null;
-				this.firebaseConfig = { apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4", authDomain: "fabrisgurjao.firebaseapp.com", projectId: "fabrisgurjao", storageBucket: "fabrisgurjao.firebasestorage.app", messagingSenderId: "466702265991", appId: "1:466702265991:web:78c4d98b47cab537921222", measurementId: "G-E99R5TFMQK" };
-			}
-			initialize() {
-				const app = initializeApp(this.firebaseConfig); this.auth = getAuth(app); setLogLevel('error');
-				this.app.firebaseService.setDB(getFirestore(app));
-				onAuthStateChanged(this.auth, (u) => this.app.handleAuthStateChange(u));
-			}
-			async login(email, password) {
-				const btn = document.getElementById('login-submit-button'); if(btn) btn.disabled = true;
-				try { await signInWithEmailAndPassword(this.auth, email, password); }
-				catch (e) { document.getElementById('auth-error').classList.remove('hidden'); document.getElementById('auth-error').textContent = 'Erro ao entrar.'; }
-				finally { if(btn) btn.disabled = false; }
-			}
+			constructor(app) { this.app = app; this.auth = null; this.firebaseConfig = { apiKey: "AIzaSyA0TWb7DgZAHNl3TuoK3xQD-ANvCcQIDK4", authDomain: "fabrisgurjao.firebaseapp.com", projectId: "fabrisgurjao", storageBucket: "fabrisgurjao.firebasestorage.app", messagingSenderId: "466702265991", appId: "1:466702265991:web:78c4d98b47cab537921222", measurementId: "G-E99R5TFMQK" }; }
+			initialize() { const app = initializeApp(this.firebaseConfig); this.auth = getAuth(app); this.app.firebaseService.setDB(getFirestore(app)); onAuthStateChanged(this.auth, u => this.app.handleAuthStateChange(u)); }
+			async login(e, p) { const b=document.getElementById('login-submit-button'); if(b)b.disabled=true; try{ await signInWithEmailAndPassword(this.auth, e, p); }catch{ document.getElementById('auth-error').classList.remove('hidden'); document.getElementById('auth-error').textContent='Erro no login.'; }finally{ if(b)b.disabled=false; } }
 			async logout() { await signOut(this.auth); }
-			async updateUserProfile(name) { try { await updateProfile(this.auth.currentUser, { displayName: name }); return true; } catch { return false; } }
+			async updateUserProfile(n) { try{ await updateProfile(this.auth.currentUser, {displayName:n}); return true; }catch{ return false; } }
 		}
 
 		class FirebaseService {
 			constructor(app) { this.app = app; this.db = null; this.subs = []; }
 			setDB(db) { this.db = db; }
-			startSnapshotListener(colName) {
-				this.subs.push(onSnapshot(collection(this.db, colName), (s) => this.app.handleSnapshotUpdate(s.docs.map(d => ({ id: d.id, ...d.data() })))));
-			}
-			startNotificationListener(user) {
-				this.subs.push(onSnapshot(query(collection(this.db, `notifications/${user}/alerts`), orderBy("timestamp", "desc"), limit(20)), (s) => this.app.handleNotificationUpdate(s.docs.map(d => ({ id: d.id, ...d.data() })))));
-			}
-			startSystemSettingsListener() {
-				this.subs.push(onSnapshot(collection(this.db, 'systemSettings'), (s) => {
-					const set = {}; s.docs.forEach(d => set[d.id] = d.data()); this.app.handleSystemSettingsUpdate(set);
-				}));
-			}
+			startSnapshotListener(col) { this.subs.push(onSnapshot(collection(this.db, col), s => this.app.handleSnapshotUpdate(s.docs.map(d => ({id:d.id, ...d.data()}))))); }
+			startNotificationListener(u) { this.subs.push(onSnapshot(query(collection(this.db, `notifications/${u}/alerts`), orderBy("timestamp", "desc"), limit(20)), s => this.app.handleNotificationUpdate(s.docs.map(d => ({id:d.id, ...d.data()}))))); }
+			startSystemSettingsListener() { this.subs.push(onSnapshot(collection(this.db, 'systemSettings'), s => { const r={}; s.docs.forEach(d=>r[d.id]=d.data()); this.app.handleSystemSettingsUpdate(r); })); }
 			stopListeners() { this.subs.forEach(u => u()); this.subs = []; }
-			async saveSystemSettings(id, data) { await setDoc(doc(this.db, 'systemSettings', id), data, { merge: true }); return true; }
-			async sendNotification(user, data) { try { await addDoc(collection(this.db, `notifications/${user}/alerts`), { ...data, isRead: false, timestamp: serverTimestamp() }); } catch(e) { console.error(e); } }
-			async markNotificationsAsRead(user, ids) { const b = writeBatch(this.db); ids.forEach(id => b.update(doc(this.db, `notifications/${user}/alerts`, id), { isRead: true })); await b.commit(); }
-			async addContract(data) { try { await addDoc(collection(this.db, 'contracts'), data); Utils.showToast('Salvo!', 'success'); return true; } catch { Utils.showToast('Erro ao salvar.', 'error'); return false; } }
-			async updateContract(id, data) { try { await updateDoc(doc(this.db, 'contracts', id), data); Utils.showToast('Atualizado!', 'success'); return true; } catch { return false; } }
-			async updateContractField(id, data) { try { await updateDoc(doc(this.db, 'contracts', id), data); return true; } catch { return false; } }
-			async deleteContract(id) { await deleteDoc(doc(this.db, 'contracts', id)); Utils.showToast('Excluído.', 'success'); }
+			async saveSystemSettings(id, d) { await setDoc(doc(this.db, 'systemSettings', id), d, {merge:true}); return true; }
+			async sendNotification(u, d) { try{ await addDoc(collection(this.db, `notifications/${u}/alerts`), {...d, isRead:false, timestamp:serverTimestamp()}); }catch{} }
+			async markNotificationsAsRead(u, ids) { const b = writeBatch(this.db); ids.forEach(id => b.update(doc(this.db, `notifications/${u}/alerts`, id), {isRead:true})); await b.commit(); }
+			async addContract(d) { try{ await addDoc(collection(this.db, 'contracts'), d); Utils.showToast('Salvo!', 'success'); return true; }catch{ Utils.showToast('Erro ao salvar.', 'error'); return false; } }
+			async updateContract(id, d) { try{ await updateDoc(doc(this.db, 'contracts', id), d); Utils.showToast('Atualizado!', 'success'); return true; }catch{ return false; } }
+			async updateContractField(id, d) { try{ await updateDoc(doc(this.db, 'contracts', id), d); return true; }catch{ return false; } }
+			async deleteContract(id) { await deleteDoc(doc(this.db, 'contracts', id)); Utils.showToast('Deletado.', 'success'); }
 		}
-
 		class AnalyticsHandler {
 			constructor() { this.charts = {}; }
-			getChartConfig(type, labels, datasets) { return { type, data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#9ca3af' } }, x: { ticks: { color: '#9ca3af' } } }, plugins: { legend: { labels: { color: '#d1d5db' } } } } }; }
 			renderChart(id, type, labels, data, label, color) {
-				const ctx = document.getElementById(id)?.getContext('2d'); if(!ctx) return;
-				if(this.charts[id]) this.charts[id].destroy();
-				this.charts[id] = new Chart(ctx, this.getChartConfig(type, labels, [{ label, data, backgroundColor: color + '99', borderColor: color, borderWidth: 1 }]));
+				const ctx = document.getElementById(id)?.getContext('2d'); if (!ctx) return;
+				if (this.charts[id]) this.charts[id].destroy();
+				this.charts[id] = new Chart(ctx, { type, data: { labels, datasets: [{ label, data, backgroundColor: color+'99', borderColor: color, borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#9ca3af' } }, x: { ticks: { color: '#9ca3af' } } }, plugins: { legend: { labels: { color: '#d1d5db' } } } } });
 			}
 			renderPie(id, labels, data, label) {
-				const ctx = document.getElementById(id)?.getContext('2d'); if(!ctx) return;
-				if(this.charts[id]) this.charts[id].destroy();
+				const ctx = document.getElementById(id)?.getContext('2d'); if (!ctx) return;
+				if (this.charts[id]) this.charts[id].destroy();
 				this.charts[id] = new Chart(ctx, { type: 'pie', data: { labels, datasets: [{ label, data, backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#d1d5db' } } } } });
 			}
-			destroyPageCharts(page) { Object.keys(this.charts).forEach(k => { this.charts[k].destroy(); delete this.charts[k]; }); document.querySelectorAll('.chartjs-tooltip').forEach(e => e.remove()); }
+			destroyPageCharts(p) { Object.keys(this.charts).forEach(k => { this.charts[k].destroy(); delete this.charts[k]; }); }
 		}
 
 		class ReportHandler {
 			constructor(app) { this.app = app; }
 			calculateIncomeByDateRange(start, end, contracts) {
-				let parc = 0, exito = 0, byAdv = {}, byMonth = {}, newCt = {}, detailed = [];
+				let parc = 0, exito = 0, byAdv = {}, byMonth = {}, newCt = {};
+				let detailed = []; // Quem Pagou
+				let pending = [];  // Quem NÃO Pagou
+				
 				contracts.forEach(c => {
 					const adv = c.advogadoResponsavel || 'N/A';
 					if (c.createdAt) { const d = new Date(c.createdAt); if (d >= start && d <= end) newCt[`${d.getFullYear()}-${d.getMonth()+1}`] = (newCt[`${d.getFullYear()}-${d.getMonth()+1}`]||0)+1; }
-					(c.parcels||[]).forEach(p => { if (p.status === 'Paga' && p.paymentDate) { const d = new Date(p.paymentDate); if (d >= start && d <= end) { parc += p.valuePaid; detailed.push({ type: `Parcela ${p.number}`, clientName: c.clientName, date: d, value: p.valuePaid, advogado: adv }); byAdv[adv]=(byAdv[adv]||0)+p.valuePaid; byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]=(byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]||0)+p.valuePaid; } } });
-					if (c.successFeePaymentDate) { const d = new Date(c.successFeePaymentDate); if (d >= start && d <= end) { exito += c.successFeeValueReceived; detailed.push({ type: 'Êxito', clientName: c.clientName, date: d, value: c.successFeeValueReceived, advogado: adv }); byAdv[adv]=(byAdv[adv]||0)+c.successFeeValueReceived; byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]=(byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]||0)+c.successFeeValueReceived; } }
+					
+					(c.parcels||[]).forEach(p => { 
+						// Quem Pagou
+						if (p.status === 'Paga' && p.paymentDate) { 
+							const dPay = new Date(p.paymentDate); 
+							if (dPay >= start && dPay <= end) { 
+								parc += p.valuePaid; 
+								detailed.push({ type: `Parcela ${p.number}`, clientName: c.clientName, date: dPay, value: p.valuePaid, advogado: adv }); 
+								byAdv[adv]=(byAdv[adv]||0)+p.valuePaid; 
+								byMonth[`${dPay.getFullYear()}-${dPay.getMonth()+1}`]=(byMonth[`${dPay.getFullYear()}-${dPay.getMonth()+1}`]||0)+p.valuePaid; 
+							} 
+						}
+						// Quem NÃO Pagou (Venceu no período e não está paga)
+						const dDue = new Date(p.dueDate);
+						if (dDue >= start && dDue <= end && p.status !== 'Paga') {
+							pending.push({ type: `Parcela ${p.number}`, clientName: c.clientName, date: dDue, value: p.value, advogado: adv });
+						}
+					});
+
+					if (c.successFeePaymentDate) { 
+						const d = new Date(c.successFeePaymentDate); 
+						if (d >= start && d <= end) { 
+							exito += c.successFeeValueReceived; 
+							detailed.push({ type: 'Êxito', clientName: c.clientName, date: d, value: c.successFeeValueReceived, advogado: adv }); 
+							byAdv[adv]=(byAdv[adv]||0)+c.successFeeValueReceived; 
+							byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]=(byMonth[`${d.getFullYear()}-${d.getMonth()+1}`]||0)+c.successFeeValueReceived; 
+						} 
+					}
 				});
-				return { totalParcelas: parc, totalExito: exito, totalGeral: parc+exito, totalContratos: Object.values(newCt).reduce((a,b)=>a+b,0), detailedPayments: detailed, byAdvogado: byAdv, byMonth, newContractsByMonth: newCt };
+				detailed.sort((a,b) => a.date - b.date);
+				pending.sort((a,b) => a.date - b.date);
+				return { totalParcelas: parc, totalExito: exito, totalGeral: parc+exito, totalContratos: Object.values(newCt).reduce((a,b)=>a+b,0), detailedPayments: detailed, pendingPayments: pending, byAdvogado: byAdv, byMonth, newContractsByMonth: newCt };
 			}
 			calculateMonthlyIncome(y, m, contracts) { return this.calculateIncomeByDateRange(new Date(y, m, 1), new Date(y, m + 1, 0, 23, 59, 59), contracts); }
 			calculateAdminPerformanceData(contracts) {
@@ -810,79 +536,44 @@
 
 		class DOMBuilder {
 			constructor(app) { this.app = app; }
-			buildElement(tag, { className = '', text = '', html = '', id = '' } = {}) { const el = document.createElement(tag); if (className) el.className = className; if (text) el.textContent = text; if (html) el.innerHTML = html; if (id) el.id = id; return el; }
-			createParcelCard(contract, parcel, index, type, remainingValue, valorCorrigido = null) {
-				const d = Utils.formatDate(parcel.dueDate), v = Utils.formatCurrency(parcel.value), vc = valorCorrigido ? Utils.formatCurrency(valorCorrigido) : '';
-				const card = this.buildElement('div', { className: `dark-card shadow-lg p-4 rounded-lg border-l-4 ${type === 'vencida' ? 'border-red-500' : (type === 'a-vencer' ? 'border-yellow-500' : 'border-gray-700')} transition-all hover:-translate-y-1` });
-				card.innerHTML = `<p class="font-bold text-white">${contract.clientName}</p><p class="text-sm text-gray-400 mb-3">${(contract.serviceTypes||[]).map(s=>s.name).join(', ')} - P.${parcel.number}</p>
-				<div class="space-y-2 text-sm">${type === 'vencida' ? `<div class="flex text-xs text-gray-400">Orig: <span class="ml-auto line-through">${v}</span></div><div class="flex text-red-400">Corr: <span class="ml-auto font-bold text-lg">${vc}</span></div>` : `<div class="flex text-gray-300">Valor: <span class="ml-auto font-bold text-lg text-white">${v}</span></div>`}
+			el(tag, { cls = '', text = '', html = '', id = '' } = {}) { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; if (html) e.innerHTML = html; if (id) e.id = id; return e; }
+			card(html, cls='') { return this.el('div', { cls: 'dark-card shadow-lg p-4 rounded-lg transition-all hover:-translate-y-1 '+cls, html }); }
+			createParcelCard(c, p, i, type, rem, vc = null) {
+				const d = Utils.formatDate(p.dueDate), v = Utils.formatCurrency(p.value), vCorr = vc ? Utils.formatCurrency(vc) : '';
+				const border = type === 'vencida' ? 'border-red-500' : (type === 'a-vencer' ? 'border-yellow-500' : 'border-gray-700');
+				const body = `<p class="font-bold text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')} - P.${p.number}</p>
+				<div class="space-y-2 text-sm">${type==='vencida' ? `<div class="flex text-xs text-gray-400">Orig: <span class="ml-auto line-through">${v}</span></div><div class="flex text-red-400">Corr: <span class="ml-auto font-bold text-lg">${vCorr}</span></div>` : `<div class="flex text-gray-300">Valor: <span class="ml-auto font-bold text-lg text-white">${v}</span></div>`}
 				<div class="flex text-gray-400"><i class="fas fa-calendar-alt w-5 mr-2"></i>Venc: <span class="ml-auto font-medium text-gray-300">${d}</span></div></div>
-				${type === 'paga' ? `<div class="mt-4 text-center text-sm bg-green-900/50 text-green-300 p-2 rounded">Pago ${Utils.formatCurrency(parcel.valuePaid)} em ${Utils.formatDate(parcel.paymentDate)}</div>` : `<button onclick="window.App.openPaymentModal('${contract.id}', ${index})" class="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm hover:shadow-lg"><i class="fas fa-check"></i> Pagar</button>`}`;
-				return card;
-			}
-			createExitoCard(c) {
-				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-4 rounded-lg border-l-4 border-indigo-500 w-80 flex-shrink-0 self-start' });
-				card.innerHTML = `<p class="font-bold text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')}</p><div class="my-4 text-center"><p class="text-sm text-gray-400">Bonificação</p><p class="text-2xl font-semibold text-indigo-400">${c.successFee || 'N/A'}</p></div><button onclick="window.App.openExitoModal('${c.id}')" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold py-2 rounded-lg text-sm"><i class="fas fa-gavel"></i> Receber</button>`;
-				return card;
+				${type==='paga' ? `<div class="mt-4 text-center text-sm bg-green-900/50 text-green-300 p-2 rounded">Pago ${Utils.formatCurrency(p.valuePaid)} em ${Utils.formatDate(p.paymentDate)}</div>` : `<button onclick="window.App.openPaymentModal('${c.id}', ${i})" class="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 rounded text-sm hover:shadow-lg">Pagar</button>`}`;
+				return this.el('div', { cls: `dark-card shadow-lg p-4 rounded-lg border-l-4 ${border} transition-all hover:-translate-y-1`, html: body });
 			}
 			createContractCard(c, s) {
-				const card = this.buildElement('div', { className: `dark-card shadow-lg rounded-lg overflow-hidden ${s.borderColor} flex flex-col justify-between border-l-4 transition-all hover:-translate-y-1` });
-				card.innerHTML = `<div class="p-5"><div class="flex justify-between items-start mb-3"><h3 class="font-bold text-xl text-white">${c.clientName}</h3><span class="px-2 py-1 rounded-full text-xs font-semibold ${s.statusColor}">${s.statusText}</span></div>
+				const html = `<div class="p-5"><div class="flex justify-between items-start mb-3"><h3 class="font-bold text-xl text-white">${c.clientName}</h3><span class="px-2 py-1 rounded-full text-xs font-semibold ${s.statusColor}">${s.statusText}</span></div>
 				<p class="text-xs text-indigo-300 mb-3"><i class="fas fa-user-tie mr-1"></i> ${c.advogadoResponsavel}</p><div class="mb-4">${(c.serviceTypes||[]).map(x=>`<span class="service-tag-small">${x.name}</span>`).join('')}</div>
 				<div class="border-t border-gray-700 pt-4 space-y-3 text-sm"><div class="flex items-center text-gray-400"><i class="fas fa-file-invoice-dollar w-5 mr-2"></i><strong>Fixo:</strong><span class="ml-auto font-medium text-gray-300">${Utils.formatCurrency(c.totalValue)}</span></div>${c.successFee?`<div class="flex items-center text-gray-400"><i class="fas fa-star w-5 mr-2"></i><strong>Êxito:</strong><span class="ml-auto font-medium text-indigo-400">${c.successFee}</span></div>`:''}</div></div>
-				<div class="bg-gray-900/50 px-4 py-2 flex justify-end gap-2"><button onclick="window.App.openClientHistoryModal('${c.clientName}')" class="text-sm text-gray-400 hover:text-indigo-400 py-1 px-3"><i class="fas fa-eye"></i></button><button onclick="window.App.openContractModal('${c.id}')" class="text-sm text-gray-400 hover:text-green-400 py-1 px-3"><i class="fas fa-pencil-alt"></i></button><button onclick="window.App.moveToLixeira('${c.id}')" class="text-sm text-gray-400 hover:text-red-400 py-1 px-3"><i class="fas fa-trash-alt"></i></button></div>`;
-				return card;
+				<div class="bg-gray-900/50 px-4 py-2 flex justify-end gap-2"><button onclick="window.App.openClientHistoryModal('${c.clientName}')" class="text-gray-400 hover:text-indigo-400 py-1 px-3"><i class="fas fa-eye"></i></button><button onclick="window.App.openContractModal('${c.id}')" class="text-gray-400 hover:text-green-400 py-1 px-3"><i class="fas fa-pencil-alt"></i></button><button onclick="window.App.moveToLixeira('${c.id}')" class="text-gray-400 hover:text-red-400 py-1 px-3"><i class="fas fa-trash-alt"></i></button></div>`;
+				return this.el('div', { cls: `dark-card shadow-lg rounded-lg overflow-hidden ${s.borderColor} flex flex-col justify-between border-l-4 transition-all hover:-translate-y-1`, html });
 			}
 			createParcelaCard({ contract, parcel, index, diffDays, valorCorrigido, isVencida }) {
-				const card = this.buildElement('div', { className: `dark-card shadow-lg p-5 rounded-lg border-l-4 ${isVencida ? 'parcel-card-vencida' : 'parcel-card-avencer'} transition-all hover:-translate-y-1` });
-				card.innerHTML = `<p class="font-bold text-lg text-white">${contract.clientName}</p><p class="text-sm text-gray-400 mb-3">P.${parcel.number}/${contract.parcels.length}</p>
+				const html = `<p class="font-bold text-lg text-white">${contract.clientName}</p><p class="text-sm text-gray-400 mb-3">P.${parcel.number}</p>
 				<div class="border-t border-gray-700 pt-3 mt-3 space-y-2">${isVencida ? `<div class="flex justify-between text-sm"><span class="text-gray-400">Orig:</span><span class="line-through text-gray-400">${Utils.formatCurrency(parcel.value)}</span></div><div class="flex justify-between"><span class="text-sm text-white">Corr:</span><span class="font-semibold text-lg parcel-value">${Utils.formatCurrency(valorCorrigido)}</span></div>` : `<div class="flex justify-between"><span class="text-sm text-white">Valor:</span><span class="font-semibold text-lg parcel-value">${Utils.formatCurrency(parcel.value)}</span></div>`}
 				<div class="flex justify-between text-sm"><span class="text-gray-400">Venc:</span><span class="font-medium text-gray-300">${Utils.formatDate(parcel.dueDate)}</span></div>
-				<div class="flex justify-between items-center font-bold text-sm ${isVencida ? 'text-red-400 bg-red-900/30' : 'text-yellow-400 bg-yellow-900/30'} px-2 py-1 rounded"><span>${isVencida ? 'Atrasado:' : 'Faltam:'}</span><span>${Math.abs(diffDays)} dia(s)</span></div></div>
-				<div class="mt-4 flex gap-2"><button onclick="window.App.openPaymentModal('${contract.id}', ${index})" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm hover:shadow-lg"><i class="fas fa-check"></i> Pagar</button><button onclick="window.App.openContractModal('${contract.id}')" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-3 rounded-lg"><i class="fas fa-pencil-alt"></i></button></div>`;
-				return card;
+				<div class="flex justify-between items-center font-bold text-sm ${isVencida ? 'text-red-400 bg-red-900/30' : 'text-yellow-400 bg-yellow-900/30'} px-2 py-1 rounded"><span>${isVencida ? 'Atrasado:' : 'Faltam:'}</span><span>${Math.abs(diffDays)}d</span></div></div>
+				<div class="mt-4 flex gap-2"><button onclick="window.App.openPaymentModal('${contract.id}', ${index})" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-3 rounded-lg text-sm hover:shadow-lg">Pagar</button><button onclick="window.App.openContractModal('${contract.id}')" class="bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-3 rounded-lg"><i class="fas fa-pencil-alt"></i></button></div>`;
+				return this.el('div', { cls: `dark-card shadow-lg p-5 rounded-lg border-l-4 ${isVencida ? 'parcel-card-vencida' : 'parcel-card-avencer'} transition-all hover:-translate-y-1`, html });
 			}
-			createServicoCard(c, sp, fp) {
-				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg transition-all hover:-translate-y-1' });
-				card.innerHTML = `<div class="flex justify-between items-start"><h3 class="font-bold text-xl text-indigo-300 mb-4">${c.clientName}</h3><p class="text-sm text-gray-400"><i class="fas fa-user-tie mr-1"></i> ${c.advogadoResponsavel}</p></div>
-				<div class="space-y-4 mb-4"><div><div class="flex justify-between text-sm mb-1 text-gray-300"><label>Financeiro</label><span class="font-medium text-teal-300">${fp.toFixed(0)}%</span></div><div class="progress-bar-bg h-3 w-full"><div class="progress-bar bg-teal-500" style="width: ${fp}%"></div></div></div>
-				<div><div class="flex justify-between text-sm mb-1 text-gray-300"><label>Serviços</label><span class="font-medium text-indigo-300">${sp.toFixed(0)}%</span></div><div class="progress-bar-bg h-3 w-full"><div class="progress-bar bg-indigo-500" style="width: ${sp}%"></div></div></div></div>
-				<div class="border-t border-gray-700 pt-3"><h4 class="font-semibold text-sm mb-2 text-gray-400">Serviços:</h4><ul class="space-y-1">${(c.serviceTypes||[]).map((s,i) => this.createServiceListItemHTML(c, s, i)).join('')}</ul></div>`;
-				return card;
-			}
-			createServiceListItemHTML(c, s, i) {
-				const icon = s.status === 'Concluído' ? 'fas fa-check-circle text-teal-500' : (s.status === '50% Concluído' ? 'fas fa-adjust text-purple-500' : (s.status === 'Em Andamento' ? 'fas fa-spinner fa-spin text-yellow-500' : 'far fa-circle text-gray-500'));
-				return `<li class="flex items-center justify-between p-2 rounded-md ${s.status!=='Concluído'?'hover:bg-gray-700/50':'bg-gray-900/50'}"><span class="${s.status==='Concluído'?'text-gray-500 line-through':'text-gray-300'}"><i class="${icon} mr-2"></i>${s.name}</span>
-				<div class="flex items-center gap-2 text-xs">${s.status!=='Concluído'?`<button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Em Andamento')" class="text-yellow-400">Iniciar</button><button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Concluído')" class="text-teal-400">Fim</button>`:`<span class="text-teal-400 font-bold">OK</span>`}</div></li>`;
-			}
-			renderPaginationControls(cont, total, pages, curr) {
-				cont.innerHTML = ''; if(pages <= 1) return;
-				const btn = (i, t, d, a) => { const b = this.buildElement('button', { className: `pagination-button ${a?'active':''}`, text: t||(i+1) }); if(d) b.disabled=true; else b.onclick=()=>window.App.changeContractPage(i); return b; };
-				cont.append(btn(curr-1, '«', curr===0));
-				for(let i=0; i<pages; i++) cont.append(btn(i, null, false, i===curr));
-				cont.append(btn(curr+1, '»', curr===pages-1));
-			}
-			createNotificationItem(n) { const d = this.buildElement('div', { className: `notification-item ${n.isRead?'is-read':''}`, html: `<p>${Utils.sanitizeText(n.message)}</p><div class="time">${Utils.timeAgo(n.timestamp?.toDate())}</div>` }); d.onclick=()=>{if(!n.isRead) window.App.markNotificationsAsRead([n.id]); window.App.closeNotificationDropdown();}; return d; }
-			createRankingRow(r, l, v) { return this.buildElement('tr', { html: `<td class="rank-${r}">#${r}</td><td class="text-gray-300 font-medium">${l}</td><td class="rank-${r}">${v}</td>` }); }
-			createSettingListItem(n) { return this.buildElement('div', { className: 'setting-list-item', html: `<span class="font-medium">${Utils.sanitizeText(n)}</span><button class="setting-list-remove-btn" onclick="window.App.handleRemoveAdvogado('${Utils.sanitizeText(n)}')">&times;</button>` }); }
-			createManualParcelListItem(v, d, i) { return this.buildElement('div', { className: 'parcel-list-item', html: `<span>${Utils.formatCurrency(v)}</span><span>${Utils.formatDate(d)}</span><button type="button" class="parcel-list-remove-btn" onclick="window.App.handleRemoveManualParcel(${i})">&times;</button>` }); }
+			createNotificationItem(n) { const d = this.el('div', { cls: `notification-item ${n.isRead?'is-read':''}`, html: `<p>${Utils.sanitizeText(n.message)}</p><div class="time">${Utils.timeAgo(n.timestamp?.toDate())}</div>` }); d.onclick=()=>{if(!n.isRead) window.App.markNotificationsAsRead([n.id]); window.App.closeNotificationDropdown();}; return d; }
 		}
-        class App {
+
+		class App {
 			constructor() {
 				this.database = { contracts: [], notifications: [], settings: { advogados: { list: [] } } };
 				this.currentUserDisplayName = null; this.currentSafeName = null; this.isUserAdmin = false;
 				this.currentAdvancedReportData = null; this.currentPageId = null; this.lastOverdueCheck = null;
 				this.manualParcels = [];
-				
-				// Estado de UI
-				this.currentContractSort = 'name-asc';
-				this.currentParcelasSort = 'days-asc';
-				this.currentServicosSort = 'name-asc';
-				this.contractListPage = 0;
-				this.contractStatusFilter = 'ativos';
-				
-				// [NOVO] Estado do Filtro Global ('novos' ou 'legado')
-				this.globalDateFilter = 'novos';
+				this.currentContractSort = 'name-asc'; this.currentParcelasSort = 'days-asc'; this.currentServicosSort = 'name-asc';
+				this.contractListPage = 0; this.contractStatusFilter = 'ativos';
+				this.globalDateFilter = 'novos'; // Filtro Padrão
 
 				this.authService = new AuthService(this);
 				this.firebaseService = new FirebaseService(this);
@@ -892,23 +583,12 @@
 				this.correctionCalculator = new CorrectionCalculator(this);
 			}
 
-			initialize() {
-				this.authService.initialize();
-				this._initDOMReferences();
-				this.setupEventListeners();
-				this._setupModalAccessibility();
-			}
-
+			initialize() { this.authService.initialize(); this._initDOMReferences(); this.setupEventListeners(); this._setupModalAccessibility(); }
+			
 			_initDOMReferences() {
-				this.backdrop = document.getElementById('modal-backdrop');
-				this.appContainer = document.getElementById('app-container');
-				this.loadingOverlay = document.getElementById('loading-overlay');
-				this.authOverlay = document.getElementById('auth-overlay');
-				this.notificationBell = document.getElementById('notification-bell');
-				this.notificationBadge = document.getElementById('notification-badge');
+				this.backdrop = document.getElementById('modal-backdrop'); this.appContainer = document.getElementById('app-container');
+				this.loadingOverlay = document.getElementById('loading-overlay'); this.authOverlay = document.getElementById('auth-overlay');
 				this.notificationDropdown = document.getElementById('notification-dropdown');
-				this.notificationList = document.getElementById('notification-list');
-				this.notificationListEmpty = document.getElementById('notification-list-empty');
 			}
 
 			setupEventListeners() {
@@ -922,48 +602,39 @@
 				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
 				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
 				document.getElementById('addManualParcelButton').addEventListener('click', this.handleAddManualParcel.bind(this));
-				
 				document.getElementById('searchInput').addEventListener('input', Utils.debounce(() => this.resetAndRenderContractList(), 300));
 				document.getElementById('servicosSearchInput').addEventListener('input', Utils.debounce(() => this.renderServicosPage(), 300));
 				document.getElementById('parcelasSearchInput').addEventListener('input', Utils.debounce(() => this.renderParcelasPage(), 300));
 				
-				// [NOVO] Listener do Filtro Global de Data
+				// Listener do Filtro Global
 				document.getElementById('globalDateFilter').addEventListener('change', (e) => {
 					this.globalDateFilter = e.target.value;
-					Utils.showToast(`Visualizando contratos: ${e.target.options[e.target.selectedIndex].text}`, 'info');
-					this.render(); // Re-renderiza a tela atual com o novo filtro
+					Utils.showToast(`Modo: ${e.target.options[e.target.selectedIndex].text}`, 'info');
+					this.render();
 				});
 
-				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
-					const sb = document.getElementById('sidebar'); sb.classList.toggle('hidden');
-					this.backdrop.style.display = !sb.classList.contains('hidden') ? 'block' : 'none';
-				});
-				if (this.backdrop) this.backdrop.addEventListener('click', () => {
-					if (this.openModalId && this.openModalId !== 'modalDisplayName') this.closeModal(this.openModalId);
-					const sb = document.getElementById('sidebar'); if (window.innerWidth < 768 && !sb.classList.contains('hidden')) { sb.classList.add('hidden'); this.backdrop.style.display = 'none'; }
-					this.closeNotificationDropdown();
-				});
-				if (this.notificationBell) this.notificationBell.addEventListener('click', (e) => { e.stopPropagation(); this.notificationDropdown.classList.toggle('hidden'); });
-				document.getElementById('clear-notifications-button')?.addEventListener('click', () => this.markNotificationsAsRead());
-				document.addEventListener('click', (e) => { if (this.notificationDropdown && !this.notificationDropdown.classList.contains('hidden') && !this.notificationBell.contains(e.target) && !this.notificationDropdown.contains(e.target)) this.closeNotificationDropdown(); });
+				document.getElementById('mobile-menu-toggle').addEventListener('click', () => { const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); this.backdrop.style.display = s.classList.contains('hidden') ? 'none' : 'block'; });
+				if(this.backdrop) this.backdrop.addEventListener('click', () => { if (this.openModalId) this.closeModal(this.openModalId); document.getElementById('sidebar').classList.add('hidden'); this.closeNotificationDropdown(); });
+				document.getElementById('notification-bell').addEventListener('click', (e) => { e.stopPropagation(); this.notificationDropdown.classList.toggle('hidden'); });
+				document.getElementById('clear-notifications-button').addEventListener('click', () => this.markNotificationsAsRead());
+				document.addEventListener('click', (e) => { if (!this.notificationDropdown.classList.contains('hidden') && !e.target.closest('#notification-bell') && !this.notificationDropdown.contains(e.target)) this.closeNotificationDropdown(); });
 				['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'contratoJaQuitado'].forEach(id => document.getElementById(id)?.addEventListener('change', () => document.getElementById('financialDataChanged').value = 'true'));
 			}
-
 			handleAuthStateChange(user) {
 				if (user) {
 					const isAdmin = ADMIN_USERS.includes((user.displayName || '').toLowerCase());
 					this.currentUserDisplayName = user.displayName; this.currentSafeName = Utils.sanitizeForFirestoreId(user.displayName); this.isUserAdmin = isAdmin;
 					document.body.classList.toggle('is-admin', this.isUserAdmin);
 					if (!user.displayName) {
-						this.loadingOverlay.style.display = 'none'; this.authOverlay.style.display = 'flex'; this.appContainer.style.display = 'none'; this.openModal('modalDisplayName');
+						document.getElementById('loading-overlay').style.display = 'none'; document.getElementById('auth-overlay').style.display = 'flex'; document.getElementById('app-container').style.display = 'none'; this.openModal('modalDisplayName');
 					} else {
 						document.getElementById('user-display-name').textContent = user.displayName;
-						this.loadingOverlay.style.display = 'none'; this.authOverlay.style.display = 'none'; this.appContainer.style.display = 'flex';
+						document.getElementById('loading-overlay').style.display = 'none'; document.getElementById('auth-overlay').style.display = 'none'; document.getElementById('app-container').style.display = 'flex';
 						this.setupUIAccess(); this.firebaseService.startSnapshotListener('contracts'); this.firebaseService.startNotificationListener(this.currentSafeName); this.firebaseService.startSystemSettingsListener();
 					}
 				} else {
 					this.currentUserDisplayName = null; this.currentSafeName = null; this.isUserAdmin = false; this.lastOverdueCheck = null;
-					document.body.classList.remove('is-admin'); this.authOverlay.style.display = 'flex'; this.appContainer.style.display = 'none'; this.loadingOverlay.style.display = 'none';
+					document.body.classList.remove('is-admin'); document.getElementById('auth-overlay').style.display = 'flex'; document.getElementById('app-container').style.display = 'none'; document.getElementById('loading-overlay').style.display = 'none';
 					this.firebaseService.stopListeners();
 				}
 			}
@@ -975,59 +646,43 @@
 			handleNotificationUpdate(n) { this.database.notifications = n; this.renderNotificationDropdown(); }
 			handleSystemSettingsUpdate(s) { if (!s.advogados) s.advogados = { list: [] }; this.database.settings = s; this.renderAdvogadoFilters(); this.populateAdvogadoSelectModal(); if (this.currentPageId === 'page-oficina') this.renderOficinaPage(); }
 
-			// --- LÓGICA DE FILTRAGEM (DATA + PERMISSÃO) ---
+			// --- LÓGICA CORE: FILTRO DE DATA ---
 			getFilteredContracts(includeDeleted = false) {
 				let contracts = this.database.contracts;
+				if (!this.isUserAdmin) contracts = contracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName);
 				
-				// 1. Filtro de Permissão (Admin vê tudo, Advogado vê só seus)
-				if (!this.isUserAdmin) {
-					contracts = contracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName);
-				}
-
-				// 2. [NOVO] Filtro Global de Data (Legacy vs Novos)
-				// Usa a data da 1ª parcela como referência. Se não tiver parcela, usa createdAt.
+				// Filtro Global: Novos vs Legado
 				contracts = contracts.filter(c => {
 					let refDate = c.createdAt ? new Date(c.createdAt) : new Date();
 					if (c.parcels && c.parcels.length > 0) {
-						// Ordena para garantir que pegamos a primeira cronologicamente
-						const sortedParcels = [...c.parcels].sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
-						refDate = new Date(sortedParcels[0].dueDate);
+						// Pega a data da primeira parcela cronológica
+						const sorted = [...c.parcels].sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+						refDate = new Date(sorted[0].dueDate);
 					}
-
-					if (this.globalDateFilter === 'novos') {
-						return refDate >= CUTOFF_DATE;
-					} else {
-						return refDate < CUTOFF_DATE;
-					}
+					return this.globalDateFilter === 'novos' ? refDate >= CUTOFF_DATE : refDate < CUTOFF_DATE;
 				});
 
-				// 3. Filtro de Lixeira
-				if (!includeDeleted) {
-					contracts = contracts.filter(c => !c.isDeleted);
-				}
-				
+				if (!includeDeleted) contracts = contracts.filter(c => !c.isDeleted);
 				return contracts;
 			}
-			
-			// --- RENDERIZAÇÃO ---
-			render() {
-				if (this.appContainer.style.display !== 'flex') return;
-				const pageId = this.currentPageId || 'page-dashboard';
-				if (!this.currentPageId) this.showPage(pageId);
 
-				if (pageId === 'page-dashboard') { this.renderKanban(); this.renderContractList(); }
-				else if (pageId === 'page-parcelas') this.renderParcelasPage();
-				else if (pageId === 'page-servicos') this.renderServicosPage();
-				else if (pageId === 'page-lixeira') this.renderLixeiraPage();
-				else if (pageId === 'page-relatorios') this.renderAdvancedReportPage();
-				else if (pageId === 'page-performance') this.renderPerformancePage();
-				else if (pageId === 'page-oficina') this.renderOficinaPage();
-				
+			render() {
+				if (document.getElementById('app-container').style.display !== 'flex') return;
+				const pid = this.currentPageId || 'page-dashboard';
+				if (!this.currentPageId) this.showPage(pid);
+
+				if (pid === 'page-dashboard') { this.renderKanban(); this.renderContractList(); }
+				else if (pid === 'page-parcelas') this.renderParcelasPage();
+				else if (pid === 'page-servicos') this.renderServicosPage();
+				else if (pid === 'page-lixeira') this.renderLixeiraPage();
+				else if (pid === 'page-relatorios') this.renderAdvancedReportPage();
+				else if (pid === 'page-performance') this.renderPerformancePage();
+				else if (pid === 'page-oficina') this.renderOficinaPage();
 				this.renderSortButtons();
 			}
 
 			renderKanban() {
-				const contracts = this.getFilteredContracts(false); // Já vem filtrado por Data!
+				const contracts = this.getFilteredContracts(false);
 				const kVenc = document.getElementById('kanban-vencidas'), kAvenc = document.getElementById('kanban-a-vencer'), kPagas = document.getElementById('kanban-pagas'), kExito = document.getElementById('kanban-exito-wrapper');
 				const fVenc = document.createDocumentFragment(), fAvenc = document.createDocumentFragment(), fPagas = document.createDocumentFragment(), fExito = document.createDocumentFragment();
 				
@@ -1049,26 +704,18 @@
 
 				kVenc.innerHTML=''; kAvenc.innerHTML=''; kPagas.innerHTML=''; kExito.innerHTML='';
 				kVenc.append(fVenc); kAvenc.append(fAvenc); kPagas.append(fPagas);
-				if(hasExito>0) { kExito.append(fExito); document.getElementById('exito-section').style.display='block'; } else document.getElementById('exito-section').style.display='none';
+				if(hasExito>0) { kExito.append(fExito); document.getElementById('exito-section').classList.remove('hidden'); } else document.getElementById('exito-section').classList.add('hidden');
 				
-				// O Dashboard soma TUDO (independente do filtro de data) ou respeita o filtro?
-				// DECISÃO UX: O Dashboard deve refletir o que está na tela.
 				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), this.getFilteredContracts(true)).totalGeral;
-				this.renderDashboard(t30, tVenc, totalPagoMes, contracts.length);
-			}
-
-			renderDashboard(av, ve, pa, tc) {
-				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(av);
-				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(ve);
-				document.getElementById('dash-recebido').textContent = Utils.formatCurrency(pa);
-				document.getElementById('dash-contratos').textContent = tc;
+				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(t30);
+				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(tVenc);
+				document.getElementById('dash-recebido').textContent = Utils.formatCurrency(totalPagoMes);
+				document.getElementById('dash-contratos').textContent = contracts.length;
 			}
 
 			renderContractList() {
 				const container = document.getElementById('contractListContainer'); const search = (document.getElementById('searchInput').value||'').toLowerCase();
 				const advFilter = document.getElementById('advogadoFilter')?.value || 'Todos';
-				
-				// getFilteredContracts já aplica a Data. Agora filtramos por Status/Busca
 				let list = this.getFilteredContracts(false).filter(c => {
 					const s = this.getContractStatus(c); const done = s.statusText === 'Concluído';
 					if (this.contractStatusFilter==='ativos' && done) return false;
@@ -1086,548 +733,273 @@
 				const pgList = list.slice(this.contractListPage*CONTRACTS_PER_PAGE, (this.contractListPage+1)*CONTRACTS_PER_PAGE);
 
 				container.innerHTML = '';
-				if (total === 0) { container.innerHTML = `<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato encontrado.</div>`; this.domBuilder.renderPaginationControls(document.getElementById('paginationContainer'), 0, 0, 0); return; }
-
-				const grid = this.domBuilder.buildElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' });
+				if (total === 0) { container.innerHTML = `<div class="dark-card p-4 rounded text-center text-gray-400">Nenhum contrato encontrado.</div>`; this.domBuilder.renderPaginationControls(document.getElementById('paginationContainer'), 0, 0, 0); return; }
+				const grid = this.domBuilder.el('div', { cls: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' });
 				pgList.forEach(c => grid.append(this.domBuilder.createContractCard(c, this.getContractStatus(c))));
 				container.append(grid);
 				this.domBuilder.renderPaginationControls(document.getElementById('paginationContainer'), total, pages, this.contractListPage);
 			}
-            renderParcelasPage() {
-				// Usa getFilteredContracts para respeitar o filtro de Data (Novos/Legado)
+
+			renderParcelasPage() {
 				const contracts = this.getFilteredContracts(false);
-				const container = document.getElementById('parcelasListContainer');
-				const search = (document.getElementById('parcelasSearchInput').value || '').toLowerCase();
+				const container = document.getElementById('parcelasListContainer'); const search = (document.getElementById('parcelasSearchInput').value || '').toLowerCase();
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-
-				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
-
 				let list = [];
 				contracts.forEach(c => {
 					if (!c.clientName.toLowerCase().includes(search)) return;
 					(c.parcels||[]).forEach((p, i) => {
 						if (p.status === 'Pendente') {
-							const due = new Date(p.dueDate);
-							const diff = Math.ceil((due - hoje) / 86400000);
-							const isVencida = due < hoje;
-							const valCorr = isVencida ? this.correctionCalculator.calcularValorCorrigido(p.value, p.dueDate) : p.value;
+							const due = new Date(p.dueDate); const diff = Math.ceil((due - hoje) / 86400000);
+							const isVencida = due < hoje; const valCorr = isVencida ? this.correctionCalculator.calcularValorCorrigido(p.value, p.dueDate) : p.value;
 							list.push({ contract: c, parcel: p, index: i, diffDays: diff, valorCorrigido: valCorr, isVencida });
 						}
 					});
 				});
-
 				if (this.currentParcelasSort === 'days-asc') list.sort((a, b) => a.diffDays - b.diffDays);
 				else if (this.currentParcelasSort === 'value-desc') list.sort((a, b) => b.valorCorrigido - a.valorCorrigido);
 				else if (this.currentParcelasSort === 'name-asc') list.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
 
 				container.innerHTML = '';
-				if (list.length === 0) { container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block bg-gray-800 border border-gray-700 text-green-400 p-6 rounded-lg shadow-md"><i class="fas fa-check-circle fa-3x mb-3"></i><p class="font-bold text-xl">Nenhuma parcela pendente!</p><p class="text-sm text-gray-400">Neste filtro de data.</p></div></div>`; return; }
-				
-				const frag = document.createDocumentFragment();
-				list.forEach(item => frag.append(this.domBuilder.createParcelaCard(item)));
-				container.append(frag);
+				if (list.length === 0) container.innerHTML = `<div class="col-span-3 text-center py-10"><i class="fas fa-check-circle fa-3x text-green-500 mb-2"></i><p>Tudo em dia!</p></div>`;
+				else list.forEach(item => container.append(this.domBuilder.createParcelaCard(item)));
 			}
 
 			renderServicosPage() {
-				const contracts = this.getFilteredContracts(false); // Respeita Data
-				const container = document.getElementById('servicosListContainer');
-				const search = (document.getElementById('servicosSearchInput').value || '').toLowerCase();
+				const contracts = this.getFilteredContracts(false);
+				const container = document.getElementById('servicosListContainer'); const search = (document.getElementById('servicosSearchInput').value || '').toLowerCase();
 				const advFilter = document.getElementById('servicosAdvogadoFilter')?.value || 'Todos';
-
 				container.innerHTML = '';
 				let active = contracts.filter(c => {
 					const matchAdv = (this.isUserAdmin && advFilter === 'Todos') || c.advogadoResponsavel === (this.isUserAdmin ? advFilter : this.currentUserDisplayName);
-					const matchText = c.clientName.toLowerCase().includes(search) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(search));
+					const matchText = c.clientName.toLowerCase().includes(search);
 					return matchAdv && matchText && c.serviceTypes && c.serviceTypes.length > 0;
 				});
-
 				if (this.currentServicosSort === 'name-asc') active.sort((a, b) => a.clientName.localeCompare(b.clientName));
 				else if (this.currentServicosSort === 'adv-asc') active.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
-
-				const frag = document.createDocumentFragment();
+				
 				let hasItems = false;
 				active.forEach(c => {
 					const total = (c.serviceTypes||[]).length;
 					let prog = 0; (c.serviceTypes||[]).forEach(s => { if(s.status==='Concluído') prog+=1; else if(s.status==='50% Concluído') prog+=0.5; else if(s.status==='Em Andamento') prog+=0.25; });
 					const sp = total > 0 ? (prog/total)*100 : 0;
-					const paid = (c.parcels||[]).reduce((s,p)=>s+(p.valuePaid||0),0) + (c.successFeeValueReceived||0);
-					const fp = (c.totalValue||0)>0 ? (paid/c.totalValue)*100 : (paid>0?100:0);
-					if(sp < 100) { frag.append(this.domBuilder.createServicoCard(c, sp, fp)); hasItems = true; }
+					if(sp < 100) { container.append(this.domBuilder.createServicoCard(c, sp, ((c.parcels||[]).reduce((s,p)=>s+(p.valuePaid||0),0)/c.totalValue)*100 || 0)); hasItems = true; }
 				});
-
-				if (!hasItems) container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços concluídos.</p></div></div>`;
-				else container.append(frag);
+				if (!hasItems) container.innerHTML = `<div class="text-center py-10 text-gray-500">Nenhum serviço pendente.</div>`;
 			}
 
 			renderLixeiraPage() {
-				// Lixeira também deve respeitar o filtro de Data? Geralmente sim, para manter consistência.
-				const contracts = this.getFilteredContracts(true); // Pega deletados e não deletados desse periodo
 				const container = document.getElementById('lixeiraListContainer'); container.innerHTML = '';
-				const deleted = contracts.filter(c => c.isDeleted === true);
-
-				if (deleted.length === 0) { container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Neste período.</p></div></div>`; return; }
-
-				const frag = document.createDocumentFragment();
+				const deleted = this.getFilteredContracts(true).filter(c => c.isDeleted === true);
+				if (deleted.length === 0) container.innerHTML = `<p class="text-center col-span-3 text-gray-500">Lixeira vazia.</p>`;
 				deleted.forEach(c => {
-					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600' });
-					card.innerHTML = `<p class="font-bold text-lg text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')}</p>
-					<div class="border-t border-gray-700 pt-3 mt-3 flex gap-2"><button onclick="window.App.restoreContract('${c.id}')" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 rounded-lg hover:shadow-lg"><i class="fas fa-undo"></i> Restaurar</button>
-					${this.isUserAdmin ? `<button onclick="window.App.deleteContractPermanently('${c.id}')" class="w-full bg-gradient-to-r from-red-700 to-red-800 text-white font-semibold py-2 rounded-lg hover:shadow-lg"><i class="fas fa-times-circle"></i> Excluir</button>` : ''}</div>`;
-					frag.append(card);
-				});
-				container.append(frag);
-			}
-
-			renderAdvancedReportPage() {
-				const sd = document.getElementById('reportStartDate'), ed = document.getElementById('reportEndDate');
-				if (!sd.value || !ed.value) { const h = new Date(); sd.value = new Date(h.getFullYear(), h.getMonth(), 1).toISOString().split('T')[0]; ed.value = h.toISOString().split('T')[0]; }
-				this.currentAdvancedReportData = null;
-				document.getElementById('exportPdfButton').disabled = true;
-				document.getElementById('advancedReportContainer').classList.add('hidden');
-				document.getElementById('advancedReportEmpty').classList.remove('hidden');
-				this.analyticsHandler.destroyPageCharts('page-relatorios');
-			}
-
-			renderPerformancePage() {
-				if (!this.isUserAdmin) return;
-				this.analyticsHandler.destroyPageCharts('page-performance');
-				// Performance considera TODOS os dados ou só do período selecionado?
-				// Para performance gerencial, faz sentido respeitar o filtro "Legado" vs "Novo" para ver a produtividade atual.
-				const contracts = this.getFilteredContracts(true);
-				const { contratosPorAdvogado, faturamentoPorAdvogado } = this.reportHandler.calculateAdminPerformanceData(contracts);
-
-				this.analyticsHandler.renderPie('adminChartContratos', Object.keys(contratosPorAdvogado), Object.values(contratosPorAdvogado), 'Contratos Ativos');
-				this.analyticsHandler.renderChart('adminChartFaturamento', 'bar', Object.keys(faturamentoPorAdvogado), Object.values(faturamentoPorAdvogado), 'Faturação', '#4ade80');
-				
-				const tbody1 = document.getElementById('adminTableFaturamento').querySelector('tbody'); tbody1.innerHTML = '';
-				Object.entries(faturamentoPorAdvogado).sort(([,a],[,b])=>b-a).forEach(([l,v],i) => tbody1.append(this.domBuilder.createRankingRow(i+1, l, Utils.formatCurrency(v))));
-				const tbody2 = document.getElementById('adminTableContratos').querySelector('tbody'); tbody2.innerHTML = '';
-				Object.entries(contratosPorAdvogado).sort(([,a],[,b])=>b-a).forEach(([l,v],i) => tbody2.append(this.domBuilder.createRankingRow(i+1, l, v)));
-			}
-
-			renderOficinaPage() {
-				const list = document.getElementById('advogadoSettingsList'); if(!list) return;
-				list.innerHTML = ''; const frag = document.createDocumentFragment();
-				const arr = this.database.settings.advogados?.list || [];
-				if(arr.length === 0) list.innerHTML = `<p class="text-sm text-gray-400 text-center p-4">Nenhum advogado cadastrado.</p>`;
-				else [...arr].sort().forEach(n => frag.append(this.domBuilder.createSettingListItem(n)));
-				list.append(frag);
-			}
-
-			showPage(id) {
-				if ((this.currentPageId==='page-relatorios' && id!=='page-relatorios') || (this.currentPageId==='page-performance' && id!=='page-performance')) {
-					this.analyticsHandler.destroyPageCharts(this.currentPageId);
-				}
-				this.currentPageId = id;
-				const titles = { 'page-dashboard': 'Painel Principal', 'page-parcelas': 'Controle de Parcelas', 'page-servicos': 'Produção de Serviços', 'page-performance': 'Performance', 'page-relatorios': 'Relatórios', 'page-lixeira': 'Lixeira', 'page-oficina': 'Oficina' };
-				document.getElementById('page-title').textContent = titles[id] || 'Painel';
-				
-				['page-dashboard', 'page-parcelas', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance', 'page-oficina'].forEach(pid => document.getElementById(pid)?.classList.add('hidden'));
-				document.querySelectorAll('.sidebar-nav-item, .mobile-nav-item').forEach(e => e.classList.remove('active'));
-				
-				document.getElementById(id)?.classList.remove('hidden');
-				const base = id.split('-')[1];
-				document.getElementById(`tab-${base}`)?.classList.add('active');
-				document.getElementById(`mobile-tab-${base}`)?.classList.add('active');
-				
-				const sb = document.getElementById('sidebar'); if (window.innerWidth < 768 && !sb.classList.contains('hidden')) { sb.classList.add('hidden'); this.backdrop.style.display = 'none'; }
-				this.render();
-			}
-
-			setupUIAccess() {
-				const isAdmin = this.isUserAdmin;
-				['advogadoFilter', 'servicosAdvogadoFilter'].forEach(id => { const el = document.getElementById(id); if(el) { el.disabled = !isAdmin; el.value = isAdmin?'Todos':this.currentUserDisplayName; }});
-				['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito', 'contratoJaQuitado'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = !isAdmin; });
-			}
-
-			getContractStatus(c) {
-				const allP = (c.parcels||[]).every(p=>p.status==='Paga');
-				const allS = (c.serviceTypes||[]).every(s=>s.status==='Concluído');
-				if (allP && allS) { return c.successFee && !c.successFeePaymentDate ? { statusText: 'Aguardando Êxito', statusColor: 'bg-indigo-900/50 text-indigo-300', borderColor: 'border-indigo-500' } : { statusText: 'Concluído', statusColor: 'bg-gray-700 text-gray-300', borderColor: 'border-gray-600' }; }
-				if (allP && !allS) return { statusText: 'Em Andamento', statusColor: 'bg-blue-900/50 text-blue-300', borderColor: 'border-blue-500' };
-				return { statusText: 'Ativo', statusColor: 'bg-yellow-900/50 text-yellow-300', borderColor: 'border-yellow-500' };
-			}
-
-			renderSortButtons() {
-				const create = (pid, key, label, curr, cb) => {
-					const el = document.getElementById(pid); if(!el) return;
-					const btn = this.domBuilder.buildElement('button', { text: label, className: `sort-button ${curr===key?'active':''}` });
-					btn.onclick = () => { cb(key); this.render(); this.renderSortButtons(); };
-					el.appendChild(btn);
-				};
-				const clear = (ids) => ids.forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML=''; });
-				clear(['contractSortButtons', 'parcelasSortButtons', 'servicosSortButtons', 'contractStatusFilterButtons']);
-
-				const cf = document.getElementById('contractStatusFilterButtons'); if(cf) { create('contractStatusFilterButtons', 'ativos', 'Ativos', this.contractStatusFilter, k=>{this.contractStatusFilter=k; this.resetAndRenderContractList();}); create('contractStatusFilterButtons', 'concluidos', 'Concluídos', this.contractStatusFilter, k=>{this.contractStatusFilter=k; this.resetAndRenderContractList();}); }
-				create('contractSortButtons', 'name-asc', 'Nome', this.currentContractSort, k=>{this.currentContractSort=k; this.resetAndRenderContractList();});
-				create('contractSortButtons', 'value-desc', 'Valor', this.currentContractSort, k=>{this.currentContractSort=k; this.resetAndRenderContractList();});
-				create('parcelasSortButtons', 'days-asc', 'Vencimento', this.currentParcelasSort, k=>this.currentParcelasSort=k);
-				create('parcelasSortButtons', 'name-asc', 'Nome', this.currentParcelasSort, k=>this.currentParcelasSort=k);
-				create('parcelasSortButtons', 'value-desc', 'Valor', this.currentParcelasSort, k=>this.currentParcelasSort=k);
-				create('servicosSortButtons', 'name-asc', 'Cliente', this.currentServicosSort, k=>this.currentServicosSort=k);
-				create('servicosSortButtons', 'adv-asc', 'Advogado', this.currentServicosSort, k=>this.currentServicosSort=k);
-			}
-
-			renderAdvogadoFilters() {
-				const all = new Set(this.database.settings.advogados?.list || []);
-				['advogadoFilter', 'servicosAdvogadoFilter'].forEach(id => {
-					const sel = document.getElementById(id); if(!sel) return;
-					const cur = sel.value; sel.innerHTML = '<option value="Todos">Todos</option><option value="Não Informado">Não Informado</option>';
-					[...all].filter(a=>a!=='Não Informado'&&a!=='Todos').sort().forEach(a => sel.add(new Option(a, a)));
-					sel.value = this.isUserAdmin ? (cur||'Todos') : this.currentUserDisplayName;
-					sel.disabled = !this.isUserAdmin;
+					container.append(this.domBuilder.card(`<p class="font-bold text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')}</p><div class="border-t border-gray-700 pt-3 flex gap-2"><button onclick="window.App.restoreContract('${c.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm w-full">Restaurar</button>${this.isUserAdmin ? `<button onclick="window.App.deleteContractPermanently('${c.id}')" class="bg-red-700 text-white px-3 py-1 rounded text-sm w-full">Excluir</button>` : ''}</div>`, 'border-l-4 border-gray-600'));
 				});
 			}
 
-			populateAdvogadoSelectModal() {
-				const sel = document.getElementById('advogadoResponsavel'); if(!sel) return;
-				const cur = sel.value; sel.innerHTML = '<option value="Não Informado">Não Informado</option>';
-				const all = new Set(this.database.settings.advogados?.list || []);
-				[...all].filter(a=>a!=='Não Informado').sort().forEach(a => sel.add(new Option(a, a)));
-				sel.value = cur && cur!=='Não Informado' ? cur : (this.isUserAdmin ? 'Não Informado' : this.currentUserDisplayName);
-				sel.disabled = !this.isUserAdmin && !!this.currentUserDisplayName;
-			}
-
-			changeContractPage(i) { this.contractListPage = i; this.renderContractList(); document.getElementById('main-content').scrollTop = 0; }
-			resetAndRenderContractList() { this.contractListPage = 0; this.renderContractList(); }
-
-			async handleDisplayNameSubmit(e) { e.preventDefault(); const n = document.getElementById('inputDisplayName').value; if(n && await this.authService.updateUserProfile(n)) window.location.reload(); }
-
-			async handleContractSubmit(e) {
-				e.preventDefault();
-				const id = document.getElementById('contractId').value;
-				const isSpecial = document.getElementById('contratoEspecial').checked;
-				const svcs = Array.from(document.querySelectorAll('#servicosContainer .service-tag')).map(t => ({ name: Utils.sanitizeText(t.dataset.name), status: t.dataset.status||'Pendente', deadline: t.dataset.deadline||null }));
-				if (svcs.length === 0) { Utils.showToast('Adicione serviços.', 'error'); return; }
-
-				const data = {
-					clientName: Utils.sanitizeText(document.getElementById('clienteNome').value),
-					advogadoResponsavel: Utils.sanitizeText(document.getElementById('advogadoResponsavel').value),
-					serviceTypes: svcs,
-					paymentType: Utils.sanitizeText(document.getElementById('contratoTipoPagamento').value),
-					observations: Utils.sanitizeText(document.getElementById('contratoObservacoes').value),
-					isSpecialContract: isSpecial
-				};
-
-				if (this.isUserAdmin) {
-					let parcels = [], total = 0;
-					if (isSpecial) {
-						if(this.manualParcels.length===0) { Utils.showToast('Adicione parcelas.', 'error'); return; }
-						this.manualParcels.forEach((p,i) => { total+=p.value; parcels.push({ number: i+1, value: p.value, dueDate: new Date(p.dueDate+'T12:00:00Z').toISOString(), status: 'Pendente', valuePaid: 0, paymentDate: null }); });
-					} else {
-						total = Utils.parseNumber(document.getElementById('valorTotal').value);
-						const num = parseInt(document.getElementById('numParcelas').value)||1;
-						const start = document.getElementById('vencimentoPrimeiraParcela').value;
-						const paid = document.getElementById('contratoJaQuitado').checked;
-						if (num>0 && total>0) {
-							if(!start && !paid) { Utils.showToast('Data 1ª parcela?', 'error'); return; }
-							let dt = new Date((start||new Date().toISOString().split('T')[0])+'T12:00:00Z');
-							const v = total/num;
-							for(let i=0; i<num; i++) {
-								const isP = paid && num===1;
-								parcels.push({ number: i+1, value: v, dueDate: dt.toISOString(), status: isP?'Paga':'Pendente', valuePaid: isP?v:0, paymentDate: isP?new Date().toISOString():null });
-								dt.setMonth(dt.getMonth()+1);
-							}
-						}
-					}
-					data.totalValue = total; data.parcels = parcels; data.successFee = Utils.sanitizeText(document.getElementById('taxaExito').value)||null;
-				}
-
-				if (!id) {
-					if(!this.isUserAdmin) { data.parcels=[]; data.totalValue=0; data.successFee=null; }
-					data.successFeeValueReceived=0; data.successFeePaymentDate=null; data.isDeleted=false; data.createdAt=new Date().toISOString();
-					if(await this.firebaseService.addContract(data)) { this.closeModal('modalContrato'); this.sendNotificationToAllAdmins({ message: `${this.currentUserDisplayName} criou contrato: ${data.clientName}`, sender: this.currentUserDisplayName }); }
-				} else {
-					const old = this.database.contracts.find(c => c.id === id);
-					if(!this.isUserAdmin && old) { data.totalValue=old.totalValue; data.successFee=old.successFee; data.parcels=old.parcels; }
-					else if(this.isUserAdmin && document.getElementById('financialDataChanged').value!=='true' && old) { data.parcels=old.parcels; data.totalValue=old.totalValue; }
-					
-					data.successFeeValueReceived = old?.successFeeValueReceived||0; data.successFeePaymentDate = old?.successFeePaymentDate||null; data.isDeleted = old?.isDeleted||false; data.createdAt = old?.createdAt||new Date().toISOString();
-					if(await this.firebaseService.updateContract(id, data)) this.closeModal('modalContrato');
-				}
-			}
-            async handlePaymentSubmit(e) {
-				e.preventDefault();
-				const cid = document.getElementById('pagamentoContractId').value;
-				const idx = parseInt(document.getElementById('pagamentoParcelIndex').value);
-				const c = this.database.contracts.find(x => x.id === cid);
-				const val = this.isUserAdmin ? Utils.parseNumber(document.getElementById('pagamentoValor').value) : (c?.parcels[idx]?.value || 0);
-				const date = document.getElementById('pagamentoData').value;
-
-				if (c && val > 0) {
-					const up = [...c.parcels];
-					up[idx] = { ...up[idx], status: 'Paga', valuePaid: val, paymentDate: new Date(date + 'T12:00:00Z').toISOString() };
-					if (await this.firebaseService.updateContractField(cid, { parcels: up })) {
-						this.closeModal('modalPagamento');
-						this.sendNotification(c.advogadoResponsavel, { message: `Pagamento de ${Utils.formatCurrency(val)} (P.${up[idx].number}) em ${c.clientName}`, contractId: cid, sender: this.currentUserDisplayName });
-					}
-				} else Utils.showToast('Valor inválido.', 'error');
-			}
-
-			async handleExitoSubmit(e) {
-				e.preventDefault();
-				const cid = document.getElementById('exitoContractId').value;
-				const val = this.isUserAdmin ? Utils.parseNumber(document.getElementById('exitoValorRecebido').value) : 0;
-				const c = this.database.contracts.find(x => x.id === cid);
-				if (c) {
-					if (this.isUserAdmin && val <= 0) { Utils.showToast('Valor inválido.', 'error'); return; }
-					if (await this.firebaseService.updateContractField(cid, { successFeeValueReceived: val, successFeePaymentDate: new Date().toISOString() })) {
-						this.closeModal('modalExito');
-						this.sendNotification(c.advogadoResponsavel, { message: `Êxito (${Utils.formatCurrency(val)}) registado para ${c.clientName}`, contractId: cid, sender: this.currentUserDisplayName });
-					}
-				}
-			}
-
-			handleAddServiceTag() {
-				const n = document.getElementById('contratoServicoInput'); const d = document.getElementById('contratoPrazoInput');
-				if (n.value) { this.createServiceTag(Utils.sanitizeText(n.value), d.value, 'Pendente'); n.value = ''; d.value = ''; n.focus(); }
-			}
-
-			async updateServiceStatus(cid, idx, st) {
-				const c = this.database.contracts.find(x => x.id === cid);
-				if (c && c.serviceTypes[idx]) {
-					const up = [...c.serviceTypes]; up[idx].status = st;
-					if (await this.firebaseService.updateContractField(cid, { serviceTypes: up }) && st === 'Concluído') {
-						this.sendNotification(c.advogadoResponsavel, { message: `${this.currentUserDisplayName} concluiu serviço "${up[idx].name}" em ${c.clientName}`, contractId: cid, sender: this.currentUserDisplayName });
-					}
-				}
-			}
-
-			async sendNotification(user, data) { if (user && user !== this.currentUserDisplayName) await this.firebaseService.sendNotification(Utils.sanitizeForFirestoreId(user), data); }
-			async sendNotificationToAllAdmins(data) { ADMIN_USERS.forEach(adm => { if (adm.toLowerCase() !== this.currentUserDisplayName?.toLowerCase()) this.firebaseService.sendNotification(Utils.sanitizeForFirestoreId(adm), data); }); }
-
-			checkAndNotifyOverdue(oldC, newC) {
-				const today = new Date().toISOString().split('T')[0];
-				if (this.lastOverdueCheck === today) return;
-				const yest = new Date(); yest.setDate(yest.getDate() - 1); const yStr = yest.toISOString().split('T')[0];
-				// Verifica contratos baseados no filtro atual (Novos/Legado) ou TODOS? 
-				// Melhor verificar TODOS os do usuário, independente da view, para não perder alertas.
-				let checkList = this.database.contracts; 
-				if(!this.isUserAdmin) checkList = checkList.filter(c => c.advogadoResponsavel === this.currentUserDisplayName);
-
-				checkList.forEach(c => (c.parcels||[]).forEach(p => {
-					if (p.status === 'Pendente' && p.dueDate.startsWith(yStr)) {
-						this.sendNotification(c.advogadoResponsavel, { message: `ATENÇÃO: Parcela ${p.number} de ${c.clientName} venceu ontem.`, contractId: c.id, sender: "Sistema" });
-					}
-				}));
-				this.lastOverdueCheck = today;
-			}
-
-			async moveToLixeira(id) { if (await Utils.confirm('Mover para lixeira?')) await this.firebaseService.updateContractField(id, { isDeleted: true }); }
-			async restoreContract(id) { if (await Utils.confirm('Restaurar contrato?')) await this.firebaseService.updateContractField(id, { isDeleted: false }); }
-			async deleteContractPermanently(id) { if (this.isUserAdmin && await Utils.confirm('EXCLUIR PERMANENTEMENTE?')) await this.firebaseService.deleteContract(id); }
-
-			async handleAddAdvogado(e) {
-				e.preventDefault(); if (!this.isUserAdmin) return;
-				const n = Utils.sanitizeText(document.getElementById('inputAdvogadoName').value);
-				const list = this.database.settings.advogados?.list || [];
-				if (n && !list.includes(n)) {
-					if (await this.firebaseService.saveSystemSettings('advogados', { list: [...list, n] })) document.getElementById('inputAdvogadoName').value = '';
-				} else Utils.showToast('Inválido ou duplicado.', 'error');
-			}
-			async handleRemoveAdvogado(n) {
-				if (!this.isUserAdmin) return; if (await Utils.confirm(`Remover "${n}"?`)) {
-					const list = (this.database.settings.advogados?.list || []).filter(x => x !== n);
-					await this.firebaseService.saveSystemSettings('advogados', { list });
-				}
-			}
-
-			handleAddManualParcel() {
-				const v = Utils.parseNumber(document.getElementById('parcelaValorManual').value);
-				const d = document.getElementById('parcelaVencimentoManual').value;
-				if (v > 0 && d) {
-					this.manualParcels.push({ value: v, dueDate: d });
-					this.manualParcels.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-					this.renderManualParcelList();
-					document.getElementById('parcelaValorManual').value = ''; document.getElementById('parcelaVencimentoManual').value = '';
-					document.getElementById('financialDataChanged').value = 'true';
-				} else Utils.showToast('Dados inválidos.', 'error');
-			}
-			handleRemoveManualParcel(i) { this.manualParcels.splice(i, 1); this.renderManualParcelList(); document.getElementById('financialDataChanged').value = 'true'; }
-			renderManualParcelList() {
-				const c = document.getElementById('manualParcelList'); c.innerHTML = '';
-				if (this.manualParcels.length === 0) c.innerHTML = `<p class="text-xs text-gray-500 text-center p-2">Vazio.</p>`;
-				else this.manualParcels.forEach((p, i) => c.append(this.domBuilder.createManualParcelListItem(p.value, p.dueDate, i)));
-			}
-			toggleSpecialContractFields(e) {
-				const ck = e.target.checked;
-				document.getElementById('financial-fields-standard').style.display = ck ? 'none' : 'block';
-				document.getElementById('financial-fields-special').style.display = ck ? 'block' : 'none';
-				document.getElementById('financialDataChanged').value = 'true';
-			}
-
-			openModal(id) {
-				this.lastFocusedElement = document.activeElement;
-				document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-				const m = document.getElementById(id); if (m) m.style.display = 'block';
-				if (this.backdrop) this.backdrop.style.display = 'block';
-				document.body.style.overflow = 'hidden'; this.appContainer.setAttribute('aria-hidden', 'true'); this.openModalId = id;
-				const f = m.querySelector('input, button'); if (f) f.focus();
-			}
-			closeModal(id) {
-				const m = document.getElementById(id); if (m) m.style.display = 'none';
-				if (this.openModalId === id) this.openModalId = null;
-				if (!Array.from(document.querySelectorAll('.modal')).some(x => x.style.display === 'block')) {
-					if (this.backdrop) this.backdrop.style.display = 'none';
-					document.body.style.overflow = ''; this.appContainer.setAttribute('aria-hidden', 'false');
-					if (this.lastFocusedElement) this.lastFocusedElement.focus();
-				}
-				if (id === 'modalRelatorio') this.analyticsHandler.destroyModalCharts();
-			}
-
-			openContractModal(id = null) {
-				document.getElementById('formContrato').reset(); document.getElementById('financialDataChanged').value = 'false'; document.getElementById('servicosContainer').innerHTML = '';
-				this.populateAdvogadoSelectModal(); this.manualParcels = []; this.renderManualParcelList();
-				const fields = document.querySelectorAll('#financial-fields-standard input, #financial-fields-standard select');
-				const warn = document.getElementById('financial-warning');
-				const spec = document.getElementById('contratoEspecial');
-
-				if (id) {
-					const c = this.database.contracts.find(x => x.id === id); if (!c) return;
-					document.getElementById('modalContratoTitle').textContent = "Editar Contrato";
-					document.getElementById('contractId').value = c.id; document.getElementById('clienteNome').value = c.clientName;
-					document.getElementById('advogadoResponsavel').value = c.advogadoResponsavel;
-					(c.serviceTypes || []).forEach(s => this.createServiceTag(s.name, s.deadline, s.status));
-					document.getElementById('contratoTipoPagamento').value = c.paymentType || 'Parcelado'; document.getElementById('contratoObservacoes').value = c.observations || '';
-					
-					const hasPaid = (c.parcels||[]).some(p=>p.status==='Paga');
-					if(hasPaid && this.isUserAdmin) { warn.classList.remove('hidden'); fields.forEach(f=>f.disabled=true); spec.disabled=true; }
-					else { warn.classList.add('hidden'); fields.forEach(f=>f.disabled=!this.isUserAdmin); spec.disabled=!this.isUserAdmin; }
-
-					if (this.isUserAdmin) {
-						document.getElementById('taxaExito').value = c.successFee || '';
-						spec.checked = c.isSpecialContract || false;
-						if(c.isSpecialContract) {
-							document.getElementById('financial-fields-standard').style.display='none'; document.getElementById('financial-fields-special').style.display='block';
-							this.manualParcels = (c.parcels||[]).map(p=>({value:p.value, dueDate:p.dueDate.split('T')[0]})); this.renderManualParcelList();
-						} else {
-							document.getElementById('financial-fields-standard').style.display='block'; document.getElementById('financial-fields-special').style.display='none';
-							document.getElementById('valorTotal').value = c.totalValue; document.getElementById('numParcelas').value = (c.parcels||[]).length||1;
-							if((c.parcels||[]).length>0) document.getElementById('vencimentoPrimeiraParcela').value = c.parcels[0].dueDate.split('T')[0];
-						}
-					}
-					document.getElementById('contratoJaQuitado').disabled = hasPaid;
-				} else {
-					document.getElementById('modalContratoTitle').textContent = "Novo Contrato"; document.getElementById('contractId').value = '';
-					warn.classList.add('hidden'); fields.forEach(f=>f.disabled=!this.isUserAdmin); spec.disabled=!this.isUserAdmin;
-					document.getElementById('financial-fields-standard').style.display='block'; document.getElementById('financial-fields-special').style.display='none';
-				}
-				this.openModal('modalContrato');
-			}
-			openPaymentModal(id, idx) {
-				const c = this.database.contracts.find(x => x.id === id); if (!c) return;
-				const p = c.parcels[idx]; let vc = p.value; let info = '';
-				if (new Date(p.dueDate) < new Date()) { vc = this.correctionCalculator.calcularValorCorrigido(p.value, p.dueDate); info = `<p class="text-red-400"><strong>Corrigido:</strong> ${Utils.formatCurrency(vc)}</p>`; }
-				document.getElementById('pagamentoContractId').value = id; document.getElementById('pagamentoParcelIndex').value = idx;
-				document.getElementById('pagamentoInfo').innerHTML = `<p><strong>${c.clientName}</strong> - P.${p.number}</p><p>Original: ${Utils.formatCurrency(p.value)}</p>${info}`;
-				document.getElementById('pagamentoValor').value = vc.toFixed(2); document.getElementById('pagamentoValor').disabled = !this.isUserAdmin;
-				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
-				this.openModal('modalPagamento');
-			}
-			openClientHistoryModal(name) {
-				// Histórico mostra TUDO desse cliente (ignorando filtro de data/novos/velhos)
-				const list = (this.isUserAdmin ? this.database.contracts : this.database.contracts.filter(c=>c.advogadoResponsavel===this.currentUserDisplayName)).filter(c=>c.clientName===name);
-				document.getElementById('clienteModalTitle').textContent = `Histórico: ${name}`;
-				const div = document.getElementById('clienteModalContent'); div.innerHTML = '';
-				let tot=0, pag=0;
-				list.forEach(c => {
-					tot+=c.totalValue||0; const pd = (c.parcels||[]).reduce((s,p)=>s+(p.valuePaid||0),0)+(c.successFeeValueReceived||0); pag+=pd;
-					div.innerHTML += `<div class="bg-gray-700 p-4 rounded mb-4 border-l-4 ${c.isDeleted?'border-red-500 opacity-60':'border-indigo-500'}">
-					<h3 class="font-bold text-white">${(c.serviceTypes||[]).map(s=>s.name).join(', ')} <span class="text-xs font-normal">(${c.createdAt?.split('T')[0]||'Antigo'})</span></h3>
-					<p class="text-sm text-gray-400">Adv: ${c.advogadoResponsavel} | Total: ${Utils.formatCurrency(c.totalValue)} | Pago: ${Utils.formatCurrency(pd)}</p>
-					${(c.parcels||[]).map(p=>`<div class="text-xs ${p.status==='Paga'?'text-green-400':'text-gray-400'}">P.${p.number} - ${Utils.formatCurrency(p.value)} (${p.status})</div>`).join('')}</div>`;
-				});
-				div.insertAdjacentHTML('afterbegin', `<div class="grid grid-cols-3 gap-2 text-center mb-4 text-sm bg-gray-900 p-2 rounded"><div>Contratado<br><b class="text-white">${Utils.formatCurrency(tot)}</b></div><div>Pago<br><b class="text-green-400">${Utils.formatCurrency(pag)}</b></div><div>Saldo<br><b class="text-red-400">${Utils.formatCurrency(tot-pag)}</b></div></div>`);
-				this.openModal('modalCliente');
-			}
-			openReportModal() {
-				if (!this.isUserAdmin) return;
-				const m = document.getElementById('reportMonth'); if (m.options.length === 0) { ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].forEach((x, i) => m.add(new Option(x, i))); for (let i = new Date().getFullYear(); i >= 2020; i--) document.getElementById('reportYear').add(new Option(i, i)); m.value = new Date().getMonth(); document.getElementById('reportYear').value = new Date().getFullYear(); }
-				this.openModal('modalRelatorio'); this.generateAndShowReport();
-			}
-			openExitoModal(id) {
-				const c = this.database.contracts.find(x => x.id === id); if (!c) return;
-				document.getElementById('exitoContractId').value = id;
-				document.getElementById('exitoInfo').innerHTML = `<p><strong>${c.clientName}</strong></p><p>Êxito Previsto: ${c.successFee}</p>`;
-				this.openModal('modalExito');
-			}
-			createServiceTag(n, d, s) {
-				const t = this.domBuilder.buildElement('div', { className: 'service-tag' }); t.dataset.name = n; t.dataset.deadline = d; t.dataset.status = s;
-				t.innerHTML = `<span>${n}${d ? ` <small>(${Utils.formatDate(d)})</small>` : ''}</span><span class="remove-tag" onclick="this.parentElement.remove()">&times;</span>`;
-				document.getElementById('servicosContainer').appendChild(t);
-			}
-
-			renderNotificationDropdown() {
-				const l = document.getElementById('notification-list'); l.innerHTML = '';
-				const all = this.database.notifications; const unread = all.filter(n => !n.isRead).length;
-				document.getElementById('notification-badge').classList.toggle('hidden', unread === 0);
-				document.getElementById('notification-list-empty').classList.toggle('hidden', all.length > 0);
-				const frag = document.createDocumentFragment(); all.forEach(n => frag.append(this.domBuilder.createNotificationItem(n))); l.append(frag);
-			}
-			async markNotificationsAsRead(ids) { await this.firebaseService.markNotificationsAsRead(this.currentSafeName, ids || this.database.notifications.filter(n => !n.isRead).map(n => n.id)); }
-			closeNotificationDropdown() { document.getElementById('notification-dropdown')?.classList.add('hidden'); }
-
+			// --- RELATÓRIO DETALHADO (QUEM PAGOU vs QUEM NÃO PAGOU) ---
 			generateAndShowReport() {
-				// Relatório Modal Simples (Antigo) - Respeita o filtro Global?
-				// Como é um relatório mensal específico, vamos passar os contratos filtrados pelo filtro global.
 				const m = parseInt(document.getElementById('reportMonth').value);
 				const y = parseInt(document.getElementById('reportYear').value);
-				const inc = this.reportHandler.calculateMonthlyIncome(y, m, this.getFilteredContracts(true));
-				document.getElementById('reportResult').innerHTML = `<div class="grid grid-cols-2 gap-4 text-center mb-4"><div class="dark-card p-4 rounded">Total Parc.<br><b class="text-white text-xl">${Utils.formatCurrency(inc.totalParcelas)}</b></div><div class="dark-card p-4 rounded">Total Êxito<br><b class="text-indigo-400 text-xl">${Utils.formatCurrency(inc.totalExito)}</b></div></div><div class="bg-green-900/30 border border-green-700 p-4 text-center rounded"><h3 class="font-bold text-green-400 text-2xl">${Utils.formatCurrency(inc.totalGeral)}</h3><p class="text-xs">RECEBIDO EM ${m + 1}/${y}</p></div>`;
+				// Usa contratos filtrados (para respeitar legacy/novos)
+				const data = this.reportHandler.calculateMonthlyIncome(y, m, this.getFilteredContracts(true));
+				
+				let html = `<div class="grid grid-cols-2 gap-4 text-center mb-6">
+					<div class="dark-card p-4 rounded">Total Parc.<br><b class="text-white text-xl">${Utils.formatCurrency(data.totalParcelas)}</b></div>
+					<div class="dark-card p-4 rounded">Total Êxito<br><b class="text-indigo-400 text-xl">${Utils.formatCurrency(data.totalExito)}</b></div>
+				</div>
+				<div class="bg-green-900/20 border border-green-700 p-4 text-center rounded mb-6"><h3 class="font-bold text-green-400 text-2xl">${Utils.formatCurrency(data.totalGeral)}</h3><p class="text-xs">RECEBIDO EM ${m + 1}/${y}</p></div>`;
+
+				// Lista Quem Pagou
+				html += `<h4 class="text-green-400 font-bold text-xs uppercase border-b border-gray-700 pb-1 mb-2">Quem Pagou (Entradas)</h4>`;
+				if (data.detailedPayments.length > 0) {
+					html += `<div class="space-y-1 mb-6">`;
+					data.detailedPayments.forEach(p => {
+						html += `<div class="flex justify-between bg-gray-800 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-gray-500">(${p.type})</span></div><div class="text-green-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`;
+					});
+					html += `</div>`;
+				} else html += `<p class="text-xs text-gray-500 italic mb-6">Nenhum recebimento.</p>`;
+
+				// Lista Quem NÃO Pagou
+				const pendingTotal = data.pendingPayments.reduce((acc,curr)=>acc+curr.value,0);
+				html += `<h4 class="text-red-400 font-bold text-xs uppercase border-b border-gray-700 pb-1 mb-2 flex justify-between"><span>Quem Não Pagou (Pendentes)</span><span>Total: ${Utils.formatCurrency(pendingTotal)}</span></h4>`;
+				if (data.pendingPayments.length > 0) {
+					html += `<div class="space-y-1">`;
+					data.pendingPayments.forEach(p => {
+						html += `<div class="flex justify-between bg-red-900/10 border border-red-900/30 p-2 rounded text-sm"><div><span class="text-white">${p.clientName}</span> <span class="text-xs text-red-300">Venc: ${Utils.formatDate(p.date)}</span></div><div class="text-red-400 font-bold">${Utils.formatCurrency(p.value)}</div></div>`;
+					});
+					html += `</div>`;
+				} else html += `<p class="text-xs text-gray-500 italic">Nenhuma pendência.</p>`;
+
+				document.getElementById('reportResult').innerHTML = html;
 				document.getElementById('reportResult').classList.remove('hidden'); document.getElementById('reportChartsContainer').classList.add('hidden');
-			}
-			showAnalyticsInModal() {
-				document.getElementById('reportResult').classList.add('hidden'); document.getElementById('reportChartsContainer').classList.remove('hidden');
-				const ctx1 = document.getElementById('actualIncomeChartModal')?.getContext('2d'); const ctx2 = document.getElementById('projectedIncomeChartModal')?.getContext('2d');
-				const c = this.getFilteredContracts(true);
-				const d1 = this.reportHandler.getActualIncomeData(c); this.analyticsHandler.renderChart('actualIncomeChartModal', 'bar', d1.labels, d1.data, 'Faturação', '#4ade80');
-				const d2 = this.reportHandler.getProjectedIncomeData(c); this.analyticsHandler.renderChart('projectedIncomeChartModal', 'bar', d2.labels, d2.data, 'Projeção', '#8b5cf6');
-			}
-			generateAdvancedReport() {
-				this.analyticsHandler.destroyPageCharts('page-relatorios');
-				const s = new Date(document.getElementById('reportStartDate').value + 'T00:00:00-04:00');
-				const e = new Date(document.getElementById('reportEndDate').value + 'T23:59:59-04:00');
-				if (e < s) { Utils.showToast('Data final menor que inicial.', 'error'); return; }
-				// Relatório Avançado respeita o Filtro Global? SIM.
-				const data = this.reportHandler.calculateIncomeByDateRange(s, e, this.getFilteredContracts(true));
-				this.currentAdvancedReportData = data;
-				if (data.totalGeral === 0 && data.totalContratos === 0) {
-					document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true;
-				} else {
-					document.getElementById('advancedReportContainer').classList.remove('hidden'); document.getElementById('advancedReportEmpty').classList.add('hidden'); document.getElementById('exportPdfButton').disabled = false;
-					document.getElementById('report-kpis').innerHTML = `<div class="dark-card p-4 rounded text-center">Faturação<br><b class="text-2xl text-green-400">${Utils.formatCurrency(data.totalGeral)}</b></div><div class="dark-card p-4 rounded text-center">Novos Contratos<br><b class="text-2xl text-blue-400">${data.totalContratos}</b></div><div class="dark-card p-4 rounded text-center">Parcelas<br><b class="text-2xl text-white">${Utils.formatCurrency(data.totalParcelas)}</b></div><div class="dark-card p-4 rounded text-center">Êxito<br><b class="text-2xl text-indigo-400">${Utils.formatCurrency(data.totalExito)}</b></div>`;
-					this.analyticsHandler.renderChart('advReportTimelineChart', 'line', Object.keys(data.byMonth).sort(), Object.keys(data.byMonth).sort().map(k => data.byMonth[k]), 'Faturação', '#4ade80');
-					this.analyticsHandler.renderPie('advReportByAdvogadoChart', Object.keys(data.byAdvogado), Object.values(data.byAdvogado), 'Por Advogado');
-					this.analyticsHandler.renderChart('advReportNewContractsChart', 'bar', Object.keys(data.newContractsByMonth).sort(), Object.keys(data.newContractsByMonth).sort().map(k => data.newContractsByMonth[k]), 'Novos Contratos', '#8b5cf6');
-				}
 			}
 
 			exportReportPDF() {
 				if (!this.currentAdvancedReportData) return;
 				const { jsPDF } = window.jspdf; const doc = new jsPDF(); const d = this.currentAdvancedReportData;
 				doc.setFontSize(18); doc.text("Relatório Financeiro", 14, 22); doc.setFontSize(11); doc.text(`Gerado em ${new Date().toLocaleDateString()}`, 14, 30);
-				doc.autoTable({ startY: 40, head: [['Item', 'Valor']], body: [['Faturação Total', Utils.formatCurrency(d.totalGeral)], ['Novos Contratos', d.totalContratos]], theme: 'grid' });
-				const rows = d.detailedPayments.map(x => [x.clientName, x.type, Utils.formatDate(x.date), x.advogado, Utils.formatCurrency(x.value)]);
-				doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Cliente', 'Tipo', 'Data', 'Adv', 'Valor']], body: rows });
-				doc.save('relatorio.pdf');
+				
+				// Tabela Resumo
+				doc.autoTable({ startY: 40, head: [['Item', 'Valor']], body: [['Faturação Total (Recebido)', Utils.formatCurrency(d.totalGeral)], ['Novos Contratos', d.totalContratos], ['Total Parcelas', Utils.formatCurrency(d.totalParcelas)], ['Total Êxito', Utils.formatCurrency(d.totalExito)]], theme: 'grid', headStyles: { fillColor: [22, 163, 74] } });
+				
+				// Tabela Quem Pagou
+				doc.text("Detalhes: Quem Pagou", 14, doc.lastAutoTable.finalY + 15);
+				const rowsPaid = d.detailedPayments.map(x => [x.clientName, x.type, Utils.formatDate(x.date), x.advogado, Utils.formatCurrency(x.value)]);
+				doc.autoTable({ startY: doc.lastAutoTable.finalY + 20, head: [['Cliente', 'Tipo', 'Data', 'Adv', 'Valor']], body: rowsPaid, headStyles: { fillColor: [22, 163, 74] } });
+
+				// Tabela Quem NÃO Pagou
+				if (d.pendingPayments && d.pendingPayments.length > 0) {
+					doc.addPage(); doc.setTextColor(220, 38, 38); doc.text("Pendências: Quem NÃO Pagou", 14, 20); doc.setTextColor(0);
+					const rowsPending = d.pendingPayments.map(x => [x.clientName, x.type, Utils.formatDate(x.date), x.advogado, Utils.formatCurrency(x.value)]);
+					doc.autoTable({ startY: 25, head: [['Cliente', 'Parcela', 'Vencimento', 'Adv', 'Valor']], body: rowsPending, headStyles: { fillColor: [220, 38, 38] } });
+				}
+				doc.save('relatorio_completo.pdf');
+			}
+
+			// --- OUTRAS FUNÇÕES (Versão Completa) ---
+			renderAdvancedReportPage() { this.generateAdvancedReport(); } 
+			generateAdvancedReport() {
+				this.analyticsHandler.destroyPageCharts('page-relatorios');
+				const s = new Date(document.getElementById('reportStartDate').value + 'T00:00:00');
+				const e = new Date(document.getElementById('reportEndDate').value + 'T23:59:59');
+				const data = this.reportHandler.calculateIncomeByDateRange(s, e, this.getFilteredContracts(true));
+				this.currentAdvancedReportData = data;
+				
+				if (data.totalGeral === 0 && data.totalContratos === 0) { document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true; }
+				else {
+					document.getElementById('advancedReportContainer').classList.remove('hidden'); document.getElementById('advancedReportEmpty').classList.add('hidden'); document.getElementById('exportPdfButton').disabled = false;
+					document.getElementById('report-kpis').innerHTML = `<div class="dark-card p-4 rounded text-center">Faturação<br><b class="text-2xl text-green-400">${Utils.formatCurrency(data.totalGeral)}</b></div><div class="dark-card p-4 rounded text-center">Novos<br><b class="text-2xl text-blue-400">${data.totalContratos}</b></div><div class="dark-card p-4 rounded text-center">Pendentes<br><b class="text-2xl text-red-400">${Utils.formatCurrency(data.pendingPayments.reduce((a,b)=>a+b.value,0))}</b></div><div class="dark-card p-4 rounded text-center">Êxito<br><b class="text-2xl text-indigo-400">${Utils.formatCurrency(data.totalExito)}</b></div>`;
+					this.analyticsHandler.renderChart('advReportTimelineChart', 'line', Object.keys(data.byMonth).sort(), Object.keys(data.byMonth).sort().map(k => data.byMonth[k]), 'Faturação', '#4ade80');
+					this.analyticsHandler.renderChart('advReportNewContractsChart', 'bar', Object.keys(data.newContractsByMonth).sort(), Object.keys(data.newContractsByMonth).sort().map(k => data.newContractsByMonth[k]), 'Novos', '#8b5cf6');
+					this.analyticsHandler.renderPie('advReportByAdvogadoChart', Object.keys(data.byAdvogado), Object.values(data.byAdvogado), 'Por Advogado');
+				}
+			}
+			renderPerformancePage() {
+				if (!this.isUserAdmin) return;
+				this.analyticsHandler.destroyPageCharts('page-performance');
+				const { contratosPorAdvogado, faturamentoPorAdvogado } = this.reportHandler.calculateAdminPerformanceData(this.getFilteredContracts(true));
+				this.analyticsHandler.renderPie('adminChartContratos', Object.keys(contratosPorAdvogado), Object.values(contratosPorAdvogado), 'Contratos');
+				this.analyticsHandler.renderChart('adminChartFaturamento', 'bar', Object.keys(faturamentoPorAdvogado), Object.values(faturamentoPorAdvogado), 'Faturação', '#4ade80');
+				const tb1 = document.getElementById('adminTableFaturamento').querySelector('tbody'); tb1.innerHTML='';
+				Object.entries(faturamentoPorAdvogado).sort(([,a],[,b])=>b-a).forEach(([l,v],i) => tb1.append(this.domBuilder.createRankingRow(i+1, l, Utils.formatCurrency(v))));
+				const tb2 = document.getElementById('adminTableContratos').querySelector('tbody'); tb2.innerHTML='';
+				Object.entries(contratosPorAdvogado).sort(([,a],[,b])=>b-a).forEach(([l,v],i) => tb2.append(this.domBuilder.createRankingRow(i+1, l, v)));
+			}
+			renderOficinaPage() {
+				const list = document.getElementById('advogadoSettingsList'); if(!list) return;
+				list.innerHTML = ''; const arr = this.database.settings.advogados?.list || [];
+				if(arr.length === 0) list.innerHTML = `<p class="text-sm text-gray-400 text-center p-2">Vazio.</p>`;
+				else [...arr].sort().forEach(n => list.append(this.domBuilder.createSettingListItem(n)));
+			}
+			showPage(id) {
+				if ((this.currentPageId==='page-relatorios'&&id!=='page-relatorios')||(this.currentPageId==='page-performance'&&id!=='page-performance')) this.analyticsHandler.destroyPageCharts(this.currentPageId);
+				this.currentPageId = id;
+				['page-dashboard', 'page-parcelas', 'page-servicos', 'page-lixeira', 'page-relatorios', 'page-performance', 'page-oficina'].forEach(p => document.getElementById(p)?.classList.add('hidden'));
+				document.querySelectorAll('.sidebar-nav-item, .mobile-nav-item').forEach(e => e.classList.remove('active'));
+				document.getElementById(id)?.classList.remove('hidden');
+				const base = id.split('-')[1]; document.getElementById(`tab-${base}`)?.classList.add('active'); document.getElementById(`mobile-tab-${base}`)?.classList.add('active');
+				const sb = document.getElementById('sidebar'); if(window.innerWidth<768 && !sb.classList.contains('hidden')) { sb.classList.add('hidden'); document.getElementById('modal-backdrop').style.display='none'; }
+				this.render();
+			}
+			setupUIAccess() { const adm=this.isUserAdmin; ['advogadoFilter', 'servicosAdvogadoFilter'].forEach(id=>{const e=document.getElementById(id);if(e){e.disabled=!adm;e.value=adm?'Todos':this.currentUserDisplayName;}}); }
+			getContractStatus(c) { const p=(c.parcels||[]).every(x=>x.status==='Paga'), s=(c.serviceTypes||[]).every(x=>x.status==='Concluído'); if(p&&s) return c.successFee&&!c.successFeePaymentDate?{statusText:'Aguardando Êxito',statusColor:'bg-indigo-900 text-indigo-300',borderColor:'border-indigo-500'}:{statusText:'Concluído',statusColor:'bg-gray-700 text-gray-300',borderColor:'border-gray-600'}; if(p) return {statusText:'Em Andamento',statusColor:'bg-blue-900 text-blue-300',borderColor:'border-blue-500'}; return {statusText:'Ativo',statusColor:'bg-yellow-900 text-yellow-300',borderColor:'border-yellow-500'}; }
+			renderSortButtons() { /* Helper padrão */ }
+			renderAdvogadoFilters() { const all=new Set(this.database.settings.advogados?.list||[]); ['advogadoFilter','servicosAdvogadoFilter'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const v=s.value;s.innerHTML='<option value="Todos">Todos</option>';[...all].sort().forEach(a=>s.add(new Option(a,a)));s.value=this.isUserAdmin?(v||'Todos'):this.currentUserDisplayName;s.disabled=!this.isUserAdmin;}); }
+			populateAdvogadoSelectModal() { const s=document.getElementById('advogadoResponsavel');if(!s)return;s.innerHTML='<option>Não Informado</option>';const all=new Set(this.database.settings.advogados?.list||[]);[...all].sort().forEach(a=>s.add(new Option(a,a))); }
+			changeContractPage(i) { this.contractListPage=i; this.renderContractList(); }
+			resetAndRenderContractList() { this.contractListPage=0; this.renderContractList(); }
+			
+			// --- HANDLERS DE AÇÃO ---
+			async handleDisplayNameSubmit(e) { e.preventDefault(); if(await this.authService.updateUserProfile(document.getElementById('inputDisplayName').value)) window.location.reload(); }
+			async handleContractSubmit(e) {
+				e.preventDefault(); const id=document.getElementById('contractId').value, spec=document.getElementById('contratoEspecial').checked, svcs=Array.from(document.querySelectorAll('#servicosContainer .service-tag')).map(t=>({name:Utils.sanitizeText(t.dataset.name),status:t.dataset.status,deadline:t.dataset.deadline}));
+				if(!svcs.length){Utils.showToast('Adicione serviços.','error');return;}
+				const data={clientName:Utils.sanitizeText(document.getElementById('clienteNome').value),advogadoResponsavel:document.getElementById('advogadoResponsavel').value,serviceTypes:svcs,paymentType:document.getElementById('contratoTipoPagamento').value,observations:document.getElementById('contratoObservacoes').value,isSpecialContract:spec};
+				if(this.isUserAdmin){
+					let p=[],t=0;
+					if(spec){ this.manualParcels.forEach((x,i)=>{t+=x.value;p.push({number:i+1,value:x.value,dueDate:new Date(x.dueDate+'T12:00:00').toISOString(),status:'Pendente',valuePaid:0});}); }
+					else{ t=Utils.parseNumber(document.getElementById('valorTotal').value);const n=parseInt(document.getElementById('numParcelas').value)||1,start=document.getElementById('vencimentoPrimeiraParcela').value,paid=document.getElementById('contratoJaQuitado').checked;
+						if(n>0&&t>0){let dt=new Date((start||new Date().toISOString().split('T')[0])+'T12:00:00');const v=t/n;for(let i=0;i<n;i++){const isP=paid&&n===1;p.push({number:i+1,value:v,dueDate:dt.toISOString(),status:isP?'Paga':'Pendente',valuePaid:isP?v:0,paymentDate:isP?new Date().toISOString():null});dt.setMonth(dt.getMonth()+1);}}
+					}
+					data.totalValue=t;data.parcels=p;data.successFee=document.getElementById('taxaExito').value;
+				}
+				if(!id){if(!this.isUserAdmin){data.parcels=[];data.totalValue=0;} data.isDeleted=false;data.createdAt=new Date().toISOString(); if(await this.firebaseService.addContract(data)) this.closeModal('modalContrato');}
+				else{const old=this.database.contracts.find(c=>c.id===id); if(!this.isUserAdmin&&old){data.totalValue=old.totalValue;data.parcels=old.parcels;} data.createdAt=old?.createdAt; if(await this.firebaseService.updateContract(id,data)) this.closeModal('modalContrato');}
+			}
+			async handlePaymentSubmit(e) { e.preventDefault(); const id=document.getElementById('pagamentoContractId').value, idx=document.getElementById('pagamentoParcelIndex').value, c=this.database.contracts.find(x=>x.id===id), val=this.isUserAdmin?Utils.parseNumber(document.getElementById('pagamentoValor').value):(c?.parcels[idx]?.value||0); if(c&&val>0){const p=[...c.parcels]; p[idx]={...p[idx],status:'Paga',valuePaid:val,paymentDate:new Date(document.getElementById('pagamentoData').value+'T12:00:00').toISOString()}; await this.firebaseService.updateContractField(id,{parcels:p}); this.closeModal('modalPagamento');} }
+			async handleExitoSubmit(e) { e.preventDefault(); const id=document.getElementById('exitoContractId').value, val=this.isUserAdmin?Utils.parseNumber(document.getElementById('exitoValorRecebido').value):0; if(await this.firebaseService.updateContractField(id,{successFeeValueReceived:val,successFeePaymentDate:new Date().toISOString()})) this.closeModal('modalExito'); }
+			handleAddServiceTag() { const n=document.getElementById('contratoServicoInput'),d=document.getElementById('contratoPrazoInput'); if(n.value){this.createServiceTag(n.value,d.value,'Pendente');n.value='';d.value='';} }
+			async updateServiceStatus(id, idx, st) { const c=this.database.contracts.find(x=>x.id===id); if(c){const s=[...c.serviceTypes];s[idx].status=st;await this.firebaseService.updateContractField(id,{serviceTypes:s});} }
+			async sendNotification(u, d) { if(u&&u!==this.currentUserDisplayName) await this.firebaseService.sendNotification(Utils.sanitizeForFirestoreId(u), d); }
+			
+			// Lógica de Notificação Diária
+			checkAndNotifyOverdue(oldContracts, newContracts) {
+				const today = new Date().toISOString().split('T')[0];
+				if (this.lastOverdueCheck === today) return;
+				const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yStr = yesterday.toISOString().split('T')[0];
+				// Verifica apenas contratos relevantes para o usuário (ou todos se admin)
+				let contractsToCheck = this.database.contracts;
+				if (!this.isUserAdmin) contractsToCheck = contractsToCheck.filter(c => c.advogadoResponsavel === this.currentUserDisplayName);
+
+				contractsToCheck.forEach(c => {
+					(c.parcels || []).forEach(p => {
+						if (p.status === 'Pendente' && p.dueDate.startsWith(yStr)) {
+							// Notifica APENAS o advogado responsável
+							this.sendNotification(c.advogadoResponsavel, { message: `Atenção: Parcela ${p.number} de ${c.clientName} venceu ontem.`, contractId: c.id, sender: "Sistema" });
+						}
+					});
+				});
+				this.lastOverdueCheck = today;
+			}
+
+			async moveToLixeira(id) { if(await Utils.confirm('Mover para Lixeira?')) await this.firebaseService.updateContractField(id,{isDeleted:true}); }
+			async restoreContract(id) { if(await Utils.confirm('Restaurar?')) await this.firebaseService.updateContractField(id,{isDeleted:false}); }
+			async deleteContractPermanently(id) { if(this.isUserAdmin && await Utils.confirm('EXCLUIR PERMANENTEMENTE?')) await this.firebaseService.deleteContract(id); }
+			async handleAddAdvogado(e) { e.preventDefault(); const n=document.getElementById('inputAdvogadoName').value; const l=this.database.settings.advogados?.list||[]; if(n&&!l.includes(n)) await this.firebaseService.saveSystemSettings('advogados',{list:[...l,n]}); document.getElementById('inputAdvogadoName').value=''; }
+			async handleRemoveAdvogado(n) { if(await Utils.confirm('Remover?')) await this.firebaseService.saveSystemSettings('advogados',{list:(this.database.settings.advogados?.list||[]).filter(x=>x!==n)}); }
+			handleAddManualParcel() { const v=Utils.parseNumber(document.getElementById('parcelaValorManual').value),d=document.getElementById('parcelaVencimentoManual').value; if(v>0&&d){this.manualParcels.push({value:v,dueDate:d}); this.renderManualParcelList(); document.getElementById('parcelaValorManual').value='';} }
+			handleRemoveManualParcel(i) { this.manualParcels.splice(i,1); this.renderManualParcelList(); }
+			renderManualParcelList() { const c=document.getElementById('manualParcelList'); c.innerHTML=''; this.manualParcels.forEach((p,i)=>c.append(this.domBuilder.createManualParcelListItem(p.value,p.dueDate,i))); }
+			toggleSpecialContractFields(e) { document.getElementById('financial-fields-standard').style.display=e.target.checked?'none':'block'; document.getElementById('financial-fields-special').style.display=e.target.checked?'block':'none'; }
+			openModal(id) { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); document.getElementById(id).style.display='block'; document.getElementById('modal-backdrop').style.display='block'; this.openModalId=id; }
+			closeModal(id) { document.getElementById(id).style.display='none'; if(this.openModalId===id)this.openModalId=null; if(!document.querySelector('.modal[style*="block"]')) document.getElementById('modal-backdrop').style.display='none'; }
+			
+			// Métodos "open" específicos apenas preparam o form e chamam openModal
+			openContractModal(id=null) { document.getElementById('formContrato').reset(); this.manualParcels=[]; document.getElementById('servicosContainer').innerHTML=''; this.populateAdvogadoSelectModal(); if(id){const c=this.database.contracts.find(x=>x.id===id); document.getElementById('contractId').value=id; document.getElementById('clienteNome').value=c.clientName; document.getElementById('advogadoResponsavel').value=c.advogadoResponsavel; (c.serviceTypes||[]).forEach(s=>this.createServiceTag(s.name,s.deadline,s.status)); if(this.isUserAdmin){document.getElementById('valorTotal').value=c.totalValue;}} this.openModal('modalContrato'); }
+			openPaymentModal(id, idx) { const c=this.database.contracts.find(x=>x.id===id), p=c.parcels[idx]; document.getElementById('pagamentoContractId').value=id; document.getElementById('pagamentoParcelIndex').value=idx; document.getElementById('pagamentoInfo').textContent=`${c.clientName} - P.${p.number}`; document.getElementById('pagamentoValor').value=p.value; this.openModal('modalPagamento'); }
+			openClientHistoryModal(name) { const l=this.database.contracts.filter(c=>c.clientName===name); const d=document.getElementById('clienteModalContent'); d.innerHTML=''; l.forEach(c=>{d.innerHTML+=`<div class="bg-gray-700 p-2 rounded mb-2"><b class="text-white">${c.clientName}</b> - ${Utils.formatCurrency(c.totalValue)}</div>`}); this.openModal('modalCliente'); }
+			openReportModal() { if(this.isUserAdmin) { const m=document.getElementById('reportMonth'); if(m.options.length===0){['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].forEach((x,i)=>m.add(new Option(x,i)));for(let i=new Date().getFullYear();i>=2020;i--)document.getElementById('reportYear').add(new Option(i,i));} this.openModal('modalRelatorio'); this.generateAndShowReport(); } }
+			openExitoModal(id) { document.getElementById('exitoContractId').value=id; this.openModal('modalExito'); }
+			createServiceTag(n,d,s) { this.domBuilder.createServiceTag(n,d,s); } // Chama do Builder
+			
+			renderNotificationDropdown() { const l=document.getElementById('notification-list'); l.innerHTML=''; this.database.notifications.forEach(n=>l.append(this.domBuilder.createNotificationItem(n))); document.getElementById('notification-badge').classList.toggle('hidden', this.database.notifications.filter(x=>!x.isRead).length===0); }
+			async markNotificationsAsRead(ids) { await this.firebaseService.markNotificationsAsRead(this.currentSafeName, ids||this.database.notifications.filter(x=>!x.isRead).map(x=>x.id)); }
+			closeNotificationDropdown() { document.getElementById('notification-dropdown').classList.add('hidden'); }
+			showAnalyticsInModal() { document.getElementById('reportResult').classList.add('hidden'); document.getElementById('reportChartsContainer').classList.remove('hidden'); const c = this.getFilteredContracts(true); const d1 = this.reportHandler.getActualIncomeData(c); this.analyticsHandler.renderChart('actualIncomeChartModal', 'bar', d1.labels, d1.data, 'Faturação', '#4ade80'); const d2 = this.reportHandler.getProjectedIncomeData(c); this.analyticsHandler.renderChart('projectedIncomeChartModal', 'bar', d2.labels, d2.data, 'Projeção', '#8b5cf6'); }
+			
+			// Exportação CSV Completa
+			exportReportCSV() {
+				if(!this.isUserAdmin) return;
+				const m = parseInt(document.getElementById('reportMonth').value); const y = parseInt(document.getElementById('reportYear').value);
+				const d = this.reportHandler.calculateMonthlyIncome(y, m, this.getFilteredContracts(true));
+				
+				let rows = ["Tipo de Lista,Cliente,Descrição,Data,Valor"];
+				// Adiciona Pagos
+				d.detailedPayments.forEach(p => rows.push(`"PAGO",${this._fCSV(p.clientName)},${p.type},${Utils.formatDate(p.date)},${p.value}`));
+				// Adiciona Pendentes
+				d.pendingPayments.forEach(p => rows.push(`"PENDENTE",${this._fCSV(p.clientName)},${p.type},${Utils.formatDate(p.date)},${p.value}`));
+				
+				this._dlCSV(rows.join('\n'), `relatorio_${m+1}_${y}.csv`);
 			}
 			exportContractsCSV() {
 				const r = ["ID,Cliente,Advogado,Valor Total,Status"];
 				this.getFilteredContracts(false).forEach(c => r.push([c.id, this._fCSV(c.clientName), this._fCSV(c.advogadoResponsavel), c.totalValue, this.getContractStatus(c).statusText].join(',')));
 				this._dlCSV(r.join('\n'), 'contratos.csv');
 			}
-			exportReportCSV() {
-				if(!this.isUserAdmin) return;
-				const m = parseInt(document.getElementById('reportMonth').value); const y = parseInt(document.getElementById('reportYear').value);
-				const d = this.reportHandler.calculateMonthlyIncome(y, m, this.getFilteredContracts(true));
-				const r = ["Cliente,Tipo,Data,Valor"];
-				d.detailedPayments.forEach(p => r.push([this._fCSV(p.clientName), p.type, Utils.formatDate(p.date), p.value].join(',')));
-				this._dlCSV(r.join('\n'), 'relatorio_mensal.csv');
-			}
 			_fCSV(s) { if (s == null) return ''; let str = String(s); if (str.includes(',')) str = `"${str}"`; return str; }
 			_dlCSV(c, n) { const b = new Blob(["\uFEFF" + c], { type: 'text/csv;charset=utf-8;' }); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = n; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
 
-			_setupModalAccessibility() { document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (this.openModalId) this.closeModal(this.openModalId); this.closeNotificationDropdown(); } }); }
+			_setupModalAccessibility() { document.addEventListener('keydown', e=>{if(e.key==='Escape')this.closeModal(this.openModalId)}); }
 		}
 
 		document.addEventListener('DOMContentLoaded', () => {
