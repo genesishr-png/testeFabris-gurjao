@@ -24,14 +24,15 @@
 		.dark-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
 		.dark-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); }
 		
-		/* MODAIS */
+		/* MODAIS (CORRIGIDO: Removido display:flex duplicado que causava o erro) */
 		.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; backdrop-filter: blur(3px); }
 		.modal { 
-			display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; 
+			display: none; /* PADRÃO: Oculto */
+			position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; 
 			max-height: 90vh; width: 90%; max-width: 800px; 
 			background-color: #1f2937; border: 1px solid #4b5563; border-radius: 0.75rem; 
 			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-			display: flex; flex-direction: column; 
+			flex-direction: column; /* Prepara para quando o JS ativar o flex */
 		}
 		.modal-header { flex-shrink: 0; padding: 1rem 1.5rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); }
 		.modal-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
@@ -70,78 +71,28 @@
 		.pretty-select:hover { background: rgba(55, 65, 81, 0.9); }
 		.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #818cf8; }
 
-		/* [CORREÇÃO 1] Checkboxes Centralizados e Bonitos */
+		/* Checkboxes Centralizados */
 		.checkbox-group-centered {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 2rem;
-			background-color: rgba(31, 41, 55, 0.5);
-			padding: 1rem;
-			border-radius: 0.75rem;
-			border: 1px solid #4b5563;
-			margin-bottom: 1.5rem;
+			display: flex; justify-content: center; align-items: center; gap: 2rem;
+			background-color: rgba(31, 41, 55, 0.5); padding: 1rem; border-radius: 0.75rem; border: 1px solid #4b5563; margin-bottom: 1.5rem;
 		}
-		.checkbox-item-custom {
-			display: flex;
-			align-items: center;
-			cursor: pointer;
-			user-select: none;
-		}
-		.checkbox-item-custom input {
-			width: 1.2rem;
-			height: 1.2rem;
-			margin-right: 0.5rem;
-			cursor: pointer;
-			accent-color: #4f46e5;
-		}
-		.checkbox-item-custom label {
-			margin-bottom: 0;
-			cursor: pointer;
-			color: #e2e8f0;
-			font-size: 0.95rem;
-		}
+		.checkbox-item-custom { display: flex; align-items: center; cursor: pointer; user-select: none; }
+		.checkbox-item-custom input { width: 1.2rem; height: 1.2rem; margin-right: 0.5rem; cursor: pointer; accent-color: #4f46e5; }
+		.checkbox-item-custom label { margin-bottom: 0; cursor: pointer; color: #e2e8f0; font-size: 0.95rem; }
 
-		/* [CORREÇÃO 2 & 3] Lista da Oficina Geométrica */
+		/* Lista da Oficina Geométrica */
 		.setting-list-item { 
-			display: flex; 
-			justify-content: space-between; 
-			align-items: center; 
-			background-color: #1f2937; 
-			border: 1px solid #374151; 
-			padding: 0.75rem 1rem; 
-			border-radius: 0.5rem; 
-			margin-bottom: 0.5rem; 
-			transition: all 0.2s ease-in-out;
+			display: flex; justify-content: space-between; align-items: center; 
+			background-color: #1f2937; border: 1px solid #374151; padding: 0.75rem 1rem; 
+			border-radius: 0.5rem; margin-bottom: 0.5rem; transition: all 0.2s ease-in-out;
 		}
-		.setting-list-item:hover { 
-			border-color: #6366f1; 
-			background-color: #252f3e; 
-			transform: translateX(2px);
-		}
-		.setting-list-item span { 
-			font-weight: 500; 
-			color: #f3f4f6; 
-			font-size: 0.9rem;
-		}
+		.setting-list-item:hover { border-color: #6366f1; background-color: #252f3e; transform: translateX(2px); }
+		.setting-list-item span { font-weight: 500; color: #f3f4f6; font-size: 0.9rem; }
 		.setting-list-remove-btn { 
-			background: rgba(220, 38, 38, 0.15); 
-			color: #f87171; 
-			width: 32px; 
-			height: 32px; 
-			border-radius: 6px; 
-			display: flex; 
-			align-items: center; 
-			justify-content: center; 
-			transition: all 0.2s; 
-			border: 1px solid rgba(220, 38, 38, 0.2);
-			cursor: pointer;
+			background: rgba(220, 38, 38, 0.15); color: #f87171; width: 32px; height: 32px; border-radius: 6px; 
+			display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid rgba(220, 38, 38, 0.2); cursor: pointer;
 		}
-		.setting-list-remove-btn:hover { 
-			background: #dc2626; 
-			color: white; 
-			border-color: #dc2626;
-		}
+		.setting-list-remove-btn:hover { background: #dc2626; color: white; border-color: #dc2626; }
 
 		/* Ranking Tables */
 		.ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; margin-top: 10px; }
@@ -149,9 +100,7 @@
 		.ranking-table td { background: #2d3748; padding: 0.75rem 1rem; vertical-align: middle; border-top: 1px solid #374151; border-bottom: 1px solid #374151; }
 		.ranking-table tr td:first-child { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; border-left: 1px solid #374151; font-weight: bold; width: 40px; text-align: center; }
 		.ranking-table tr td:last-child { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-right: 1px solid #374151; text-align: right; font-family: monospace; }
-		.ranking-table .rank-1 { color: #fbbf24; } 
-		.ranking-table .rank-2 { color: #e5e7eb; } 
-		.ranking-table .rank-3 { color: #d97706; }
+		.ranking-table .rank-1 { color: #fbbf24; } .ranking-table .rank-2 { color: #e5e7eb; } .ranking-table .rank-3 { color: #d97706; }
 
 		/* Utils */
 		#loading-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.95); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.25rem; }
@@ -956,6 +905,31 @@
 				doc.save('relatorio_completo.pdf');
 			}
 
+			renderAdvancedReportCharts(data) {
+				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
+				const sortedMonths = Object.keys(data.byMonth).sort();
+				const timelineLabels = sortedMonths.map(key => {
+					const [year, month] = key.split('-');
+					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+				});
+				const timelineData = sortedMonths.map(key => data.byMonth[key]);
+				this.analyticsHandler.renderChart('advReportTimelineChart', 'line', timelineLabels, timelineData, 'Faturação', '#4ade80');
+				
+				const byAdvCtx = document.getElementById('advReportByAdvogadoChart').getContext('2d');
+				const advLabels = Object.keys(data.byAdvogado);
+				const advData = Object.values(data.byAdvogado);
+				this.analyticsHandler.renderPie('advReportByAdvogadoChart', advLabels, advData, 'Por Advogado');
+
+				const newContractsCtx = document.getElementById('advReportNewContractsChart').getContext('2d');
+				const sortedContractMonths = Object.keys(data.newContractsByMonth).sort();
+				const contractLabels = sortedContractMonths.map(key => {
+					const [year, month] = key.split('-');
+					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+				});
+				const contractData = sortedContractMonths.map(key => data.newContractsByMonth[key]);
+				this.analyticsHandler.renderChart('advReportNewContractsChart', 'bar', contractLabels, contractData, 'Novos Contratos', '#8b5cf6');
+			}
+
 			renderAdvancedReportPage() { this.generateAdvancedReport(); } 
 			generateAdvancedReport() {
 				this.analyticsHandler.destroyPageCharts('page-relatorios');
@@ -963,13 +937,12 @@
 				const e = new Date(document.getElementById('reportEndDate').value + 'T23:59:59');
 				const data = this.reportHandler.calculateIncomeByDateRange(s, e, this.getFilteredContracts(true));
 				this.currentAdvancedReportData = data;
-				if (data.totalGeral === 0 && data.totalContratos === 0) { document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true; }
-				else {
+				if (data.totalGeral === 0 && data.totalContratos === 0) {
+					document.getElementById('advancedReportContainer').classList.add('hidden'); document.getElementById('advancedReportEmpty').classList.remove('hidden'); document.getElementById('exportPdfButton').disabled = true;
+				} else {
 					document.getElementById('advancedReportContainer').classList.remove('hidden'); document.getElementById('advancedReportEmpty').classList.add('hidden'); document.getElementById('exportPdfButton').disabled = false;
 					document.getElementById('report-kpis').innerHTML = `<div class="dark-card p-4 rounded text-center">Faturação<br><b class="text-2xl text-green-400">${Utils.formatCurrency(data.totalGeral)}</b></div><div class="dark-card p-4 rounded text-center">Novos<br><b class="text-2xl text-blue-400">${data.totalContratos}</b></div><div class="dark-card p-4 rounded text-center">Pendentes<br><b class="text-2xl text-red-400">${Utils.formatCurrency(data.pendingPayments.reduce((a,b)=>a+b.value,0))}</b></div><div class="dark-card p-4 rounded text-center">Êxito<br><b class="text-2xl text-indigo-400">${Utils.formatCurrency(data.totalExito)}</b></div>`;
-					this.analyticsHandler.renderChart('advReportTimelineChart', 'line', Object.keys(data.byMonth).sort(), Object.keys(data.byMonth).sort().map(k => data.byMonth[k]), 'Faturação', '#4ade80');
-					this.analyticsHandler.renderChart('advReportNewContractsChart', 'bar', Object.keys(data.newContractsByMonth).sort(), Object.keys(data.newContractsByMonth).sort().map(k => data.newContractsByMonth[k]), 'Novos', '#8b5cf6');
-					this.analyticsHandler.renderPie('advReportByAdvogadoChart', Object.keys(data.byAdvogado), Object.values(data.byAdvogado), 'Por Advogado');
+					this.renderAdvancedReportCharts(data);
 				}
 			}
 			renderPerformancePage() {
