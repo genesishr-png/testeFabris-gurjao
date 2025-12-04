@@ -12,7 +12,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 	<style>
 		/* --- ESTILOS GERAIS --- */
-		body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; overflow-y: hidden; }
+		body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; overflow: hidden; }
 		body::after { content: ''; position: fixed; z-index: -2; top: 0; left: 0; right: 0; bottom: 0; background-image: url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center; opacity: 0.15; }
 		
 		/* Scrollbars */
@@ -20,72 +20,146 @@
 		::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
 		::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 		
-		/* Classes Utilitárias Customizadas */
+		/* Cards & UI */
 		.dark-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); transition: transform 0.2s; }
 		.dark-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); }
 		
-		/* Modais */
-		.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9000; backdrop-filter: blur(2px); }
-		.modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; max-height: 90vh; border: 1px solid #4b5563; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); border-radius: 0.75rem; background-color: #1f2937; }
-		.modal-body { overflow-y: auto; max-height: 70vh; padding: 1.5rem; }
-		
-		/* Inputs e Formulários (Correção Visual) */
+		/* MODAIS */
+		.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9000; backdrop-filter: blur(3px); }
+		.modal { 
+			display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; 
+			max-height: 90vh; width: 90%; max-width: 800px; 
+			background-color: #1f2937; border: 1px solid #4b5563; border-radius: 0.75rem; 
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+			display: flex; flex-direction: column; 
+		}
+		.modal-header { flex-shrink: 0; padding: 1rem 1.5rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); }
+		.modal-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
+		.modal-footer { flex-shrink: 0; padding: 1rem 1.5rem; border-top: 1px solid #374151; background: rgba(31, 41, 55, 0.95); display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+		/* Inputs */
 		input, select, textarea, .form-input {
-			width: 100%;
-			background-color: #374151; /* Cinza Escuro */
-			border: 1px solid #4b5563;
-			color: #ffffff;
-			padding: 0.5rem 0.75rem;
-			border-radius: 0.5rem;
-			outline: none;
-			transition: all 0.2s;
-			color-scheme: dark; /* Para o calendário ficar escuro */
+			width: 100%; background-color: #374151; border: 1px solid #4b5563; color: #ffffff;
+			padding: 0.6rem 0.75rem; border-radius: 0.5rem; outline: none; transition: all 0.2s; color-scheme: dark;
 		}
-		input:focus, select:focus, textarea:focus {
-			border-color: #6366f1;
-			box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-		}
-		input:disabled, select:disabled { opacity: 0.6; cursor: not-allowed; }
-		label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; color: #9ca3af; }
+		input:focus, select:focus, textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+		input:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; background-color: #1f2937; }
+		label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: #9ca3af; font-weight: 500; }
 
 		/* Navegação */
 		.sidebar-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #d1d5db; cursor: pointer; transition: all 0.2s; }
-		.sidebar-nav-item:hover { background-color: #374151; color: white; }
-		.sidebar-nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
+		.sidebar-nav-item:hover, .sidebar-nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 		
 		/* Kanban & Listas */
 		.kanban-content { max-height: 60vh; overflow-y: auto; padding-right: 4px; }
-		.service-tag { display: inline-flex; align-items: center; background: #374151; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; margin-right: 4px; border: 1px solid #4b5563; }
+		.service-tag { display: inline-flex; align-items: center; background: #4b5563; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; margin: 0 4px 4px 0; border: 1px solid #6b7280; color: white; }
 		
-		/* Botões de Ordenação */
+		/* Botões */
+		.btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; }
+		.btn-primary { background: #4f46e5; color: white; } .btn-primary:hover { background: #4338ca; }
+		.btn-secondary { background: #4b5563; color: white; } .btn-secondary:hover { background: #374151; }
+		.btn-danger { background: #dc2626; color: white; } .btn-danger:hover { background: #b91c1c; }
+		.btn-success { background: #16a34a; color: white; } .btn-success:hover { background: #15803d; }
+
 		.sort-button { background: #374151; border: 1px solid #4b5563; color: #9ca3af; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
 		.sort-button.active { background: #4f46e5; color: white; border-color: #4f46e5; }
 
-		/* Botão de Filtro Estilizado (Glassmorphism) */
+		/* Filtro Global */
 		.pretty-select-wrapper { position: relative; }
-		.pretty-select {
-			appearance: none;
-			background-color: rgba(31, 41, 55, 0.7);
-			border: 1px solid #6366f1;
-			color: #e0e7ff;
-			padding: 0.5rem 2.5rem 0.5rem 1rem;
-			border-radius: 9999px;
-			font-weight: 600;
-			cursor: pointer;
-			backdrop-filter: blur(4px);
-		}
-		.pretty-select:hover { background-color: rgba(55, 65, 81, 0.9); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+		.pretty-select { appearance: none; background: rgba(31, 41, 55, 0.8); border: 1px solid #6366f1; color: #e0e7ff; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 999px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); }
+		.pretty-select:hover { background: rgba(55, 65, 81, 0.9); }
 		.select-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #818cf8; }
 
-		/* Utilitários */
+		/* [CORREÇÃO 1] Checkboxes Centralizados e Bonitos */
+		.checkbox-group-centered {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 2rem;
+			background-color: rgba(31, 41, 55, 0.5);
+			padding: 1rem;
+			border-radius: 0.75rem;
+			border: 1px solid #4b5563;
+			margin-bottom: 1.5rem;
+		}
+		.checkbox-item-custom {
+			display: flex;
+			align-items: center;
+			cursor: pointer;
+			user-select: none;
+		}
+		.checkbox-item-custom input {
+			width: 1.2rem;
+			height: 1.2rem;
+			margin-right: 0.5rem;
+			cursor: pointer;
+			accent-color: #4f46e5;
+		}
+		.checkbox-item-custom label {
+			margin-bottom: 0;
+			cursor: pointer;
+			color: #e2e8f0;
+			font-size: 0.95rem;
+		}
+
+		/* [CORREÇÃO 2 & 3] Lista da Oficina Geométrica */
+		.setting-list-item { 
+			display: flex; 
+			justify-content: space-between; 
+			align-items: center; 
+			background-color: #1f2937; 
+			border: 1px solid #374151; 
+			padding: 0.75rem 1rem; 
+			border-radius: 0.5rem; 
+			margin-bottom: 0.5rem; 
+			transition: all 0.2s ease-in-out;
+		}
+		.setting-list-item:hover { 
+			border-color: #6366f1; 
+			background-color: #252f3e; 
+			transform: translateX(2px);
+		}
+		.setting-list-item span { 
+			font-weight: 500; 
+			color: #f3f4f6; 
+			font-size: 0.9rem;
+		}
+		.setting-list-remove-btn { 
+			background: rgba(220, 38, 38, 0.15); 
+			color: #f87171; 
+			width: 32px; 
+			height: 32px; 
+			border-radius: 6px; 
+			display: flex; 
+			align-items: center; 
+			justify-content: center; 
+			transition: all 0.2s; 
+			border: 1px solid rgba(220, 38, 38, 0.2);
+			cursor: pointer;
+		}
+		.setting-list-remove-btn:hover { 
+			background: #dc2626; 
+			color: white; 
+			border-color: #dc2626;
+		}
+
+		/* Ranking Tables */
+		.ranking-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; margin-top: 10px; }
+		.ranking-table th { text-align: left; padding: 0 1rem; color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
+		.ranking-table td { background: #2d3748; padding: 0.75rem 1rem; vertical-align: middle; border-top: 1px solid #374151; border-bottom: 1px solid #374151; }
+		.ranking-table tr td:first-child { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; border-left: 1px solid #374151; font-weight: bold; width: 40px; text-align: center; }
+		.ranking-table tr td:last-child { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; border-right: 1px solid #374151; text-align: right; font-family: monospace; }
+		.ranking-table .rank-1 { color: #fbbf24; } 
+		.ranking-table .rank-2 { color: #e5e7eb; } 
+		.ranking-table .rank-3 { color: #d97706; }
+
+		/* Utils */
 		#loading-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.95); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-size: 1.25rem; }
 		#app-container, .admin-only { display: none; }
 		body.is-admin .admin-only:not(.hidden) { display: block; }
 		body.is-admin .flex.admin-only:not(.hidden) { display: flex; }
 		.notification-item { background: #374151; padding: 12px; border-radius: 8px; border-left: 4px solid #4f46e5; margin-bottom: 8px; cursor: pointer; }
 		.notification-item.is-read { background: #1f2937; border-left-color: #4b5563; opacity: 0.6; }
-		
-		/* Animação Login */
 		@keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } }
 		.animate-blob { animation: blob 7s infinite; }
 	</style>
@@ -94,29 +168,25 @@
 	<div id="notifications"></div>
 	<div id="loading-overlay"><i class="fas fa-spinner fa-spin mr-3"></i> A carregar sistema...</div>
 
-	<!-- TELA DE LOGIN -->
+	<!-- LOGIN -->
 	<div id="auth-overlay" class="min-h-screen flex items-center justify-center bg-gray-900 relative overflow-hidden px-4">
 		<div class="absolute inset-0 opacity-10 bg-[url('https://i.postimg.cc/x81V8QJg/Imagem-do-Whats-App-de-2025-10-27-a-s-09-49-28-f966cd35.jpg')] bg-cover bg-center"></div>
 		<div class="absolute w-96 h-96 bg-blue-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob top-0 left-1/4"></div>
 		<div class="absolute w-96 h-96 bg-indigo-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000 bottom-0 right-1/4"></div>
-		
 		<div class="relative z-10 w-full max-w-md bg-gray-800/80 backdrop-blur-xl border border-gray-700 p-8 rounded-2xl shadow-2xl">
-			<div class="text-center mb-8">
-				<img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-20 mx-auto mb-4 drop-shadow-lg">
-				<h1 class="text-2xl font-bold text-white">Acesso Restrito</h1>
-			</div>
+			<div class="text-center mb-8"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-20 mx-auto mb-4 drop-shadow-lg"><h1 class="text-2xl font-bold text-white">Acesso Restrito</h1></div>
 			<form id="login-form" class="space-y-4">
 				<div><label>Email</label><input type="email" id="login-email" class="w-full" required></div>
 				<div><label>Senha</label><input type="password" id="login-password" class="w-full" required></div>
 				<div id="auth-error" class="hidden text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-900/50"></div>
-				<button type="submit" id="login-submit-button" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition transform hover:-translate-y-0.5">Entrar</button>
+				<button type="submit" id="login-submit-button" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition">Entrar</button>
 			</form>
 		</div>
 	</div>
 
-	<!-- SISTEMA PRINCIPAL -->
+	<!-- APP CONTAINER -->
 	<div id="app-container" class="flex h-screen">
-		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/90 backdrop-blur border-r border-gray-800 p-4 z-20">
+		<aside id="sidebar" class="hidden md:flex md:flex-col md:w-64 bg-gray-900/95 backdrop-blur border-r border-gray-800 p-4 z-20">
 			<div class="mb-8 text-center"><img src="https://www.fabrisegurjao.adv.br/netpage/data/uploads/2019/12/logo-fabris-e-gurjao-491x325px.png" class="h-16 mx-auto opacity-90"></div>
 			<nav class="flex-1 space-y-2">
 				<a onclick="window.App.showPage('page-dashboard')" id="tab-dashboard" class="sidebar-nav-item active"><i class="fas fa-chart-line w-5 text-center"></i> Painel</a>
@@ -133,20 +203,14 @@
 			</div>
 		</aside>
 
-		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-20 md:pb-0 relative">
-			<header class="sticky top-0 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 p-4 z-10 flex justify-between items-center shadow-sm">
+		<main id="main-content" class="flex-1 flex flex-col h-screen overflow-y-auto pb-20 md:pb-0 relative bg-gray-900/50">
+			<header class="sticky top-0 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 p-4 z-10 flex justify-between items-center shadow-md">
 				<h1 id="page-title" class="text-xl font-bold text-white hidden md:block">Painel</h1>
 				<div class="flex items-center gap-4 w-full md:w-auto justify-end">
-					
-					<!-- FILTRO GLOBAL ESTILIZADO -->
 					<div class="pretty-select-wrapper">
-						<select id="globalDateFilter" class="pretty-select">
-							<option value="novos">✨ Atuais (Novos)</option>
-							<option value="legado">📜 Legado (Antigos)</option>
-						</select>
+						<select id="globalDateFilter" class="pretty-select"><option value="novos">✨ Atuais (Novos)</option><option value="legado">📜 Legado (Antigos)</option></select>
 						<i class="fas fa-calendar-check select-icon"></i>
 					</div>
-
 					<div class="relative">
 						<button id="notification-bell" class="p-2 text-gray-400 hover:text-white relative"><i class="fas fa-bell text-xl"></i><span id="notification-badge" class="hidden absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900"></span></button>
 						<div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
@@ -163,8 +227,8 @@
 				<!-- DASHBOARD -->
 				<div id="page-dashboard">
 					<div class="flex flex-wrap gap-4 mb-8">
-						<button onclick="window.App.openContractModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-2"><i class="fas fa-plus"></i> Novo Contrato</button>
-						<button onclick="window.App.openReportModal()" class="admin-only bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-2"><i class="fas fa-chart-pie"></i> Relatório Mensal</button>
+						<button onclick="window.App.openContractModal()" class="btn btn-primary shadow-lg"><i class="fas fa-plus"></i> Novo Contrato</button>
+						<button onclick="window.App.openReportModal()" class="admin-only btn btn-success shadow-lg" style="background-color: #0d9488;"><i class="fas fa-chart-pie"></i> Relatório Mensal</button>
 					</div>
 
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -213,12 +277,12 @@
 				<div id="page-performance" class="hidden admin-only">
 					<h2 class="text-2xl font-bold text-white mb-6">Performance</h2>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4">Faturação por Advogado</h3><div class="h-64"><canvas id="adminChartFaturamento"></canvas></div></div>
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4">Contratos Ativos</h3><div class="h-64"><canvas id="adminChartContratos"></canvas></div></div>
+						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4 font-semibold uppercase text-xs tracking-wider">Faturação por Advogado</h3><div class="h-64"><canvas id="adminChartFaturamento"></canvas></div></div>
+						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-4 font-semibold uppercase text-xs tracking-wider">Contratos Ativos</h3><div class="h-64"><canvas id="adminChartContratos"></canvas></div></div>
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-2">Ranking Financeiro</h3><table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>#</th><th>Nome</th><th>Valor</th></tr></thead><tbody></tbody></table></div>
-						<div class="dark-card p-4 rounded-xl"><h3 class="text-gray-400 mb-2">Ranking Contratos</h3><table class="ranking-table" id="adminTableContratos"><thead><tr><th>#</th><th>Nome</th><th>Qtd</th></tr></thead><tbody></tbody></table></div>
+						<div class="dark-card p-6 rounded-xl border border-gray-700"><h3 class="text-white font-bold mb-4 text-lg">Ranking Financeiro</h3><table class="ranking-table" id="adminTableFaturamento"><thead><tr><th>#</th><th>Nome</th><th>Valor</th></tr></thead><tbody></tbody></table></div>
+						<div class="dark-card p-6 rounded-xl border border-gray-700"><h3 class="text-white font-bold mb-4 text-lg">Ranking Contratos</h3><table class="ranking-table" id="adminTableContratos"><thead><tr><th>#</th><th>Nome</th><th>Qtd</th></tr></thead><tbody></tbody></table></div>
 					</div>
 				</div>
 
@@ -229,8 +293,8 @@
 							<input type="date" id="reportStartDate" class="bg-gray-700 border-gray-600 rounded p-1 text-sm text-white">
 							<span class="text-gray-500">até</span>
 							<input type="date" id="reportEndDate" class="bg-gray-700 border-gray-600 rounded p-1 text-sm text-white">
-							<button onclick="window.App.generateAdvancedReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm font-bold">Gerar</button>
-							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold" disabled>PDF</button>
+							<button onclick="window.App.generateAdvancedReport()" class="btn btn-primary text-xs">Gerar</button>
+							<button id="exportPdfButton" onclick="window.App.exportReportPDF()" class="btn btn-danger text-xs" disabled>PDF</button>
 						</div>
 					</div>
 					<div id="advancedReportContainer" class="space-y-8 hidden">
@@ -251,10 +315,16 @@
 
 				<div id="page-oficina" class="hidden admin-only">
 					<h2 class="text-2xl font-bold text-white mb-6">Oficina</h2>
-					<div class="dark-card p-6 rounded-xl max-w-md">
-						<h3 class="text-lg font-bold text-white mb-4">Gerenciar Advogados</h3>
-						<form id="formAddAdvogado" class="flex gap-2 mb-4"><input type="text" id="inputAdvogadoName" class="form-input flex-1" placeholder="Nome..." required><button type="submit" class="bg-indigo-600 px-4 rounded text-white font-bold">+</button></form>
-						<div id="advogadoSettingsList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+					<div class="dark-card p-8 rounded-xl max-w-lg mx-auto border border-gray-700 shadow-2xl">
+						<h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2"><i class="fas fa-user-shield text-indigo-500"></i> Gerenciar Advogados</h3>
+						<form id="formAddAdvogado" class="flex gap-3 mb-6">
+							<input type="text" id="inputAdvogadoName" class="form-input flex-1 bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Nome do Advogado..." required>
+							<button type="submit" class="btn btn-primary px-4 aspect-square rounded-lg shadow-lg hover:shadow-indigo-500/20 transition-all"><i class="fas fa-plus"></i></button>
+						</form>
+						<div class="bg-gray-800/50 rounded-xl p-4 max-h-[400px] overflow-y-auto border border-gray-700/50">
+							<div id="advogadoSettingsList" class="space-y-2"></div>
+						</div>
+						<p class="text-xs text-gray-500 mt-4 text-center">Use o botão vermelho para remover um advogado da lista.</p>
 					</div>
 				</div>
 
@@ -269,38 +339,53 @@
 		</nav>
 	</div>
 
-	<!-- MODAIS -->
-	<div id="modalDisplayName" class="modal bg-gray-800 w-11/12 md:w-1/3 p-6 rounded-xl text-center">
-		<h2 class="text-xl font-bold text-white mb-4">Bem-vindo(a)!</h2>
-		<p class="text-gray-400 mb-6">Como gostaria de ser chamado?</p>
-		<form id="formDisplayName"><input id="inputDisplayName" class="w-full mb-4" required><button type="submit" class="w-full bg-indigo-600 py-2 rounded text-white font-bold">Começar</button></form>
+	<!-- MODAIS (Estrutura Corrigida) -->
+	<div id="modalDisplayName" class="modal">
+		<div class="modal-header"><h2 class="text-xl font-bold text-white">Bem-vindo(a)!</h2></div>
+		<div class="modal-body text-center">
+			<p class="text-gray-400 mb-6">Como gostaria de ser chamado?</p>
+			<form id="formDisplayName"><input id="inputDisplayName" class="w-full mb-4" required><button type="submit" class="w-full btn btn-primary">Começar</button></form>
+		</div>
 	</div>
 
-	<div id="modalContrato" class="modal bg-gray-800 w-11/12 md:w-1/2 flex flex-col rounded-xl">
-		<div class="p-4 border-b border-gray-700 flex justify-between"><h2 id="modalContratoTitle" class="text-lg font-bold text-white">Contrato</h2><button onclick="window.App.closeModal('modalContrato')" class="text-gray-400">&times;</button></div>
+	<div id="modalContrato" class="modal">
+		<div class="modal-header"><h2 id="modalContratoTitle" class="text-lg font-bold text-white">Novo Contrato</h2><button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white">&times;</button></div>
 		<form id="formContrato" class="flex-1 flex flex-col overflow-hidden">
-			<div class="p-6 overflow-y-auto space-y-4">
+			<div class="modal-body space-y-4">
 				<input type="hidden" id="contractId"><input type="hidden" id="financialDataChanged" value="false">
 				<div class="grid grid-cols-2 gap-4">
 					<div><label>Cliente</label><input id="clienteNome" class="form-input" required></div>
 					<div><label>Advogado</label><select id="advogadoResponsavel" class="form-input" required></select></div>
 				</div>
-				<div class="bg-gray-700/30 p-3 rounded border border-gray-700">
-					<label class="mb-2 block">Serviços</label>
+				<div class="bg-gray-800 p-3 rounded border border-gray-600">
+					<label class="mb-2 block font-bold text-indigo-400">Serviços</label>
 					<div id="servicosContainer" class="flex flex-wrap gap-2 mb-2"></div>
-					<div class="flex gap-2"><input id="contratoServicoInput" placeholder="Serviço..." class="form-input flex-1"><input type="date" id="contratoPrazoInput" class="form-input w-32"><button type="button" id="addServiceButton" class="bg-indigo-600 px-3 rounded text-white">Add</button></div>
+					<div class="flex gap-2">
+						<input id="contratoServicoInput" placeholder="Ex: Divórcio..." class="form-input flex-1">
+						<input type="date" id="contratoPrazoInput" class="form-input w-36">
+						<button type="button" id="addServiceButton" class="btn btn-primary text-xs">Adicionar</button>
+					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-4">
 					<div><label>Tipo Pgto</label><select id="contratoTipoPagamento" class="form-input"><option>Parcelado</option><option>Pró-labore</option><option>Entrada única</option></select></div>
 					<div><label>Obs</label><input id="contratoObservacoes" class="form-input"></div>
 				</div>
 				
-				<div class="admin-only border-t border-gray-700 pt-4 mt-2">
+				<div class="admin-only border-t border-gray-600 pt-4 mt-2">
 					<div id="financial-warning" class="hidden bg-yellow-900/30 text-yellow-200 p-2 rounded text-xs mb-2">Financeiro bloqueado (parcialmente pago).</div>
-					<div class="flex items-center gap-4 mb-3">
-						<div class="flex items-center"><input type="checkbox" id="contratoEspecial" class="mr-2"><label for="contratoEspecial" class="mb-0 cursor-pointer">Manual</label></div>
-						<div class="flex items-center"><input type="checkbox" id="contratoJaQuitado" class="mr-2"><label for="contratoJaQuitado" class="mb-0 cursor-pointer">Já Quitado</label></div>
+					
+					<!-- CHECKBOXES CENTRALIZADOS (CORREÇÃO PEDIDA) -->
+					<div class="checkbox-group-centered">
+						<div class="checkbox-item-custom">
+							<input type="checkbox" id="contratoEspecial">
+							<label for="contratoEspecial">Modo Manual</label>
+						</div>
+						<div class="checkbox-item-custom">
+							<input type="checkbox" id="contratoJaQuitado">
+							<label for="contratoJaQuitado">Já Quitado</label>
+						</div>
 					</div>
+
 					<div id="financial-fields-standard" class="space-y-3">
 						<div class="grid grid-cols-2 gap-4">
 							<div><label>Total (R$)</label><input type="number" step="0.01" id="valorTotal" class="form-input"></div>
@@ -309,50 +394,61 @@
 						<div><label>1º Vencimento</label><input type="date" id="vencimentoPrimeiraParcela" class="form-input"></div>
 					</div>
 					<div id="financial-fields-special" class="hidden space-y-2">
-						<div class="flex gap-2"><input type="number" id="parcelaValorManual" placeholder="R$" class="form-input"><input type="date" id="parcelaVencimentoManual" class="form-input"><button type="button" id="addManualParcelButton" class="bg-indigo-600 px-3 rounded text-white">Add</button></div>
+						<div class="flex gap-2"><input type="number" id="parcelaValorManual" placeholder="R$" class="form-input"><input type="date" id="parcelaVencimentoManual" class="form-input"><button type="button" id="addManualParcelButton" class="btn btn-primary text-xs">Add</button></div>
 						<div id="manualParcelList" class="bg-gray-900 p-2 rounded max-h-32 overflow-y-auto"></div>
 					</div>
-					<div class="mt-3"><label>Êxito</label><input id="taxaExito" class="form-input" placeholder="Ex: 20%"></div>
+					<div class="mt-3"><label>Êxito (opcional)</label><input id="taxaExito" class="form-input" placeholder="Ex: 20% ou R$ 5.000"></div>
 				</div>
 			</div>
-			<div class="p-4 border-t border-gray-700 flex justify-end gap-2"><button type="button" onclick="window.App.closeModal('modalContrato')" class="bg-gray-600 px-4 py-2 rounded text-white">Cancelar</button><button type="submit" class="bg-indigo-600 px-4 py-2 rounded text-white font-bold">Salvar</button></div>
+			<div class="modal-footer">
+				<button type="button" onclick="window.App.closeModal('modalContrato')" class="btn btn-secondary">Cancelar</button>
+				<button type="submit" class="btn btn-primary">Salvar</button>
+			</div>
 		</form>
 	</div>
 
-	<div id="modalPagamento" class="modal bg-gray-800 w-11/12 md:w-1/3 rounded-xl">
-		<div class="p-4 border-b border-gray-700 flex justify-between"><h2 class="font-bold text-white">Pagamento</h2><button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400">&times;</button></div>
-		<form id="formPagamento" class="p-6 space-y-4">
-			<div id="pagamentoInfo" class="bg-gray-700 p-3 rounded text-sm text-gray-200"></div>
-			<input type="hidden" id="pagamentoContractId"><input type="hidden" id="pagamentoParcelIndex">
-			<div><label>Valor Pago</label><input type="number" step="0.01" id="pagamentoValor" class="form-input" required></div>
-			<div><label>Data</label><input type="date" id="pagamentoData" class="form-input" required></div>
-			<button type="submit" class="w-full bg-green-600 py-2 rounded text-white font-bold mt-4">Confirmar</button>
+	<div id="modalPagamento" class="modal md:w-1/3">
+		<div class="modal-header"><h2 class="font-bold text-white">Pagamento</h2><button onclick="window.App.closeModal('modalPagamento')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<form id="formPagamento" class="flex-1 flex flex-col">
+			<div class="modal-body space-y-4">
+				<div id="pagamentoInfo" class="bg-gray-800 p-3 rounded text-sm text-gray-200 border border-gray-600"></div>
+				<input type="hidden" id="pagamentoContractId"><input type="hidden" id="pagamentoParcelIndex">
+				<div><label>Valor Pago (R$)</label><input type="number" step="0.01" id="pagamentoValor" class="form-input" required></div>
+				<div><label>Data Pagamento</label><input type="date" id="pagamentoData" class="form-input" required></div>
+			</div>
+			<div class="modal-footer"><button type="button" onclick="window.App.closeModal('modalPagamento')" class="btn btn-secondary">Cancelar</button><button type="submit" class="btn btn-success">Confirmar</button></div>
 		</form>
 	</div>
 
-	<div id="modalExito" class="modal bg-gray-800 w-11/12 md:w-1/3 rounded-xl">
-		<div class="p-4 border-b border-gray-700 flex justify-between"><h2 class="font-bold text-white">Receber Êxito</h2><button onclick="window.App.closeModal('modalExito')" class="text-gray-400">&times;</button></div>
-		<form id="formExito" class="p-6 space-y-4">
-			<div id="exitoInfo" class="bg-gray-700 p-3 rounded text-sm text-gray-200"></div>
-			<input type="hidden" id="exitoContractId">
-			<div class="admin-only"><label>Valor Recebido</label><input type="number" step="0.01" id="exitoValorRecebido" class="form-input" required></div>
-			<button type="submit" class="w-full bg-indigo-600 py-2 rounded text-white font-bold mt-4">Salvar</button>
+	<div id="modalExito" class="modal md:w-1/3">
+		<div class="modal-header"><h2 class="font-bold text-white">Receber Êxito</h2><button onclick="window.App.closeModal('modalExito')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<form id="formExito" class="flex-1 flex flex-col">
+			<div class="modal-body space-y-4">
+				<div id="exitoInfo" class="bg-gray-800 p-3 rounded text-sm text-gray-200 border border-gray-600"></div>
+				<input type="hidden" id="exitoContractId">
+				<div class="admin-only"><label>Valor Líquido (R$)</label><input type="number" step="0.01" id="exitoValorRecebido" class="form-input" required></div>
+			</div>
+			<div class="modal-footer"><button type="button" onclick="window.App.closeModal('modalExito')" class="btn btn-secondary">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
 		</form>
 	</div>
 
-	<div id="modalCliente" class="modal bg-gray-800 w-11/12 md:w-2/3 rounded-xl flex flex-col">
-		<div class="p-4 border-b border-gray-700 flex justify-between"><h2 id="clienteModalTitle" class="font-bold text-white"></h2><button onclick="window.App.closeModal('modalCliente')" class="text-gray-400">&times;</button></div>
-		<div id="clienteModalContent" class="p-6 overflow-y-auto space-y-4"></div>
+	<div id="modalCliente" class="modal md:w-2/3">
+		<div class="modal-header"><h2 id="clienteModalTitle" class="font-bold text-white"></h2><button onclick="window.App.closeModal('modalCliente')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<div id="clienteModalContent" class="modal-body space-y-4"></div>
 	</div>
 
-	<div id="modalRelatorio" class="modal bg-gray-800 w-11/12 md:w-2/3 rounded-xl admin-only flex flex-col">
-		<div class="p-4 border-b border-gray-700 flex justify-between"><h2 class="font-bold text-white">Relatório Mensal</h2><button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400">&times;</button></div>
-		<div class="p-6 overflow-y-auto">
+	<div id="modalRelatorio" class="modal md:w-2/3 admin-only">
+		<div class="modal-header"><h2 class="font-bold text-white">Relatório Mensal</h2><button onclick="window.App.closeModal('modalRelatorio')" class="text-gray-400 hover:text-white">&times;</button></div>
+		<div class="modal-body">
 			<div class="flex gap-4 mb-4">
 				<div class="flex-1"><label>Mês</label><select id="reportMonth" class="form-input"></select></div>
 				<div class="flex-1"><label>Ano</label><select id="reportYear" class="form-input"></select></div>
 			</div>
-			<div class="flex gap-2 mb-6"><button onclick="window.App.generateAndShowReport()" class="flex-1 bg-teal-600 py-2 rounded text-white font-bold">Visualizar</button><button onclick="window.App.showAnalyticsInModal()" class="flex-1 bg-purple-600 py-2 rounded text-white font-bold">Gráficos</button><button onclick="window.App.exportReportCSV()" class="flex-1 bg-green-600 py-2 rounded text-white font-bold">CSV</button></div>
+			<div class="flex gap-2 mb-6">
+				<button onclick="window.App.generateAndShowReport()" class="flex-1 btn btn-primary" style="background-color: #0d9488;">Visualizar</button>
+				<button onclick="window.App.showAnalyticsInModal()" class="flex-1 btn btn-primary" style="background-color: #7c3aed;">Gráficos</button>
+				<button onclick="window.App.exportReportCSV()" class="flex-1 btn btn-success">CSV</button>
+			</div>
 			<div id="reportResult" class="space-y-4"></div>
 			<div id="reportChartsContainer" class="hidden grid grid-cols-2 gap-4"><div class="dark-card p-4 rounded"><canvas id="actualIncomeChartModal"></canvas></div><div class="dark-card p-4 rounded"><canvas id="projectedIncomeChartModal"></canvas></div></div>
 		</div>
@@ -390,7 +486,7 @@
 			confirm(msg) {
 				return new Promise(res => {
 					let m = document.getElementById('confirmModal');
-					if (!m) { m = document.createElement('div'); m.id='confirmModal'; m.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:12000;display:flex;align-items:center;justify-content:center"><div class="dark-card p-6 rounded-lg max-w-sm w-full border border-gray-600"><p id="cfmMsg" class="text-white mb-6 text-lg font-medium text-center"></p><div class="flex justify-center gap-4"><button id="cfmNo" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500">Não</button><button id="cfmYes" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-500">Sim</button></div></div></div>`; document.body.appendChild(m); }
+					if (!m) { m = document.createElement('div'); m.id='confirmModal'; m.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:12000;display:flex;align-items:center;justify-content:center"><div class="dark-card p-6 rounded-lg max-w-sm w-full border border-gray-600"><p id="cfmMsg" class="text-white mb-6 text-lg font-medium text-center"></p><div class="flex justify-center gap-4"><button id="cfmNo" class="btn btn-secondary">Não</button><button id="cfmYes" class="btn btn-danger">Sim</button></div></div></div>`; document.body.appendChild(m); }
 					m.querySelector('#cfmMsg').textContent=msg; m.style.display='flex';
 					m.querySelector('#cfmNo').onclick=()=>{m.style.display='none';res(false)}; m.querySelector('#cfmYes').onclick=()=>{m.style.display='none';res(true)};
 				});
@@ -538,7 +634,16 @@
 			createNotificationItem(n) { const d = this.el('div', { cls: `notification-item ${n.isRead?'is-read':''}`, html: `<p class="text-sm text-white">${Utils.sanitizeText(n.message)}</p><div class="text-xs text-gray-500 mt-1">${Utils.timeAgo(n.timestamp?.toDate())}</div>` }); d.onclick=()=>{if(!n.isRead) window.App.markNotificationsAsRead([n.id]); window.App.closeNotificationDropdown();}; return d; }
 			createServiceTag(n,d,s) { const t=this.el('div',{cls:'service-tag'}); t.dataset.name=n; t.dataset.deadline=d; t.dataset.status=s; t.innerHTML=`<span>${n}${d?` <small class="text-gray-400">(${Utils.formatDate(d)})</small>`:''}</span><span class="ml-2 cursor-pointer hover:text-red-400 font-bold" onclick="this.parentElement.remove()">&times;</span>`; document.getElementById('servicosContainer').appendChild(t); }
 			createManualParcelListItem(v,d,i) { return this.el('div', { cls: 'parcel-list-item', html: `<span>${Utils.formatCurrency(v)} - ${Utils.formatDate(d)}</span><button type="button" class="text-red-400 hover:text-red-300 font-bold" onclick="window.App.handleRemoveManualParcel(${i})">&times;</button>` }); }
-			createSettingListItem(n) { return this.el('div', { cls: 'setting-list-item', html: `<span class="font-medium text-white">${Utils.sanitizeText(n)}</span><button class="text-red-400 hover:text-red-300 font-bold" onclick="window.App.handleRemoveAdvogado('${Utils.sanitizeText(n)}')">&times;</button>` }); }
+			
+			// [CORREÇÃO 2 & 3] Lista Geométrica da Oficina
+			createSettingListItem(n) { 
+				return this.el('div', { 
+					cls: 'setting-list-item', 
+					html: `<span class="font-medium text-white">${Utils.sanitizeText(n)}</span>
+						   <button class="setting-list-remove-btn" onclick="window.App.handleRemoveAdvogado('${Utils.sanitizeText(n)}')"><i class="fas fa-times"></i></button>` 
+				}); 
+			}
+
 			createExitoCard(c) { return this.card(`<p class="font-bold text-white">${c.clientName}</p><p class="text-sm text-gray-400 mb-3">${(c.serviceTypes||[]).map(s=>s.name).join(', ')}</p><div class="my-4 text-center"><p class="text-sm text-gray-400">Bonificação</p><p class="text-2xl font-semibold text-indigo-400">${c.successFee || 'N/A'}</p></div><button onclick="window.App.openExitoModal('${c.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg text-sm">Receber</button>`, 'border-l-4 border-indigo-500 w-80 flex-shrink-0'); }
 			createServicoCard(c, sp, fp) {
 				const html = `<div class="flex justify-between items-start"><h3 class="font-bold text-xl text-indigo-300 mb-4">${c.clientName}</h3><p class="text-sm text-gray-400"><i class="fas fa-user-tie mr-1"></i> ${c.advogadoResponsavel}</p></div>
@@ -547,7 +652,18 @@
 				<div class="border-t border-gray-700 pt-3"><h4 class="font-semibold text-sm mb-2 text-gray-400">Serviços:</h4><ul class="space-y-1">${(c.serviceTypes||[]).map((s,i) => `<li class="flex items-center justify-between p-2 rounded hover:bg-gray-700/50"><span class="${s.status==='Concluído'?'text-gray-500 line-through':'text-gray-300'} text-sm">${s.name}</span><div class="flex gap-2 text-xs">${s.status!=='Concluído'?`<button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Em Andamento')" class="text-yellow-400 hover:underline">Iniciar</button><button onclick="window.App.updateServiceStatus('${c.id}', ${i}, 'Concluído')" class="text-teal-400 hover:underline">Fim</button>`:`<span class="text-teal-500 font-bold">✓</span>`}</div></li>`).join('')}</ul></div>`;
 				return this.card(html);
 			}
-			createRankingRow(r, l, v) { return this.el('tr', { html: `<td class="rank-${r}">#${r}</td><td class="text-gray-300 font-medium">${l}</td><td class="rank-${r}">${v}</td>` }); }
+			
+			// ATUALIZADO: MELHORIA VISUAL NA TABELA DE RANKING
+			createRankingRow(r, l, v) { 
+				const cls = r === 1 ? 'rank-1' : (r === 2 ? 'rank-2' : (r === 3 ? 'rank-3' : 'rank-other'));
+				const medal = r === 1 ? '🥇' : (r === 2 ? '🥈' : (r === 3 ? '🥉' : ''));
+				return this.el('tr', { 
+					html: `<td><span class="${cls}">${r}</span></td>
+						   <td class="text-gray-200 font-medium">${medal} ${l}</td>
+						   <td class="${cls}">${v}</td>` 
+				}); 
+			}
+
 			renderPaginationControls(cont, total, pages, curr) {
 				cont.innerHTML = ''; if(pages <= 1) return;
 				const btn = (i, t, d, a) => { const b = this.el('button', { cls: `pagination-button px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white mx-1 ${a?'bg-indigo-600 hover:bg-indigo-600':''}`, text: t||(i+1) }); if(d) b.disabled=true; else b.onclick=()=>window.App.changeContractPage(i); return b; };
@@ -591,9 +707,15 @@
 				document.getElementById('formPagamento').addEventListener('submit', this.handlePaymentSubmit.bind(this));
 				document.getElementById('formExito').addEventListener('submit', this.handleExitoSubmit.bind(this));
 				document.getElementById('formAddAdvogado').addEventListener('submit', this.handleAddAdvogado.bind(this));
-				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
+				
+				// AQUI: Listener correto para adicionar serviço
+				const addSvcBtn = document.getElementById('addServiceButton');
+				if(addSvcBtn) addSvcBtn.addEventListener('click', this.handleAddServiceTag.bind(this));
+				
 				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
-				document.getElementById('addManualParcelButton').addEventListener('click', this.handleAddManualParcel.bind(this));
+				const addParcelBtn = document.getElementById('addManualParcelButton');
+				if(addParcelBtn) addParcelBtn.addEventListener('click', this.handleAddManualParcel.bind(this));
+				
 				document.getElementById('searchInput').addEventListener('input', Utils.debounce(() => this.resetAndRenderContractList(), 300));
 				document.getElementById('servicosSearchInput').addEventListener('input', Utils.debounce(() => this.renderServicosPage(), 300));
 				document.getElementById('parcelasSearchInput').addEventListener('input', Utils.debounce(() => this.renderParcelasPage(), 300));
@@ -887,6 +1009,7 @@
 			changeContractPage(i) { this.contractListPage=i; this.renderContractList(); }
 			resetAndRenderContractList() { this.contractListPage=0; this.renderContractList(); }
 			
+			// --- HANDLERS DE AÇÃO ---
 			async handleDisplayNameSubmit(e) { e.preventDefault(); if(await this.authService.updateUserProfile(document.getElementById('inputDisplayName').value)) window.location.reload(); }
 			async handleContractSubmit(e) {
 				e.preventDefault(); const id=document.getElementById('contractId').value, spec=document.getElementById('contratoEspecial').checked, svcs=Array.from(document.querySelectorAll('#servicosContainer .service-tag')).map(t=>({name:Utils.sanitizeText(t.dataset.name),status:t.dataset.status,deadline:t.dataset.deadline}));
@@ -918,9 +1041,10 @@
 			handleRemoveManualParcel(i) { this.manualParcels.splice(i,1); this.renderManualParcelList(); }
 			renderManualParcelList() { const c=document.getElementById('manualParcelList'); c.innerHTML=''; this.manualParcels.forEach((p,i)=>c.append(this.domBuilder.createManualParcelListItem(p.value,p.dueDate,i))); }
 			toggleSpecialContractFields(e) { document.getElementById('financial-fields-standard').style.display=e.target.checked?'none':'block'; document.getElementById('financial-fields-special').style.display=e.target.checked?'block':'none'; }
-			openModal(id) { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); document.getElementById(id).style.display='block'; document.getElementById('modal-backdrop').style.display='block'; this.openModalId=id; }
-			closeModal(id) { document.getElementById(id).style.display='none'; if(this.openModalId===id)this.openModalId=null; if(!document.querySelector('.modal[style*="block"]')) document.getElementById('modal-backdrop').style.display='none'; }
+			openModal(id) { document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); document.getElementById(id).style.display='flex'; document.getElementById('modal-backdrop').style.display='block'; this.openModalId=id; }
+			closeModal(id) { document.getElementById(id).style.display='none'; if(this.openModalId===id)this.openModalId=null; if(!document.querySelector('.modal[style*="flex"]')) document.getElementById('modal-backdrop').style.display='none'; }
 			
+			// Métodos "open" específicos apenas preparam o form e chamam openModal
 			openContractModal(id=null) { document.getElementById('formContrato').reset(); this.manualParcels=[]; document.getElementById('servicosContainer').innerHTML=''; this.populateAdvogadoSelectModal(); if(id){const c=this.database.contracts.find(x=>x.id===id); document.getElementById('contractId').value=id; document.getElementById('clienteNome').value=c.clientName; document.getElementById('advogadoResponsavel').value=c.advogadoResponsavel; (c.serviceTypes||[]).forEach(s=>this.createServiceTag(s.name,s.deadline,s.status)); if(this.isUserAdmin){document.getElementById('valorTotal').value=c.totalValue;}} this.openModal('modalContrato'); }
 			openPaymentModal(id, idx) { const c=this.database.contracts.find(x=>x.id===id), p=c.parcels[idx]; document.getElementById('pagamentoContractId').value=id; document.getElementById('pagamentoParcelIndex').value=idx; document.getElementById('pagamentoInfo').textContent=`${c.clientName} - P.${p.number}`; document.getElementById('pagamentoValor').value=p.value; document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0]; this.openModal('modalPagamento'); }
 			openClientHistoryModal(name) { const l=this.database.contracts.filter(c=>c.clientName===name); document.getElementById('clienteModalContent').innerHTML = l.map(c => `<div class="bg-gray-700 p-2 mb-2"><b>${c.clientName}</b> - ${Utils.formatCurrency(c.totalValue)}</div>`).join(''); this.openModal('modalCliente'); }
