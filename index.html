@@ -21,13 +21,13 @@
 			display: none; /* Garante que começa FECHADO */
 			position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9001; 
 			max-height: 90vh; width: 90%; max-width: 800px; 
-			background-color: #1f2937; border: 1px solid #374151; border-radius: 0.75rem; 
+			background-color: #1f2937; border: 1px solid #374151; border-radius: 1rem; /* Arredondado */
 			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 			flex-direction: column;
 		}
-		.modal-header { flex-shrink: 0; padding: 1.25rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); }
+		.modal-header { flex-shrink: 0; padding: 1.25rem; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 41, 55, 0.95); border-radius: 1rem 1rem 0 0; }
 		.modal-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
-		.modal-footer { flex-shrink: 0; padding: 1rem 1.5rem; border-top: 1px solid #374151; background: rgba(31, 41, 55, 0.95); display: flex; justify-content: flex-end; gap: 0.5rem; }
+		.modal-footer { flex-shrink: 0; padding: 1rem 1.5rem; border-top: 1px solid #374151; background: rgba(31, 41, 55, 0.95); display: flex; justify-content: flex-end; gap: 0.5rem; border-radius: 0 0 1rem 1rem; }
 
 		/* Scrollbars */
 		::-webkit-scrollbar { width: 8px; }
@@ -38,20 +38,27 @@
 		.dark-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
 		.dark-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
 		
-		/* --- INPUTS (CORREÇÃO DE COR E ACESSIBILIDADE) --- */
-		.form-input, select, textarea, input[type="text"], input[type="number"], input[type="date"] {
+		/* --- INPUTS (CORREÇÃO DE COR E ACESSIBILIDADE NOS MODAIS) --- */
+		.modal .form-input, .modal select, .modal textarea, .modal input[type="text"], .modal input[type="number"], .modal input[type="date"] {
 			width: 100%; 
-			background-color: #374151 !important; /* Força fundo escuro */
-			border: 1px solid #4b5563; 
-			color: #ffffff !important; /* Força texto branco */
+			background-color: #ffffff !important; /* Força fundo BRANCO nos modais */
+			border: 1px solid #d1d5db !important; 
+			color: #000000 !important; /* Força texto PRETO nos modais */
 			padding: 0.6rem 0.75rem; 
 			border-radius: 0.5rem; 
 			outline: none; 
 			transition: all 0.2s; 
-			color-scheme: dark;
+			color-scheme: light; /* Garante ícones claros */
 		}
-		.form-input:focus, select:focus, textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
-		.form-input:disabled { opacity: 0.6; cursor: not-allowed; background-color: #1f2937 !important; }
+		.modal .form-input:focus, .modal select:focus, .modal textarea:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important; }
+		.modal .form-input:disabled { opacity: 0.6; cursor: not-allowed; background-color: #f3f4f6 !important; }
+		.modal label { color: #e5e7eb; } /* Label claro no modal escuro */
+
+		/* Inputs de Filtro na Página Principal (Mantém Escuro) */
+		#app-container .form-input, #app-container select, #app-container textarea, #app-container input[type="text"], #app-container input[type="number"], #app-container input[type="date"] {
+			background-color: #374151; border: 1px solid #4b5563; color: #ffffff; padding: 0.6rem 0.75rem; border-radius: 0.5rem; outline: none; transition: all 0.2s; color-scheme: dark;
+		}
+		#app-container .form-input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
 		label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: #9ca3af; font-weight: 500; }
 
 		/* --- LOGIN ORIGINAL (Restaurado) --- */
