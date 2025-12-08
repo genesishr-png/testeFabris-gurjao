@@ -263,7 +263,7 @@
 
 	</style>
 </head>
-	<body class="text-gray-300">
+<body class="text-gray-300">
 	<div id="notifications"></div>
 
 	<div id="loading-overlay">
@@ -749,7 +749,7 @@
 			</form>
 		</div>
 	</div>
-		<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
+	<div id="modalContrato" class="modal bg-gray-800 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-2/5 overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modalContratoTitle">
 		<div class="flex-shrink-0 flex justify-between items-center p-5 bg-gray-900/50 border-b border-gray-700">
 			<h2 id="modalContratoTitle" class="text-2xl font-bold text-white">Registar Novo Contrato</h2>
 			<button onclick="window.App.closeModal('modalContrato')" class="text-gray-400 hover:text-white text-2xl transition-colors duration-150" aria-label="Fechar modal">&times;</button>
@@ -974,14 +974,18 @@
 	</div>
 
 	<div id="modal-backdrop" class="modal-backdrop"></div>
-
 	<script type="module">
+		// Imports do Firebase
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
+		// Constantes Globais
 		const ADMIN_USERS = ["dra. renata fabris","Darc", "dr. felipe gurjão", "lilian"];
-		const CONTRACTS_PER_PAGE = 12;
+		const CONTRACTS_PER_PAGE = 12; 
+		const CUTOFF_DATE = "2025-11-01"; // [NOVO] Data de corte para o filtro de Era
+
+		// Objeto de Utilitários
 		const Utils = {
 			toastContainer: null,
 			initToast() {
@@ -1090,9 +1094,9 @@
 				return `há ${Math.floor(seconds)} seg(s)`;
 			}
 		};
+
 		class CorrectionCalculator {
 			constructor() {
-				// Valores do IPCA (em %) - Atualize mensalmente
 				this.IPCA_TABLE = {
 					"2023-01": 0.53, "2023-02": 0.84, "2023-03": 0.71, "2023-04": 0.61,
 					"2023-05": 0.23, "2023-06": -0.08, "2023-07": 0.12, "2023-08": 0.23,
@@ -1103,7 +1107,6 @@
 					"2025-01": 0.55, "2025-02": 0.78, "2025-03": 0.21, "2025-04": 0.35,
 					"2025-05": 0.40, "2025-06": 0.26, "2025-07": 0.22, "2025-08": 0.31,
 					"2025-09": 0.33, "2025-10": 0.40, 
-					// Futuro: Adicionar novos índices aqui
 				};
 			}
 		
@@ -1531,15 +1534,20 @@
 				this.app = appInstance;
 			}
 		
-			// [MUDANÇA: REQUISITO 1] Agora calcula também quem NÃO pagou
+			// [MUDANÇA CRÍTICA - REQUISITO 1] 
+			// Lógica ajustada para listar em "Não Pagos" APENAS quem tinha vencimento no mês e não pagou.
 			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
 				let totalParcelas = 0, totalExito = 0;
 				const detailedPayments = [];
 				const byAdvogado = {};
 				const byMonth = {};
 				const newContractsByMonth = {};
+				
+				// Filtra excluídos
 				const allContracts = contractsToRender.filter(c => !c.isDeleted);
-				const paidContractIds = new Set(); // Rastreia quem pagou algo
+				
+				// Lista para armazenar quem devia ter pago e não pagou
+				const notPaidList = [];
 
 				const addData = (map, date, value) => {
 					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -1548,9 +1556,8 @@
 
 				allContracts.forEach(contract => {
 					const advogado = contract.advogadoResponsavel || 'Não Informado';
-					let contractPaidSomething = false;
 
-					// 1. Novos contratos
+					// 1. Novos contratos (criação)
 					if (contract.createdAt) {
 						const d = new Date(contract.createdAt);
 						if (d >= startDate && d <= endDate) {
@@ -1558,22 +1565,42 @@
 						}
 					}
 					
-					// 2. Parcelas
-					(contract.parcels || []).forEach(parcel => {
-						if (parcel.status === 'Paga' && parcel.paymentDate) {
-							const d = new Date(parcel.paymentDate);
-							if (d >= startDate && d <= endDate) {
-								const value = parcel.valuePaid;
-								totalParcelas += value;
-								detailedPayments.push({ type: `Parcela ${parcel.number}/${contract.parcels.length}`, clientName: contract.clientName, date: d, value: value, advogado: advogado });
-								byAdvogado[advogado] = (byAdvogado[advogado] || 0) + value;
-								addData(byMonth, d, value);
-								contractPaidSomething = true;
+					// 2. Processamento de Parcelas (Pagamentos e Inadimplência do Mês)
+					if (contract.parcels) {
+						contract.parcels.forEach(parcel => {
+							const dueDate = new Date(parcel.dueDate);
+							const paymentDate = parcel.paymentDate ? new Date(parcel.paymentDate) : null;
+							
+							// A. Lógica de Recebimento (Dinheiro que entrou no período)
+							if (parcel.status === 'Paga' && paymentDate) {
+								if (paymentDate >= startDate && paymentDate <= endDate) {
+									const value = parcel.valuePaid;
+									totalParcelas += value;
+									detailedPayments.push({ type: `Parcela ${parcel.number}/${contract.parcels.length}`, clientName: contract.clientName, date: paymentDate, value: value, advogado: advogado });
+									byAdvogado[advogado] = (byAdvogado[advogado] || 0) + value;
+									addData(byMonth, paymentDate, value);
+								}
 							}
-						}
-					});
+
+							// B. Lógica de Inadimplência (Dinheiro que DEVERIA ter entrado no período)
+							// Se a parcela vencia neste mês...
+							if (dueDate >= startDate && dueDate <= endDate) {
+								// ...e NÃO está marcada como Paga (ou foi paga fora do prazo, tecnicamente devia no mês)
+								// Aqui simplificamos: se o status não é 'Paga', é inadimplente do mês.
+								if (parcel.status !== 'Paga') {
+									notPaidList.push({
+										clientName: contract.clientName,
+										advogado: advogado,
+										parcelNumber: parcel.number,
+										value: parcel.value,
+										dueDate: dueDate
+									});
+								}
+							}
+						});
+					}
 					
-					// 3. Êxito
+					// 3. Processamento de Êxito
 					if (contract.successFeePaymentDate) {
 						const d = new Date(contract.successFeePaymentDate);
 						if (d >= startDate && d <= endDate) {
@@ -1582,27 +1609,12 @@
 							detailedPayments.push({ type: 'Taxa de Êxito', clientName: contract.clientName, date: d, value: value, advogado: advogado });
 							byAdvogado[advogado] = (byAdvogado[advogado] || 0) + value;
 							addData(byMonth, d, value);
-							contractPaidSomething = true;
 						}
-					}
-
-					if (contractPaidSomething) {
-						paidContractIds.add(contract.id);
 					}
 				});
 				
-				// 4. Identifica Inadimplentes (Ativos que não pagaram nada no período)
-				const notPaidList = allContracts.filter(c => {
-					const statusInfo = this.app.getContractStatus(c);
-					// Só considera quem NÃO pagou E NÃO está Concluído (ainda tem algo a pagar ou fazer)
-					return !paidContractIds.has(c.id) && statusInfo.statusText !== 'Concluído';
-				}).map(c => ({
-					clientName: c.clientName,
-					advogado: c.advogadoResponsavel || 'Não Informado'
-				}));
-
 				detailedPayments.sort((a, b) => a.date - b.date);
-				notPaidList.sort((a, b) => a.clientName.localeCompare(b.clientName));
+				notPaidList.sort((a, b) => a.dueDate - b.dueDate); // Ordena inadimplentes por vencimento
 				
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
@@ -2067,8 +2079,9 @@
 				return item;
 			}
 		}
-class App {
+		class App {
 			constructor() {
+				// Estado da Aplicação
 				this.database = { 
 					contracts: [],
 					notifications: [],
@@ -2079,10 +2092,12 @@ class App {
 				this.isUserAdmin = false;
 				this.currentAdvancedReportData = null;
 				this.currentPageId = null;
+				
+				// Estado para notificações de vencimento
 				this.lastOverdueCheck = null;
 				this.manualParcels = [];
 				
-				// Estado de UI
+				// Estado de UI e Filtros
 				this.currentContractSort = 'name-asc';
 				this.currentParcelasSort = 'days-asc';
 				this.currentServicosSort = 'name-asc';
@@ -2131,20 +2146,26 @@ class App {
 			}
 		
 			setupEventListeners() {
+				// Auth
 				document.getElementById('login-form').addEventListener('submit', (e) => {
 					e.preventDefault();
 					this.authService.login(document.getElementById('login-email').value, document.getElementById('login-password').value);
 				});
 				document.getElementById('logout-button').addEventListener('click', () => this.authService.logout());
 				document.getElementById('formDisplayName').addEventListener('submit', this.handleDisplayNameSubmit.bind(this));
+				
+				// Forms
 				document.getElementById('formContrato').addEventListener('submit', this.handleContractSubmit.bind(this));
 				document.getElementById('formPagamento').addEventListener('submit', this.handlePaymentSubmit.bind(this));
 				document.getElementById('formExito').addEventListener('submit', this.handleExitoSubmit.bind(this));
 				document.getElementById('formAddAdvogado').addEventListener('submit', this.handleAddAdvogado.bind(this));
+				
+				// Actions
 				document.getElementById('addServiceButton').addEventListener('click', this.handleAddServiceTag.bind(this));
 				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
 				document.getElementById('addManualParcelButton').addEventListener('click', this.handleAddManualParcel.bind(this));
 
+				// Search Inputs (Debounced)
 				const debouncedContracts = Utils.debounce(() => this.resetAndRenderContractList(), 300);
 				document.getElementById('searchInput').addEventListener('input', debouncedContracts);
 				
@@ -2154,36 +2175,57 @@ class App {
 				const debouncedParcelas = Utils.debounce(() => this.renderParcelasPage(), 300);
 				document.getElementById('parcelasSearchInput').addEventListener('input', debouncedParcelas);
 		
+				// Mobile Menu
 				document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
 					const sidebar = document.getElementById('sidebar');
 					sidebar.classList.toggle('hidden');
-					this.backdrop.style.display = sidebar.classList.contains('hidden') ? 'none' : 'block';
+					if (!sidebar.classList.contains('hidden')) {
+						this.backdrop.style.display = 'block';
+					} else {
+						this.backdrop.style.display = 'none';
+					}
 				});
 
+				// Backdrop & Notifications
 				if (this.backdrop) {
 					this.backdrop.addEventListener('click', () => {
-						if (this.openModalId && this.openModalId !== 'modalDisplayName') this.closeModal(this.openModalId);
+						if (this.openModalId && this.openModalId !== 'modalDisplayName') {
+							this.closeModal(this.openModalId);
+						}
 						const sidebar = document.getElementById('sidebar');
-						if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) { sidebar.classList.add('hidden'); this.backdrop.style.display = 'none'; }
+						if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
+							sidebar.classList.add('hidden');
+							this.backdrop.style.display = 'none';
+						}
 						this.closeNotificationDropdown();
 					});
 				}
 
 				if (this.notificationBell) {
-					this.notificationBell.addEventListener('click', (e) => { e.stopPropagation(); this.notificationDropdown.classList.toggle('hidden'); });
+					this.notificationBell.addEventListener('click', (e) => {
+						e.stopPropagation();
+						this.notificationDropdown.classList.toggle('hidden');
+					});
 				}
 				if (this.clearNotificationsButton) {
-					this.clearNotificationsButton.addEventListener('click', () => this.markNotificationsAsRead());
+					this.clearNotificationsButton.addEventListener('click', () => {
+						this.markNotificationsAsRead();
+					});
 				}
 				document.addEventListener('click', (e) => {
 					if (this.notificationDropdown && !this.notificationDropdown.classList.contains('hidden')) {
-						if (!this.notificationBell.contains(e.target) && !this.notificationDropdown.contains(e.target)) this.closeNotificationDropdown();
+						if (!this.notificationBell.contains(e.target) && !this.notificationDropdown.contains(e.target)) {
+							this.closeNotificationDropdown();
+						}
 					}
 				});
 				
+				// Financial Fields Change Detection
 				const financialInputs = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'contratoJaQuitado'];
 				financialInputs.forEach(id => {
-					document.getElementById(id)?.addEventListener('change', () => { document.getElementById('financialDataChanged').value = 'true'; });
+					document.getElementById(id)?.addEventListener('change', () => {
+						document.getElementById('financialDataChanged').value = 'true';
+					});
 				});
 			}
 		
@@ -2244,17 +2286,24 @@ class App {
 			}
 
 			handleSystemSettingsUpdate(settings) {
-				if (!settings.advogados) settings.advogados = { list: [] };
+				if (!settings.advogados) {
+					settings.advogados = { list: [] };
+				}
 				this.database.settings = settings;
 				this.renderAdvogadoFilters();
 				this.populateAdvogadoSelectModal();
-				if (this.currentPageId === 'page-oficina') this.renderOficinaPage();
+				if (this.currentPageId === 'page-oficina') {
+					this.renderOficinaPage();
+				}
 			}
 		
 			render() {
 				if (this.appContainer.style.display !== 'flex') return;
 				const pageId = this.currentPageId;
-				if (!pageId) { this.showPage('page-dashboard'); return; }
+				if (!pageId) {
+					this.showPage('page-dashboard');
+					return;
+				}
 				
 				if (pageId === 'page-dashboard') {
 					this.renderKanban();
@@ -2273,11 +2322,23 @@ class App {
 					this.renderOficinaPage();
 				}
 				this.renderSortButtons();
-				this.updateEraButtonsUI(); // [NOVO] Atualiza botões
+				this.updateEraButtonsUI(); // [NOVO]
 			}
 		
+			// [MUDANÇA GLOBAL] O Kanban agora filtra por Era antes de calcular
 			renderKanban() {
-				const contractsToRender = this.getFilteredContracts(false);
+				let contractsToRender = this.getFilteredContracts(false);
+				
+				// [NOVO] Aplica filtro de Era GLOBALMENTE no Dashboard
+				contractsToRender = contractsToRender.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					if (this.contractEraFilter === 'novos') {
+						return createdAt >= CUTOFF_DATE;
+					} else {
+						return createdAt < CUTOFF_DATE;
+					}
+				});
+
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
 				const kanbanAVencer = document.getElementById('kanban-a-vencer');
 				const kanbanPagas = document.getElementById('kanban-pagas');
@@ -2332,12 +2393,11 @@ class App {
 				document.getElementById('exito-section').style.display = exitoPendente > 0 ? 'block' : 'none';
 				if(exitoPendente > 0) kanbanExitoWrapper.append(fragExito);
 		
-				const allContracts = this.getFilteredContracts(true);
-				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral;
+				// O "Pago Este Mês" também respeita o filtro de Era agora
+				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), contractsToRender).totalGeral;
 				
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
-		
 			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(vencido);
@@ -2345,7 +2405,7 @@ class App {
 				document.getElementById('dash-contratos').textContent = totalContratos;
 			}
 			
-			// [NOVO: REQUISITO 2] Atualiza UI dos botões de Era
+			// [NOVO] Atualiza visual dos botões de Era
 			updateEraButtonsUI() {
 				const btnNovos = document.getElementById('btn-era-novos');
 				const btnLegados = document.getElementById('btn-era-legados');
@@ -2364,12 +2424,11 @@ class App {
 				}
 			}
 
-			// [NOVO: REQUISITO 2] Define a era e re-renderiza
+			// [NOVO] Define Era e re-renderiza tudo (Muda tudo)
 			setContractEra(era) {
 				this.contractEraFilter = era;
-				this.contractListPage = 0; // Reseta paginação
-				this.renderContractList();
-				this.updateEraButtonsUI();
+				this.contractListPage = 0;
+				this.render(); // Re-renderiza Dashboard, Kanban e Listas
 			}
 
 			renderContractList() {
@@ -2379,9 +2438,7 @@ class App {
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
 		
-				const CUTOFF_DATE = "2025-11-01";
-
-				// 1. Filtra Contratos
+				// 1. Filtra contratos
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
 					// Filtro de Status
 					const statusInfo = this.getContractStatus(c);
@@ -2393,7 +2450,7 @@ class App {
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
 					
-					// [NOVO: REQUISITO 2] Filtro de Era
+					// [NOVO] Filtro de Era
 					const createdAt = (c.createdAt || "").substring(0, 10);
 					let matchesEra = true;
 					if (this.contractEraFilter === 'novos') {
@@ -2425,7 +2482,7 @@ class App {
 				const paginationContainer = document.getElementById('paginationContainer');
 		
 				if (totalItems === 0) {
-					const eraText = this.contractEraFilter === 'novos' ? 'Novos (pós 01/11/25)' : 'Legados (pré 01/11/25)';
+					const eraText = this.contractEraFilter === 'novos' ? 'Novos' : 'Legados';
 					listContainer.innerHTML = `<div class="dark-card shadow-lg p-4 rounded-lg text-center text-gray-400 py-4">Nenhum contrato ${this.contractStatusFilter} encontrado em "${eraText}".</div>`;
 					this.domBuilder.renderPaginationControls(paginationContainer, 0, 0, 0);
 					return;
@@ -2442,12 +2499,15 @@ class App {
 				this.domBuilder.renderPaginationControls(paginationContainer, totalItems, totalPages, this.contractListPage);
 			}
 
-			// ... (Resto das funções de renderização mantidas iguais: renderParcelasPage, renderServicosPage, etc.)
-			// Para economizar espaço, assumimos que renderParcelasPage e outras usam getFilteredContracts
-			// e funcionam como na versão anterior.
-			
 			renderParcelasPage() {
-				const contractsToRender = this.getFilteredContracts(false);
+				let contractsToRender = this.getFilteredContracts(false);
+				
+				// [NOVO] Aplica filtro de Era nas Parcelas também
+				contractsToRender = contractsToRender.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					return this.contractEraFilter === 'novos' ? createdAt >= CUTOFF_DATE : createdAt < CUTOFF_DATE;
+				});
+
 				const container = document.getElementById('parcelasListContainer');
 				const searchTerm = (document.getElementById('parcelasSearchInput').value || '').toLowerCase();
 				container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><i class="fas fa-spinner fa-spin fa-2x text-indigo-400"></i><p class="mt-2 text-sm text-gray-400">A calcular...</p></div>`;
@@ -2478,7 +2538,14 @@ class App {
 			}
 
 			renderServicosPage() {
-				const contractsToRender = this.getFilteredContracts(false);
+				let contractsToRender = this.getFilteredContracts(false);
+
+				// [NOVO] Aplica filtro de Era nos Serviços também
+				contractsToRender = contractsToRender.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					return this.contractEraFilter === 'novos' ? createdAt >= CUTOFF_DATE : createdAt < CUTOFF_DATE;
+				});
+
 				const container = document.getElementById('servicosListContainer');
 				const searchTerm = (document.getElementById('servicosSearchInput').value || '').toLowerCase();
 				const advogadoFilterEl = document.getElementById('servicosAdvogadoFilter');
@@ -2507,13 +2574,19 @@ class App {
 				if(fragment.children.length === 0) { container.innerHTML = `<div class="text-center py-10"><div class="inline-block dark-card shadow-lg text-green-400 p-6 rounded-lg"><i class="fas fa-check-double fa-3x mb-3"></i><p class="font-bold text-xl">Todos os serviços estão concluídos.</p></div></div>`; return; }
 				container.append(fragment);
 			}
-			
 			renderLixeiraPage() {
-				const contractsToRender = this.getFilteredContracts(true); 
+				let contractsToRender = this.getFilteredContracts(true); 
+				
+				// [NOVO] Aplica filtro de Era na Lixeira
+				contractsToRender = contractsToRender.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					return this.contractEraFilter === 'novos' ? createdAt >= CUTOFF_DATE : createdAt < CUTOFF_DATE;
+				});
+
 				const container = document.getElementById('lixeiraListContainer');
 				container.innerHTML = '';
 				const deletedContracts = contractsToRender.filter(c => c.isDeleted === true); 
-				if (deletedContracts.length === 0) { container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p></div></div>`; return; }
+				if (deletedContracts.length === 0) { container.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-10"><div class="inline-block dark-card shadow-lg text-gray-400 p-6 rounded-lg"><i class="fas fa-trash fa-3x mb-3"></i><p class="font-bold text-xl">Lixeira Vazia</p><p class="text-sm">Nenhum contrato desta era.</p></div></div>`; return; }
 				const fragment = document.createDocumentFragment();
 				deletedContracts.forEach(contract => {
 					const card = this.domBuilder.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg border-l-4 border-gray-600 transition-all duration-200 hover:-translate-y-1' });
@@ -2552,7 +2625,14 @@ class App {
 			renderPerformancePage() {
 				if (!this.isUserAdmin) return;
 				this.analyticsHandler.destroyPageCharts('page-performance');
-				const allContracts = this.getFilteredContracts(true);
+				
+				let allContracts = this.getFilteredContracts(true);
+				// [NOVO] Aplica filtro de Era na Performance
+				allContracts = allContracts.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					return this.contractEraFilter === 'novos' ? createdAt >= CUTOFF_DATE : createdAt < CUTOFF_DATE;
+				});
+
 				const { contratosPorAdvogado, faturamentoPorAdvogado } = this.reportHandler.calculateAdminPerformanceData(allContracts);
 				
 				const contratosCtx = document.getElementById('adminChartContratos').getContext('2d');
@@ -2581,7 +2661,7 @@ class App {
 				listContainer.append(fragment);
 			}
 
-			// Lógica de Geração do Relatório (Atualizada para Requisito 1)
+			// [MUDANÇA: REQUISITO 1 e 2] Relatório Mensal
 			generateAndShowReport() {
 				if (!this.isUserAdmin) return;
 				document.getElementById('reportChartsContainer').classList.add('hidden');
@@ -2590,7 +2670,15 @@ class App {
 		
 				const month = parseInt(document.getElementById('reportMonth').value);
 				const year = parseInt(document.getElementById('reportYear').value);
-				const income = this.reportHandler.calculateMonthlyIncome(year, month, this.getFilteredContracts(true));
+				
+				let contractsToProcess = this.getFilteredContracts(true);
+				// [NOVO] Aplica filtro de Era
+				contractsToProcess = contractsToProcess.filter(c => {
+					const createdAt = (c.createdAt || "").substring(0, 10);
+					return this.contractEraFilter === 'novos' ? createdAt >= CUTOFF_DATE : createdAt < CUTOFF_DATE;
+				});
+
+				const income = this.reportHandler.calculateMonthlyIncome(year, month, contractsToProcess);
 		
 				let detailsHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Detalhes dos Recebimentos</h4>';
 				if (income.detailedPayments.length > 0) {
@@ -2603,16 +2691,30 @@ class App {
 					detailsHtml += '<p class="text-sm text-gray-400 mt-2">Nenhum recebimento neste período.</p>';
 				}
 
-				// [NOVO: REQUISITO 1] Seção de Contratos Não Pagos
-				detailsHtml += '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Contratos sem Pagamentos (Neste Mês)</h4>';
+				// [NOVO: REQUISITO 1] Seção de Contratos Não Pagos (Inadimplentes do Mês)
+				// Esta lista já vem filtrada do reportHandler (apenas quem tinha vencimento)
+				detailsHtml += '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-red-300"><i class="fas fa-exclamation-circle mr-2"></i>Contratos sem Pagamentos (Deviam ter pago este mês)</h4>';
+				
 				if (income.notPaidList && income.notPaidList.length > 0) {
-					detailsHtml += '<div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 text-sm">';
+					detailsHtml += '<div class="grid grid-cols-1 gap-2 mt-2 text-sm">';
 					income.notPaidList.forEach(c => {
-						detailsHtml += `<div class="bg-red-900/20 border border-red-900/50 p-2 rounded-md flex justify-between items-center"><span class="text-gray-300 font-medium">${c.clientName}</span><span class="text-xs text-gray-500">${c.advogado}</span></div>`;
+						const vencimento = Utils.formatDate(c.dueDate);
+						const valor = Utils.formatCurrency(c.value);
+						detailsHtml += `
+						<div class="bg-red-900/20 border border-red-900/50 p-3 rounded-md flex justify-between items-center">
+							<div>
+								<p class="font-medium text-red-200">${c.clientName}</p>
+								<p class="text-xs text-red-400">Parcela ${c.parcelNumber} - Vencia em: ${vencimento}</p>
+							</div>
+							<div class="text-right">
+								<p class="font-bold text-red-400">${valor}</p>
+								<p class="text-xs text-gray-500">${c.advogado}</p>
+							</div>
+						</div>`;
 					});
 					detailsHtml += '</div>';
 				} else {
-					detailsHtml += '<p class="text-sm text-green-400 mt-2"><i class="fas fa-check-circle"></i> Todos os contratos ativos tiveram pagamentos!</p>';
+					detailsHtml += '<p class="text-sm text-green-400 mt-2 p-2 bg-green-900/20 border border-green-900/50 rounded"><i class="fas fa-check-circle mr-1"></i> Parabéns! Todos os contratos com vencimento neste mês foram pagos.</p>';
 				}
 		
 				resultDiv.innerHTML = `
@@ -2624,11 +2726,6 @@ class App {
 				` + detailsHtml;
 			}
 			
-			// ... (Demais funções auxiliares mantidas: showPage, setupUIAccess, getContractStatus, openModal, etc.)
-			// As funções CRUD, handlers de modal e utilitários que já existiam
-			// continuam funcionando dentro da estrutura da classe App.
-			// Por brevidade, o restante da classe segue a estrutura já conhecida.
-
 			showPage(pageId) {
 				const pageTitles = { 'page-dashboard': 'Painel Principal', 'page-parcelas': 'Controle de Parcelas', 'page-servicos': 'Produção de Serviços', 'page-performance': 'Performance Gerencial', 'page-relatorios': 'Relatórios Avançados', 'page-lixeira': 'Lixeira', 'page-oficina': 'Oficina de Configurações' };
 				if (this.currentPageId === 'page-relatorios' && pageId !== 'page-relatorios') this.analyticsHandler.destroyPageCharts('page-relatorios');
@@ -2646,8 +2743,12 @@ class App {
 
 			setupUIAccess() {
 				const isAdmin = this.isUserAdmin;
-				[document.getElementById('advogadoFilter'), document.getElementById('servicosAdvogadoFilter')].forEach(s => { if(s){ s.disabled = !isAdmin; s.value = isAdmin ? 'Todos' : this.currentUserDisplayName; }});
-				['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito', 'contratoJaQuitado'].forEach(id => { const f = document.getElementById(id); if(f) f.disabled = !isAdmin; });
+				[document.getElementById('advogadoFilter'), document.getElementById('servicosAdvogadoFilter')].forEach(s => { 
+					if(s){ s.disabled = !isAdmin; s.value = isAdmin ? 'Todos' : this.currentUserDisplayName; }
+				});
+				['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito', 'contratoJaQuitado'].forEach(id => { 
+					const f = document.getElementById(id); if(f) f.disabled = !isAdmin; 
+				});
 			}
 			
 			getFilteredContracts(includeDeleted = false) {
@@ -2679,7 +2780,6 @@ class App {
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 				createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
 
-				// Botões de Parcelas e Serviços seguem o mesmo padrão...
 				const parcelasSortContainer = document.getElementById('parcelasSortButtons');
 				parcelasSortContainer.innerHTML = '';
 				createButton(parcelasSortContainer, 'days-asc', 'Venc. Próximo', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
@@ -2782,14 +2882,119 @@ class App {
 				}
 			}
 			
-			async handlePaymentSubmit(e) { e.preventDefault(); /* ... código existente mantido ... */ const contractId = document.getElementById('pagamentoContractId').value; const parcelIndex = parseInt(document.getElementById('pagamentoParcelIndex').value); const contract = this.database.contracts.find(c => c.id === contractId); const valuePaid = this.isUserAdmin ? Utils.parseNumber(document.getElementById('pagamentoValor').value) : (contract?.parcels[parcelIndex]?.value || 0); const paymentDate = document.getElementById('pagamentoData').value; if (contract && !isNaN(valuePaid) && valuePaid > 0) { const updatedParcels = [...(contract.parcels || [])]; updatedParcels[parcelIndex].status = 'Paga'; updatedParcels[parcelIndex].valuePaid = valuePaid; updatedParcels[parcelIndex].paymentDate = new Date(paymentDate + 'T12:00:00Z').toISOString(); if (await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels })) { this.closeModal('modalPagamento'); Utils.showToast('Pagamento registado.', 'success'); this.sendNotification(contract.advogadoResponsavel, { message: `Pagamento registado: ${contract.clientName}`, contractId, sender: this.currentUserDisplayName }); } } }
-			async handleExitoSubmit(e) { e.preventDefault(); const contractId = document.getElementById('exitoContractId').value; const value = this.isUserAdmin ? Utils.parseNumber(document.getElementById('exitoValorRecebido').value) : 0; if (await this.firebaseService.updateContractField(contractId, { successFeeValueReceived: value, successFeePaymentDate: new Date().toISOString() })) { this.closeModal('modalExito'); Utils.showToast('Êxito registado.', 'success'); } }
+			async handlePaymentSubmit(e) {
+				e.preventDefault();
+				const contractId = document.getElementById('pagamentoContractId').value;
+				const parcelIndex = parseInt(document.getElementById('pagamentoParcelIndex').value);
+				const contract = this.database.contracts.find(c => c.id === contractId);
+				const valuePaid = this.isUserAdmin ? Utils.parseNumber(document.getElementById('pagamentoValor').value) : (contract?.parcels[parcelIndex]?.value || 0);
+				const paymentDate = document.getElementById('pagamentoData').value;
+				
+				if (contract && !isNaN(valuePaid) && valuePaid > 0) {
+					const updatedParcels = [...(contract.parcels || [])];
+					updatedParcels[parcelIndex].status = 'Paga';
+					updatedParcels[parcelIndex].valuePaid = valuePaid;
+					updatedParcels[parcelIndex].paymentDate = new Date(paymentDate + 'T12:00:00Z').toISOString();
+					
+					if (await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels })) {
+						this.closeModal('modalPagamento');
+						Utils.showToast('Pagamento registado.', 'success');
+						this.sendNotification(contract.advogadoResponsavel, { message: `Pagamento registado: ${contract.clientName}`, contractId, sender: this.currentUserDisplayName });
+					}
+				}
+			}
+
+			async handleExitoSubmit(e) {
+				e.preventDefault();
+				const contractId = document.getElementById('exitoContractId').value;
+				const value = this.isUserAdmin ? Utils.parseNumber(document.getElementById('exitoValorRecebido').value) : 0;
+				if (await this.firebaseService.updateContractField(contractId, { successFeeValueReceived: value, successFeePaymentDate: new Date().toISOString() })) {
+					this.closeModal('modalExito');
+					Utils.showToast('Êxito registado.', 'success');
+				}
+			}
+
+			// Helpers de Modal e CRUD
+			openContractModal(id) {
+				try {
+					document.getElementById('formContrato').reset();
+					document.getElementById('financialDataChanged').value = 'false';
+					document.getElementById('servicosContainer').innerHTML = '';
+					this.populateAdvogadoSelectModal();
+					this.manualParcels = [];
+					this.domBuilder.renderManualParcelList();
+					
+					const isAdm = this.isUserAdmin;
+					const finDiv = document.getElementById('financial-fields-standard');
+					const specDiv = document.getElementById('financial-fields-special');
+					const chk = document.getElementById('contratoEspecial');
+					
+					if(id) {
+						const c = this.database.contracts.find(x => x.id === id);
+						document.getElementById('contractId').value = c.id;
+						document.getElementById('clienteNome').value = c.clientName;
+						document.getElementById('advogadoResponsavel').value = c.advogadoResponsavel;
+						(c.serviceTypes||[]).forEach(s => this.createServiceTag(s.name, s.deadline, s.status));
+						document.getElementById('contratoTipoPagamento').value = c.paymentType||'Parcelado';
+						document.getElementById('contratoObservacoes').value = c.observations||'';
+						
+						if(isAdm) {
+							document.getElementById('taxaExito').value = c.successFee||'';
+							chk.checked = c.isSpecialContract||false;
+							if(c.isSpecialContract) {
+								finDiv.style.display='none';
+								specDiv.style.display='block';
+								this.manualParcels = (c.parcels||[]).map(p=>({value:p.value, dueDate:p.dueDate.split('T')[0]}));
+								this.domBuilder.renderManualParcelList();
+							} else {
+								finDiv.style.display='block';
+								specDiv.style.display='none';
+								document.getElementById('valorTotal').value = c.totalValue;
+								document.getElementById('numParcelas').value = (c.parcels||[]).length||1;
+								if(c.parcels?.length) document.getElementById('vencimentoPrimeiraParcela').value = c.parcels[0].dueDate.split('T')[0];
+							}
+						}
+					} else {
+						document.getElementById('contractId').value='';
+						finDiv.style.display='block';
+						specDiv.style.display='none';
+						chk.checked=false;
+					}
+					this.openModal('modalContrato');
+				} catch(e){ console.error(e); }
+			}
+
+			openPaymentModal(id, idx) {
+				const c = this.database.contracts.find(x => x.id === id);
+				const p = c.parcels[idx];
+				document.getElementById('pagamentoContractId').value = id;
+				document.getElementById('pagamentoParcelIndex').value = idx;
+				document.getElementById('pagamentoValor').value = p.value;
+				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
+				document.getElementById('pagamentoInfo').innerHTML = `<p>${c.clientName} - Parcela ${p.number}</p>`;
+				this.openModal('modalPagamento');
+			}
+
+			openClientHistoryModal(name) { this.domBuilder.openClientHistoryModal(name); }
+			openReportModal() { this.openModal('modalRelatorio'); this._populateDateSelectors(); this.generateAndShowReport(); }
+			openExitoModal(id) { document.getElementById('exitoContractId').value = id; this.openModal('modalExito'); }
+			exportContractsCSV() { this.domBuilder.exportContractsCSV(); }
+			exportReportCSV() { this.domBuilder.exportReportCSV(); }
+			exportReportPDF() { this.domBuilder.exportReportPDF(); }
+			showAnalyticsInModal() { this.domBuilder.showAnalyticsInModal(); }
+			createServiceTag(n,d,s='Pendente') { this.domBuilder.createServiceTag(n,d,s); }
+			markNotificationsAsRead() { this.domBuilder.markNotificationsAsRead(); }
+			closeNotificationDropdown() { this.domBuilder.closeNotificationDropdown(); }
+			
 			async handleAddAdvogado(e) { e.preventDefault(); const name = Utils.sanitizeText(document.getElementById('inputAdvogadoName').value); if(!name) return; const list = this.database.settings.advogados?.list || []; if(list.includes(name)) return; await this.firebaseService.saveSystemSettings('advogados', { list: [...list, name] }); document.getElementById('inputAdvogadoName').value = ''; }
 			async handleRemoveAdvogado(name) { if(await Utils.confirm(`Remover "${name}"?`)) { const list = (this.database.settings.advogados?.list || []).filter(n => n !== name); await this.firebaseService.saveSystemSettings('advogados', { list }); } }
-			
-			// Helpers e Outros
-			handleAddServiceTag() { /* ... */ const name = document.getElementById('contratoServicoInput').value; if(name) { this.createServiceTag(name, document.getElementById('contratoPrazoInput').value); document.getElementById('contratoServicoInput').value = ''; } }
+			async handleAddManualParcel() { const v = Utils.parseNumber(document.getElementById('parcelaValorManual').value); const d = document.getElementById('parcelaVencimentoManual').value; if(v>0 && d) { this.manualParcels.push({value:v, dueDate:d}); this.domBuilder.renderManualParcelList(); document.getElementById('financialDataChanged').value='true'; } }
+			async handleRemoveManualParcel(i) { this.manualParcels.splice(i,1); this.domBuilder.renderManualParcelList(); document.getElementById('financialDataChanged').value='true'; }
 			async updateServiceStatus(c, i, s) { if(c && c.serviceTypes[i]) { const types = [...c.serviceTypes]; types[i].status = s; await this.firebaseService.updateContractField(c.id, { serviceTypes: types }); if(s === 'Concluído') this.sendNotification(c.advogadoResponsavel, { message: `Serviço concluído: ${c.clientName}`, contractId: c.id, sender: this.currentUserDisplayName }); } }
+			
+			_populateDateSelectors() { const m = document.getElementById('reportMonth'); if(m.options.length>0) return; ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"].forEach((x,i)=>m.add(new Option(x,i))); const y = new Date().getFullYear(); for(let i=y;i>=y-5;i--) document.getElementById('reportYear').add(new Option(i,i)); m.value=new Date().getMonth(); document.getElementById('reportYear').value=y; }
+			toggleSpecialContractFields(e) { document.getElementById('financial-fields-standard').style.display = e.target.checked ? 'none' : 'block'; document.getElementById('financial-fields-special').style.display = e.target.checked ? 'block' : 'none'; document.getElementById('financialDataChanged').value = 'true'; }
+			handleAddServiceTag() { const name = document.getElementById('contratoServicoInput').value; if(name) { this.createServiceTag(name, document.getElementById('contratoPrazoInput').value); document.getElementById('contratoServicoInput').value = ''; } }
 			async sendNotification(r, d) { if(r && r !== this.currentUserDisplayName) await this.firebaseService.sendNotification(Utils.sanitizeForFirestoreId(r), d); }
 			async sendNotificationToAllAdmins(d) { ADMIN_USERS.forEach(a => { if(a.toLowerCase() !== this.currentUserDisplayName?.toLowerCase()) this.firebaseService.sendNotification(Utils.sanitizeForFirestoreId(a), d); }); }
 			checkAndNotifyOverdue(old, newC) { /* Lógica de notificação diária mantida */ }
@@ -2797,37 +3002,21 @@ class App {
 			async restoreContract(id) { await this.firebaseService.updateContractField(id, { isDeleted: false }); }
 			async deleteContractPermanently(id) { if(this.isUserAdmin && await Utils.confirm('Excluir PERMANENTEMENTE?')) await this.firebaseService.deleteContract(id); }
 			
-			// Modais
-			openModal(id) { this.lastFocusedElement = document.activeElement; document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById(id).style.display = 'block'; if(this.backdrop) this.backdrop.style.display = 'block'; this.openModalId = id; }
-			closeModal(id) { document.getElementById(id).style.display = 'none'; if(this.openModalId === id) this.openModalId = null; if(!Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'block') && this.backdrop) this.backdrop.style.display = 'none'; if(id === 'modalRelatorio') this.analyticsHandler.destroyModalCharts(); }
-			
-			// Wrappers simples para abrir modais com dados
-			openContractModal(id) { /* Lógica detalhada na parte 5 */ try { document.getElementById('formContrato').reset(); document.getElementById('financialDataChanged').value = 'false'; document.getElementById('servicosContainer').innerHTML = ''; this.populateAdvogadoSelectModal(); this.manualParcels = []; this.domBuilder.renderManualParcelList(); const isAdm = this.isUserAdmin; const finDiv = document.getElementById('financial-fields-standard'); const specDiv = document.getElementById('financial-fields-special'); const chk = document.getElementById('contratoEspecial'); if(id) { const c = this.database.contracts.find(x => x.id === id); document.getElementById('contractId').value = c.id; document.getElementById('clienteNome').value = c.clientName; document.getElementById('advogadoResponsavel').value = c.advogadoResponsavel; (c.serviceTypes||[]).forEach(s => this.createServiceTag(s.name, s.deadline, s.status)); document.getElementById('contratoTipoPagamento').value = c.paymentType||'Parcelado'; document.getElementById('contratoObservacoes').value = c.observations||''; if(isAdm) { document.getElementById('taxaExito').value = c.successFee||''; chk.checked = c.isSpecialContract||false; if(c.isSpecialContract) { finDiv.style.display='none'; specDiv.style.display='block'; this.manualParcels = (c.parcels||[]).map(p=>({value:p.value, dueDate:p.dueDate.split('T')[0]})); this.domBuilder.renderManualParcelList(); } else { finDiv.style.display='block'; specDiv.style.display='none'; document.getElementById('valorTotal').value = c.totalValue; document.getElementById('numParcelas').value = (c.parcels||[]).length||1; if(c.parcels?.length) document.getElementById('vencimentoPrimeiraParcela').value = c.parcels[0].dueDate.split('T')[0]; } } } else { document.getElementById('contractId').value=''; finDiv.style.display='block'; specDiv.style.display='none'; chk.checked=false; } this.openModal('modalContrato'); } catch(e){console.error(e);} }
-			openPaymentModal(id, idx) { const c = this.database.contracts.find(x => x.id === id); const p = c.parcels[idx]; document.getElementById('pagamentoContractId').value = id; document.getElementById('pagamentoParcelIndex').value = idx; document.getElementById('pagamentoValor').value = p.value; document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0]; document.getElementById('pagamentoInfo').innerHTML = `<p>${c.clientName} - Parcela ${p.number}</p>`; this.openModal('modalPagamento'); }
-			openClientHistoryModal(name) { this.domBuilder.openClientHistoryModal(name); /* Implementado no DOMBuilder na parte anterior, apenas o wrapper aqui */ }
-			openReportModal() { this.openModal('modalRelatorio'); this._populateDateSelectors(); this.generateAndShowReport(); }
-			openExitoModal(id) { document.getElementById('exitoContractId').value = id; this.openModal('modalExito'); }
-			
-			// Métodos auxiliares
-			_populateDateSelectors() { const m = document.getElementById('reportMonth'); if(m.options.length>0) return; ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"].forEach((x,i)=>m.add(new Option(x,i))); const y = new Date().getFullYear(); for(let i=y;i>=y-5;i--) document.getElementById('reportYear').add(new Option(i,i)); m.value=new Date().getMonth(); document.getElementById('reportYear').value=y; }
-			toggleSpecialContractFields(e) { document.getElementById('financial-fields-standard').style.display = e.target.checked ? 'none' : 'block'; document.getElementById('financial-fields-special').style.display = e.target.checked ? 'block' : 'none'; document.getElementById('financialDataChanged').value = 'true'; }
-			handleAddManualParcel() { const v = Utils.parseNumber(document.getElementById('parcelaValorManual').value); const d = document.getElementById('parcelaVencimentoManual').value; if(v>0 && d) { this.manualParcels.push({value:v, dueDate:d}); this.domBuilder.renderManualParcelList(); document.getElementById('financialDataChanged').value='true'; } }
-			handleRemoveManualParcel(i) { this.manualParcels.splice(i,1); this.domBuilder.renderManualParcelList(); document.getElementById('financialDataChanged').value='true'; }
-			createServiceTag(n,d,s='Pendente') { this.domBuilder.createServiceTag(n,d,s); } // Wrapper
-			exportContractsCSV() { this.domBuilder.exportContractsCSV(); } // Wrapper
-			exportReportCSV() { this.domBuilder.exportReportCSV(); } // Wrapper
-			exportReportPDF() { this.domBuilder.exportReportPDF(); } // Wrapper
-			showAnalyticsInModal() { this.domBuilder.showAnalyticsInModal(); } // Wrapper
-			
 			_handleKeyDown(event) { if (event.key === 'Escape') { if (this.openModalId && this.openModalId !== 'modalDisplayName') this.closeModal(this.openModalId); const s = document.getElementById('sidebar'); if (window.innerWidth < 768 && !s.classList.contains('hidden')) { s.classList.add('hidden'); this.backdrop.style.display='none'; } this.closeNotificationDropdown(); } }
 			_setupModalAccessibility() { document.addEventListener('keydown', this._handleKeyDown.bind(this)); }
-			markNotificationsAsRead() { this.domBuilder.markNotificationsAsRead(); }
-			closeNotificationDropdown() { this.domBuilder.closeNotificationDropdown(); }
+			
+			openModal(id) { this.lastFocusedElement = document.activeElement; document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById(id).style.display = 'block'; if(this.backdrop) this.backdrop.style.display = 'block'; this.openModalId = id; }
+			closeModal(id) { document.getElementById(id).style.display = 'none'; if(this.openModalId === id) this.openModalId = null; if(!Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'block') && this.backdrop) this.backdrop.style.display = 'none'; if(id === 'modalRelatorio') this.analyticsHandler.destroyModalCharts(); }
 		}
 		
 		document.addEventListener('DOMContentLoaded', () => {
-			window.App = new App();
-			window.App.initialize();
+			const autoTableScript = document.createElement('script');
+			autoTableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+			autoTableScript.onload = () => {
+				window.App = new App();
+				window.App.initialize();
+			};
+			document.head.appendChild(autoTableScript);
 		});
 		
 	</script>
