@@ -3384,17 +3384,80 @@
 			}
 
 			// [CHANGE] Atualiza o label e renderiza a lista quando o filtro de período muda
-			setPeriodFilter(filter) {
-				this.periodFilter = filter;
-				const labelMap = {
-					'todos': 'Todos os Contratos',
-					'novos': 'Contratos Novos',
-					'legados': 'Contratos Legados',
-					'comparacao': 'Modo Comparação'
-				};
-				document.getElementById('period-filter-label').textContent = labelMap[filter];
-				this.resetAndRenderContractList();
-			}
+		setPeriodFilter(filter) {
+			
+showComparisonView() {
+    const listContainer = document.getElementById('contractListContainer');
+    
+    // Pega todos os contratos não deletados
+    const allContracts = this.getFilteredContracts(false);
+    const cutoffDate = new Date('2025-11-01');
+    
+    // Separa em novos e legados
+    const novosContracts = allContracts.filter(c => new Date(c.createdAt || '2000-01-01') >= cutoffDate);
+    const legadosContracts = allContracts.filter(c => new Date(c.createdAt || '2000-01-01') < cutoffDate);
+    
+    // Calcula métricas para cada grupo
+    const novosTotal = novosContracts.reduce((sum, c) => sum + (c.totalValue || 0), 0);
+    const legadosTotal = legadosContracts.reduce((sum, c) => sum + (c.totalValue || 0), 0);
+    
+    listContainer.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-green-900/30 to-green-800/20 border border-green-700/50 rounded-lg p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-star text-green-400 text-2xl"></i>
+                    <h3 class="text-xl font-bold text-white">Contratos Novos</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">Total de contratos:</span>
+                        <span class="text-2xl font-bold text-green-400">${novosContracts.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">Valor total:</span>
+                        <span class="text-2xl font-bold text-green-400">${Utils.formatCurrency(novosTotal)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-history text-amber-400 text-2xl"></i>
+                    <h3 class="text-xl font-bold text-white">Contratos Legados</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">Total de contratos:</span>
+                        <span class="text-2xl font-bold text-amber-400">${legadosContracts.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">Valor total:</span>
+                        <span class="text-2xl font-bold text-amber-400">${Utils.formatCurrency(legadosTotal)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-gray-400 text-sm mb-4">
+            <i class="fas fa-info-circle"></i> Data de corte: 01/11/2025
+        </div>
+    `;
+}
+    this.periodFilter = filter;
+    const labelMap = {
+        'todos': 'Todos os Contratos',
+        'novos': 'Contratos Novos',
+        'legados': 'Contratos Legados',
+        'comparacao': 'Modo Comparação'
+    };
+    document.getElementById('period-filter-label').textContent = labelMap[filter];
+    
+    if (filter === 'comparacao') {
+        this.showComparisonView();
+    } else {
+        this.resetAndRenderContractList();
+    }
+}
 			
 			// --- 5. LÓGICA DE AÇÕES (CRUD) ---
 			
