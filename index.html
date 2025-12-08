@@ -4573,11 +4573,7 @@
 			};
 			document.head.appendChild(autoTableScript);
 		});
-		
-		// Funções globais para serem chamadas pelo HTML (evitar poluir o escopo global)
-		window.App = new App();
-		window.App.initialize();
-		
+				
 		// Permite chamar as funções App diretamente no HTML
 		window.App.showPage = (pageId) => window.App.showPage(pageId);
 		window.App.openContractModal = (contractId) => window.App.openContractModal(contractId);
@@ -4634,7 +4630,6 @@
 				firstElement.focus();
 			}
 		});
-	});
 	
 </script>
 </body>
