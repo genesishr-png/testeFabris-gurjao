@@ -2871,10 +2871,11 @@
 						const cutoffDate = new Date('2025-11-01');
 						if (createdDate < cutoffDate) return false;
 					} else if (this.periodFilter === 'legados') {
-						const createdDate = new new Date(c.createdAt || '2000-01-01');
+						const createdDate = new Date(c.createdAt || '2000-01-01');
 						const cutoffDate = new Date('2025-11-01');
 						if (createdDate >= cutoffDate) return false;
 					}
+					// </CHANGE>
 
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
@@ -3601,7 +3602,7 @@
 						// [NOVO v5.4] Notifica admins sobre pagamento
 						this.sendNotificationToAllAdmins({
 							message: `Pagamento de ${Utils.formatCurrency(valuePaid)} (Parcela ${parcel.number}) registado para ${contract.clientName}.`,
-							contractId: contractId,
+							contractId: contract.id,
 							sender: this.currentUserDisplayName
 						});
 					}
@@ -3631,7 +3632,7 @@
 						// [NOVO v5.4] Notifica admins sobre pagamento de êxito
 						this.sendNotificationToAllAdmins({
 							message: `Pagamento de Êxito (${Utils.formatCurrency(valueReceived)}) registado para ${contract.clientName}.`,
-							contractId: contractId,
+							contractId: contract.id,
 							sender: this.currentUserDisplayName
 						});
 					}
@@ -3849,7 +3850,6 @@
 					listContainer.innerHTML = `<p class="text-xs text-gray-500 text-center p-2">Nenhuma parcela adicionada.</p>`;
 					return;
 				}
-				
 				const fragment = document.createDocumentFragment();
 				this.manualParcels.forEach((parcel, index) => {
 					fragment.append(this.domBuilder.createManualParcelListItem(parcel.value, parcel.dueDate, index));
@@ -4021,8 +4021,6 @@
 			}
 			// [FIM DA ALTERAÇÃO - CONTRATO ESPECIAL]
 			
-			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
-			// Removida a verificação 'isUserAdmin' para exibir valores
 			openPaymentModal(contractId, parcelIndex) {
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract || !contract.parcels || !contract.parcels[parcelIndex]) return;
@@ -4601,9 +4599,9 @@
 		window.App.renderParcelasPage = () => window.App.renderParcelasPage(); // [MUDANÇA v5.6]
 		window.App.changeContractPage = (pageIndex) => window.App.changeContractPage(pageIndex);
 		window.App.markNotificationsAsRead = (ids) => window.App.markNotificationsAsRead(ids);
-		window.App.generateAdvancedReport = () => window.App.generateAdvancedReport();
+		window.App.generateAdvancedReport = () =>window.App.generateAdvancedReport();
 		window.App.exportReportPDF = () => window.App.exportReportPDF();
-		window.App.handleRemoveAdvogado = (name) => window.App.handleRemoveAdvogado(name); // [INÍCIO DA ALTERAÇÃO - OFICINA]
+		window.App.handleRemoveAdvogado = (name) => window.App.handleRemoveAdvogado(name);
 		
 		// Trap focus no modal aberto
 		document.addEventListener('keydown', (event) => {
