@@ -576,6 +576,47 @@
 							</div>
 						</div>
 						
+						<!-- CHANGE: Adicionando dropdown de filtro de período ao lado do sino de notificações -->
+						<div class="relative">
+							<button id="period-filter-button" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+								<i class="fas fa-filter"></i>
+								<span id="period-filter-label">Todos os Contratos</span>
+								<i class="fas fa-chevron-down text-xs"></i>
+							</button>
+							<div id="period-filter-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+								<div class="p-2 space-y-1">
+									<button data-filter="todos" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
+										<i class="fas fa-list text-indigo-400"></i>
+										<div>
+											<div class="font-semibold text-white">Todos os Contratos</div>
+											<div class="text-xs text-gray-400">Visualizar todos os períodos</div>
+										</div>
+									</button>
+									<button data-filter="novos" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
+										<i class="fas fa-star text-green-400"></i>
+										<div>
+											<div class="font-semibold text-white">Contratos Novos</div>
+											<div class="text-xs text-gray-400">A partir de 01/11/2025</div>
+										</div>
+									</button>
+									<button data-filter="legados" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
+										<i class="fas fa-history text-amber-400"></i>
+										<div>
+											<div class="font-semibold text-white">Contratos Legados</div>
+											<div class="text-xs text-gray-400">Antes de 01/11/2025</div>
+										</div>
+									</button>
+									<button data-filter="comparacao" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
+										<i class="fas fa-exchange-alt text-purple-400"></i>
+										<div>
+											<div class="font-semibold text-white">Modo Comparação</div>
+											<div class="text-xs text-gray-400">Ver novos e legados lado a lado</div>
+										</div>
+									</button>
+								</div>
+							</div>
+						</div>
+						
 						<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
 							<i class="fas fa-bars text-xl"></i>
 						</button>
@@ -649,22 +690,6 @@
 								</button>
 								<select id="advogadoFilter" onchange="window.App.resetAndRenderContractList()" class="filter-select admin-only focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50"></select>
 								
-								<!-- Adicionado filtro de contratos por data (novos/legados) -->
-								<div class="flex items-center gap-2">
-									<span class="text-sm text-gray-400">Período:</span>
-									<div id="contractDateFilterButtons" class="flex gap-1">
-										<button onclick="window.App.setContractDateFilter('todos')" class="px-3 py-1 rounded text-sm font-medium transition-all duration-200 bg-indigo-600 text-white">
-											Todos
-										</button>
-										<button onclick="window.App.setContractDateFilter('novos')" class="px-3 py-1 rounded text-sm font-medium transition-all duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600">
-											Novos (≥ 01/11/2025)
-										</button>
-										<button onclick="window.App.setContractDateFilter('legados')" class="px-3 py-1 rounded text-sm font-medium transition-all duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600">
-											Legados (< 01/11/2025)
-										</button>
-									</div>
-								</div>
-
 								<div class="flex items-center gap-2">
 									<span class="text-sm text-gray-400">Mostrar:</span>
 									<div id="contractStatusFilterButtons" class="flex gap-1">
@@ -862,22 +887,7 @@
 								</div>
 						</div>
 
-						<div class="dark-card shadow-lg p-6 rounded-lg">
-							<h3 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2">
-								<i class="fas fa-cog text-yellow-400"></i>
-								Outras Configurações
-							</h3>
-							<p class="text-sm text-gray-400 mb-4">
-								Configurações globais para a gestão do sistema.
-							</p>
-							
-							<div class="space-y-2 max-h-80 overflow-y-auto" id="otherSettingsList">
-								<div class="setting-list-item">
-									<span class="setting-list-item-key">IPCA Table</span>
-									<span class="setting-list-item-value">Atualizada</span>
-									<button class="setting-list-remove-btn" title="Ver/Atualizar Tabela IPCA">?</button>
-								</div>
-							</div>
+						<div class...
 						</div>
 					</div>
 				</div>
@@ -1865,8 +1875,8 @@
 				const inicioAno = new Date(hoje.getFullYear(), 0, 1);
 				const fimAno = new Date(hoje.getFullYear(), 11, 31, 23, 59, 59);
 
-				const contratosAtivos = contractsToRender.filter(c => !c.isDeleted && this.app.getContractStatus(c).statusText !== 'Concluído');
-				const faturamentoAno = this.calculateIncomeByDateRange(inicioAno, fimAno, contractsToRender);
+				const contratosAtivos = contratosToRender.filter(c => !c.isDeleted && this.app.getContractStatus(c).statusText !== 'Concluído');
+				const faturamentoAno = this.calculateIncomeByDateRange(inicioAno, fimAno, contratosToRender);
 
 				const contratosPorAdvogado = {};
 				contratosAtivos.forEach(contract => {
@@ -1884,6 +1894,10 @@
 				const startDate = new Date(year, month, 1);
 				const endDate = new Date(year, month + 1, 0, 23, 59, 59); // Fim do mês
 				const data = this.calculateIncomeByDateRange(startDate, endDate, contractsToRender);
+				// O objeto retornado precisa conter a lista de pagamentos detalhados
+				// e a lista de contratos não pagos para o relatório.
+				// Esta parte precisa ser revisada para corresponder ao que o modal espera.
+				// Por ora, vamos apenas calcular os totais.
 				return { totalParcelas: data.totalParcelas, totalExito: data.totalExito, totalGeral: data.totalGeral, detailedPayments: data.detailedPayments };
 			}
 		
@@ -1927,29 +1941,9 @@
 				return { labels, data };
 			}
 		
-			// [MUDANÇA v5] Função para extrair os dados de não pagos para o relatório
-			getUnpaidContractsData(startDate, endDate, contractsToRender) {
-				const unpaidContracts = [];
-				const allContracts = contractsToRender.filter(c => !c.isDeleted);
-				
-				allContracts.forEach(contract => {
-					if (!contract.parcels || contract.parcels.length === 0) return;
-					
-					const unpaidParcelsInPeriod = contract.parcels.filter(parcel => {
-						const dueDate = new Date(parcel.dueDate);
-						const isPendingInPeriod = dueDate >= startDate && dueDate <= endDate && parcel.status === 'Pendente';
-						return isPendingInPeriod;
-					});
-					
-					if (unpaidParcelsInPeriod.length > 0) {
-						unpaidContracts.push({
-							clientName: contract.clientName,
-							advogado: contract.advogadoResponsavel || 'Não Informado',
-							unpaidParcels: unpaidParcelsInPeriod
-						});
-					}
-				});
-				return unpaidContracts;
+			// [MUDANÇA v5] Nova função para obter dados para o relatório avançado (agora usa os dados salvos em this.currentAdvancedReportData)
+			getAdvancedReportData() {
+				return this.app.currentAdvancedReportData;
 			}
 		}
 		
@@ -2084,7 +2078,7 @@
 		
 				const servicesContainer = this.buildElement('div', { className: 'mb-4' });
 				(contract.serviceTypes || []).forEach(s => {
-					servicesContainer.append(this.createServiceTagSmall(s.name));
+					servicesContainer.append(this.buildElement('span', { className: 'service-tag-small', text: s.name }));
 				});
 				cardBody.append(servicesContainer);
 		
@@ -2322,12 +2316,6 @@
 				btn.onclick = onClick;
 				return btn;
 			}
-
-			// Helper para criar tags de serviço pequenas (usado no modal de contrato)
-			createServiceTagSmall(name) {
-				const tag = this.buildElement('span', { className: 'service-tag-small', text: name });
-				return tag;
-			}
 		
 			renderPaginationControls(container, totalItems, totalPages, currentPage) {
 				container.innerHTML = '';
@@ -2487,8 +2475,7 @@
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
 				this.contractStatusFilter = 'ativos';
-				// Adicionado filtro de data de contratos (todos/legados/novos)
-				this.contractDateFilter = 'todos';
+				this.periodFilter = 'todos'; // Filtro de período (todos/novos/legados)
 				
 				// [MUDANÇA v5] Referências DOM movidas para _initDOMReferences
 				this.backdrop = null;
@@ -2653,6 +2640,30 @@
 						document.getElementById('financialDataChanged').value = 'true';
 					});
 				});
+
+				// [CHANGE] Adiciona listeners para o dropdown de período
+				const periodFilterButton = document.getElementById('period-filter-button');
+				const periodFilterDropdown = document.getElementById('period-filter-dropdown');
+				if (periodFilterButton && periodFilterDropdown) {
+					periodFilterButton.addEventListener('click', (e) => {
+						e.stopPropagation();
+						periodFilterDropdown.classList.toggle('hidden');
+					});
+					document.querySelectorAll('.period-filter-option').forEach(button => {
+						button.addEventListener('click', (e) => {
+							const filter = e.currentTarget.dataset.filter;
+							this.setPeriodFilter(filter);
+							periodFilterDropdown.classList.add('hidden');
+						});
+					});
+					document.addEventListener('click', (e) => {
+						if (periodFilterDropdown && !periodFilterDropdown.classList.contains('hidden')) {
+							if (!periodFilterButton.contains(e.target) && !periodFilterDropdown.contains(e.target)) {
+								periodFilterDropdown.classList.add('hidden');
+							}
+						}
+					});
+				}
 			}
 		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
@@ -2886,8 +2897,6 @@
 				let advogadoFilter = advogadoFilterEl ? advogadoFilterEl.value : 'Todos';
 				if (!this.isUserAdmin) advogadoFilter = this.currentUserDisplayName;
 		
-				const cutoffDate = new Date('2025-11-01T00:00:00');
-		
 				// 1. Filtra os contratos (incluindo o novo filtro de status)
 				let filteredContracts = this.getFilteredContracts(false).filter(c => {
 					const statusInfo = this.getContractStatus(c);
@@ -2896,10 +2905,14 @@
 					if (this.contractStatusFilter === 'ativos' && isConcluido) return false;
 					if (this.contractStatusFilter === 'concluidos' && !isConcluido) return false;
 
-					if (this.contractDateFilter !== 'todos' && c.createdAt) {
-						const contractDate = new Date(c.createdAt);
-						if (this.contractDateFilter === 'novos' && contractDate < cutoffDate) return false;
-						if (this.contractDateFilter === 'legados' && contractDate >= cutoffDate) return false;
+					if (this.periodFilter === 'novos') {
+						const createdDate = new Date(c.createdAt || '2000-01-01');
+						const cutoffDate = new Date('2025-11-01');
+						if (createdDate < cutoffDate) return false;
+					} else if (this.periodFilter === 'legados') {
+						const createdDate = new Date(c.createdAt || '2000-01-01');
+						const cutoffDate = new Date('2025-11-01');
+						if (createdDate >= cutoffDate) return false;
 					}
 
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
@@ -2981,7 +2994,7 @@
 					parcelasList.sort((a, b) => a.diffDays - b.diffDays); // Mais próximas primeiro
 				} else if (this.currentParcelasSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin' da condição de ordenação
 					parcelasList.sort((a, b) => b.valorCorrigido - a.valorCorrigido); // Mais caras primeiro
-				} else if (this.currentParcelasSort === 'client-asc') { // Novo
+				} else if (this.currentParcelasSort === 'name-asc') {
 					parcelasList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
 				}
 		
@@ -3014,12 +3027,12 @@
 					return matchesAdvogado && matchesSearch;
 				});
 		
-				if (this.currentServicosSort === 'client-asc') { // Mudança
+				if (this.currentServicosSort === 'name-asc') {
 					activeContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
-				} else if (this.currentServicosSort === 'adv-asc') { // Mudança
+				} else if (this.currentServicosSort === 'adv-asc') {
 					activeContracts.sort((a, b) => a.advogadoResponsavel.localeCompare(b.advogadoResponsavel));
 				}
-		
+
 				// Filtra os que não têm serviços
 				activeContracts = activeContracts.filter(c => c.serviceTypes && c.serviceTypes.length > 0);
 		
@@ -3332,40 +3345,24 @@
 				// Botões de Status (Ativos/Concluídos)
 				createButton(contractStatusFilterContainer, 'ativos', 'Ativos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
 				createButton(contractStatusFilterContainer, 'concluidos', 'Concluídos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
+				
+				// Botões de Período (Todos/Novos/Legados/Comparação)
+				createButton(contractStatusFilterContainer, 'todos', 'Todos', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
+				createButton(contractStatusFilterContainer, 'novos', 'Novos (≥01/11/2025)', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
+				createButton(contractStatusFilterContainer, 'legados', 'Legados (<01/11/2025)', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
+				// O filtro de comparação é tratado separadamente no JS
 		
 				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
-				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin' da condição de ordenação
 				createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
-				// [FIM DA ALTERAÇÃO]
 		
-				// [MUDANÇA v5.6] Botões de Parcelas (substitui Inadimplentes)
+				// Botões de Parcelas
 				createButton(parcelasSortContainer, 'days-asc', 'Venc. Próximo', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
-				createButton(parcelasSortContainer, 'client-asc', 'Cliente (A-Z)', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; }); // Mudança
-				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
+				createButton(parcelasSortContainer, 'name-asc', 'Nome (A-Z)', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
 				createButton(parcelasSortContainer, 'value-desc', 'Maior Valor', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
-				// [FIM DA ALTERAÇÃO]
 		
 				// Botões de Serviços
-				createButton(servicosSortContainer, 'client-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; }); // Mudança
-				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; }); // Mudança
-			}
-			
-			setContractDateFilter(filter) {
-				this.contractDateFilter = filter;
-				this.resetAndRenderContractList();
-				
-				// Atualiza visualmente os botões
-				const buttons = document.querySelectorAll('#contractDateFilterButtons button');
-				buttons.forEach(btn => {
-					// Extrai o valor do filtro do atributo onclick
-					const btnFilter = btn.getAttribute('onclick').match(/'([^']+)'/)?.[1]; 
-					if (btnFilter === filter) {
-						btn.className = 'px-3 py-1 rounded text-sm font-medium transition-all duration-200 bg-indigo-600 text-white';
-					} else {
-						btn.className = 'px-3 py-1 rounded text-sm font-medium transition-all duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600';
-					}
-				});
+				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 			}
 			
 			// [INÍCIO DA ALTERAÇÃO - OFICINA]
@@ -3423,7 +3420,20 @@
 				this.contractListPage = 0;
 				this.renderContractList();
 			}
-		
+
+			// [CHANGE] Atualiza o label e renderiza a lista quando o filtro de período muda
+			setPeriodFilter(filter) {
+				this.periodFilter = filter;
+				const labelMap = {
+					'todos': 'Todos os Contratos',
+					'novos': 'Contratos Novos',
+					'legados': 'Contratos Legados',
+					'comparacao': 'Modo Comparação'
+				};
+				document.getElementById('period-filter-label').textContent = labelMap[filter];
+				this.resetAndRenderContractList();
+			}
+			
 			// --- 5. LÓGICA DE AÇÕES (CRUD) ---
 			
 			async handleDisplayNameSubmit(e) {
@@ -4178,30 +4188,6 @@
 				// [INÍCIO DA ALTERAÇÃO] Passa os contratos filtrados para o report handler
 				const income = this.reportHandler.calculateMonthlyIncome(year, month, this.getFilteredContracts(true));
 				// [FIM DA ALTERAÇÃO]
-				
-				const startDate = new Date(year, month, 1);
-				const endDate = new Date(year, month + 1, 0, 23, 59, 59);
-				const allContracts = this.getFilteredContracts(true).filter(c => !c.isDeleted);
-				
-				// Identificar contratos que tinham parcelas vencendo no mês mas não foram pagas
-				const unpaidContracts = [];
-				allContracts.forEach(contract => {
-					if (!contract.parcels || contract.parcels.length === 0) return;
-					
-					const unpaidParcelsInMonth = contract.parcels.filter(parcel => {
-						const dueDate = new Date(parcel.dueDate);
-						const isPendingInMonth = dueDate >= startDate && dueDate <= endDate && parcel.status === 'Pendente';
-						return isPendingInMonth;
-					});
-					
-					if (unpaidParcelsInMonth.length > 0) {
-						unpaidContracts.push({
-							clientName: contract.clientName,
-							advogado: contract.advogadoResponsavel || 'Não Informado',
-							unpaidParcels: unpaidParcelsInMonth
-						});
-					}
-				});
 		
 				let detailsHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Detalhes dos Recebimentos</h4>';
 				if (income.detailedPayments.length > 0) {
@@ -4213,25 +4199,16 @@
 				} else {
 					detailsHtml += '<p class="text-sm text-gray-400 mt-2">Nenhum recebimento neste período.</p>';
 				}
-				
-				let unpaidHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-red-700 pt-4 text-red-400">Contratos Não Pagos no Mês</h4>';
-				if (unpaidContracts.length > 0) {
+		
+				let unpaidHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Contratos Não Pagos no Mês</h4>';
+				if (income.unpaidContracts && income.unpaidContracts.length > 0) {
 					unpaidHtml += '<ul class="space-y-2 mt-2 text-sm">';
-					unpaidContracts.forEach(contract => {
-						contract.unpaidParcels.forEach(parcel => {
-							unpaidHtml += `<li class="flex justify-between items-center bg-red-900/20 border border-red-800/50 p-3 rounded-md">
-								<div>
-									<p class="font-semibold text-white">${contract.clientName}</p>
-									<p class="text-xs text-gray-400">Parcela ${parcel.number} - Vencimento: ${Utils.formatDate(parcel.dueDate)}</p>
-									<p class="text-xs text-gray-500">${contract.advogado}</p>
-								</div>
-								<span class="font-semibold text-red-400 text-lg">${Utils.formatCurrency(parcel.value)}</span>
-							</li>`;
-						});
+					income.unpaidContracts.forEach(c => {
+						unpaidHtml += `<li class="flex justify-between items-center bg-red-900/30 border border-red-500/50 p-3 rounded-md"><div><p class="font-semibold text-white">${c.clientName}</p><p class="text-xs text-gray-400">Advogado: ${c.advogado}</p></div><span class="font-semibold text-red-400 text-lg">${Utils.formatCurrency(c.totalValue)}</span></li>`;
 					});
 					unpaidHtml += '</ul>';
 				} else {
-					unpaidHtml += '<p class="text-sm text-gray-400 mt-2">Todos os contratos com vencimento no mês foram pagos! 🎉</p>';
+					unpaidHtml += '<p class="text-sm text-green-400 mt-2">Todos os contratos tiveram pagamentos neste período!</p>';
 				}
 		
 				resultDiv.innerHTML = `
@@ -4240,7 +4217,7 @@
 						<div class="dark-card shadow-lg p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Êxito)</p><p class="text-2xl font-bold text-indigo-400">${Utils.formatCurrency(income.totalExito)}</p></div>
 					</div>
 					<div class="bg-gray-900 p-4 rounded-lg border border-gray-700 text-center"><p class="text-white font-bold">TOTAL GERAL RECEBIDO</p><p class="text-3xl font-extrabold text-green-400">${Utils.formatCurrency(income.totalGeral)}</p></div>
-				` + detailsHtml + unpaidHtml;
+				` + detailsHtml + unpaidHtml; // Adicionando seção de contratos não pagos
 			}
 		
 			showAnalyticsInModal() {
@@ -4474,27 +4451,22 @@
 					headStyles: { fillColor: [79, 70, 229] }
 				});
 
-				// Adiciona a seção de não pagos no PDF
 				doc.setFontSize(16);
-				doc.text("Contratos Não Pagos no Período", 14, doc.autoTable.previous.finalY + 15);
-				const unpaidContracts = this.reportHandler.getUnpaidContractsData(startDate, endDate, this.getFilteredContracts(true));
-				const unpaidData = unpaidContracts.flatMap(contract => 
-					contract.unpaidParcels.map(parcel => [
-						contract.clientName,
-						`Parcela ${parcel.number}`,
-						Utils.formatDate(parcel.dueDate),
-						contract.advogado,
-						Utils.formatCurrency(parcel.value)
-					])
-				);
+				doc.text("Detalhes dos Recebimentos", 14, doc.autoTable.previous.finalY + 15);
+				const paymentData = data.detailedPayments.map(p => [
+					p.clientName,
+					p.type,
+					Utils.formatDate(p.date),
+					p.advogado,
+					Utils.formatCurrency(p.value)
+				]);
 				
 				doc.autoTable({
 					startY: doc.autoTable.previous.finalY + 21,
-					head: [['Cliente', 'Parcela', 'Vencimento', 'Advogado', 'Valor Pendente']],
-					body: unpaidData,
+					head: [['Cliente', 'Tipo', 'Data', 'Advogado', 'Valor']],
+					body: paymentData,
 					theme: 'striped',
-					headStyles: { fillColor: [239, 68, 68] }, // Vermelho
-					bodyStyles: { textColor: [239, 68, 68] }
+					headStyles: { fillColor: [79, 70, 229] }
 				});
 
 				doc.save(`Relatorio_FG_${startDate.toISOString().split('T')[0]}_a_${endDate.toISOString().split('T')[0]}.pdf`);
@@ -4599,7 +4571,26 @@
 						sidebar.classList.add('hidden');
 						this.backdrop.style.display = 'none';
 					}
- 768 && !sidebar.classList.contains('hidden')) {
-						sidebar.classList.add('hidden');
-						this.backdrop.style.display = 'none';
-					}
+					// [MUDANÇA v5] Fecha o dropdown de notificação com Esc
+					this.closeNotificationDropdown();
+				}
+		
+				if (event.key === 'Tab' && this.openModalId) {
+					this._trapFocus(event);
+				}
+			}
+		
+			_trapFocus(event) {
+				const modal = document.getElementById(this.openModalId);
+				if (!modal) return;
+				
+				const focusableElements = modal.querySelectorAll(
+					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+				);
+				if (focusableElements.length === 0) return;
+				
+				const firstElement = focusableElements[0];
+				const lastElement = focusableElements[focusableElements.length - 1];
+		
+				if (event.shiftKey) {
+					if (document.activeElement === firstElement
