@@ -1772,16 +1772,16 @@
 			// Removida a verificação 'isUserAdmin', pois os 'contractsToRender'
 			// já vêm pré-filtrados pela classe App.
 			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
-				let totalParcelas = 0, totalExito = 0;
+				let totalParcelas = 0, totalExito = 0, totalVencido = 0; // [NOVO] Variável para somar dívida
 				const detailedPayments = [];
 				const byAdvogado = {};
 				const byMonth = {};
+				const vencidoByMonth = {}; // [NOVO] Para o gráfico comparativo
 				const newContractsByMonth = {};
 				const allContracts = contractsToRender.filter(c => !c.isDeleted);
 				
-				// Helper para agrupar por mês
 				const addData = (map, date, value) => {
-					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 					map[monthKey] = (map[monthKey] || 0) + value;
 				};
 
@@ -1796,8 +1796,9 @@
 						}
 					}
 					
-					// 2. Processa pagamentos de parcelas
+					// 2. Processa parcelas (Pagas e Pendentes/Vencidas)
 					(contract.parcels || []).forEach(parcel => {
+						// PAGAS (Receita)
 						if (parcel.status === 'Paga' && parcel.paymentDate) {
 							const d = new Date(parcel.paymentDate);
 							if (d >= startDate && d <= endDate) {
@@ -1806,6 +1807,15 @@
 								detailedPayments.push({ type: `Parcela ${parcel.number}/${contract.parcels.length}`, clientName: contract.clientName, date: d, value: value, advogado: advogado });
 								byAdvogado[advogado] = (byAdvogado[advogado] || 0) + value;
 								addData(byMonth, d, value);
+							}
+						}
+						// [NOVO] VENCIDAS (Dívida) - Só conta se venceu DENTRO do período selecionado
+						else if (parcel.status === 'Pendente') {
+							const d = new Date(parcel.dueDate);
+							// Verifica se a data de vencimento está no intervalo E se já passou de hoje
+							if (d >= startDate && d <= endDate && d < new Date()) {
+								totalVencido += parcel.value;
+								addData(vencidoByMonth, d, parcel.value);
 							}
 						}
 					});
@@ -1824,13 +1834,12 @@
 				});
 				
 				detailedPayments.sort((a, b) => a.date - b.date);
-				
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
 				
-				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
+				// Retorna os novos dados (totalVencido, vencidoByMonth)
+				return { totalParcelas, totalExito, totalGeral, totalContratos, totalVencido, detailedPayments, byAdvogado, byMonth, vencidoByMonth, newContractsByMonth };
 			}
-			// [NOVO] Função para achar quem não pagou no mês
 			getDefaultersInMonth(month, year, contracts) {
 				const defaulters = [];
 				const startMonth = new Date(year, month, 1);
@@ -4338,36 +4347,88 @@
 
 			renderReportKPIs(data) {
 				const container = document.getElementById('report-kpis');
+				// Grid ajustado para 5 colunas para caber o novo card
+				container.className = "grid grid-cols-1 md:grid-cols-5 gap-4"; 
 				container.innerHTML = `
-					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
-						<h3 class="text-lg font-semibold text-gray-400">Faturação Total</h3>
-						<p class="text-3xl font-bold text-green-400">${Utils.formatCurrency(data.totalGeral)}</p>
+					<div class="dark-card p-4 rounded-lg shadow-lg text-center border-l-4 border-green-500">
+						<h3 class="text-xs font-semibold text-gray-400 uppercase">Faturação Total</h3>
+						<p class="text-2xl font-bold text-green-400 mt-1">${Utils.formatCurrency(data.totalGeral)}</p>
 					</div>
-					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
-						<h3 class="text-lg font-semibold text-gray-400">Total (Parcelas)</h3>
-						<p class="text-3xl font-bold text-white">${Utils.formatCurrency(data.totalParcelas)}</p>
+					<div class="dark-card p-4 rounded-lg shadow-lg text-center border-l-4 border-gray-600">
+						<h3 class="text-xs font-semibold text-gray-400 uppercase">Parc. Recebidas</h3>
+						<p class="text-xl font-bold text-white mt-1">${Utils.formatCurrency(data.totalParcelas)}</p>
 					</div>
-					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
-						<h3 class="text-lg font-semibold text-gray-400">Total (Êxito)</h3>
-						<p class="text-3xl font-bold text-indigo-400">${Utils.formatCurrency(data.totalExito)}</p>
+					<div class="dark-card p-4 rounded-lg shadow-lg text-center border-l-4 border-indigo-500">
+						<h3 class="text-xs font-semibold text-gray-400 uppercase">Êxito Recebido</h3>
+						<p class="text-xl font-bold text-indigo-400 mt-1">${Utils.formatCurrency(data.totalExito)}</p>
 					</div>
-					<div class="dark-card p-6 rounded-lg shadow-lg text-center">
-						<h3 class="text-lg font-semibold text-gray-400">Novos Contratos</h3>
-						<p class="text-3xl font-bold text-blue-400">${data.totalContratos}</p>
+					<div class="dark-card p-4 rounded-lg shadow-lg text-center border-l-4 border-red-500 bg-red-900/10">
+						<h3 class="text-xs font-semibold text-red-300 uppercase">Total em Atraso</h3>
+						<p class="text-xl font-bold text-red-500 mt-1">${Utils.formatCurrency(data.totalVencido)}</p>
+					</div>
+					<div class="dark-card p-4 rounded-lg shadow-lg text-center border-l-4 border-blue-500">
+						<h3 class="text-xs font-semibold text-gray-400 uppercase">Novos Contratos</h3>
+						<p class="text-xl font-bold text-blue-400 mt-1">${data.totalContratos}</p>
 					</div>
 				`;
 			}
 
 			renderAdvancedReportCharts(data) {
-				// 1. Gráfico de Linha (Faturação no Tempo)
+				// 1. Gráfico de Linha Comparativo (Recebido vs Vencido)
 				const timelineCtx = document.getElementById('advReportTimelineChart').getContext('2d');
-				const sortedMonths = Object.keys(data.byMonth).sort();
+				
+				// Junta meses de recebimento e de vencimento para o eixo X ficar correto
+				const allMonths = new Set([...Object.keys(data.byMonth), ...Object.keys(data.vencidoByMonth)]);
+				const sortedMonths = Array.from(allMonths).sort();
+				
 				const timelineLabels = sortedMonths.map(key => {
 					const [year, month] = key.split('-');
 					return new Date(year, month - 1).toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
 				});
-				const timelineData = sortedMonths.map(key => data.byMonth[key]);
-				this.analyticsHandler.renderTimelineChart(timelineCtx, timelineLabels, timelineData);
+				
+				const incomeData = sortedMonths.map(key => data.byMonth[key] || 0);
+				const debtData = sortedMonths.map(key => data.vencidoByMonth[key] || 0);
+
+				if (this.advReportTimelineChart) this.advReportTimelineChart.destroy();
+				this.advReportTimelineChart = new Chart(timelineCtx, {
+					type: 'line',
+					data: {
+						labels: timelineLabels,
+						datasets: [
+							{
+								label: 'Recebido (Real)',
+								data: incomeData,
+								backgroundColor: 'rgba(74, 222, 128, 0.2)',
+								borderColor: '#4ade80', // Verde
+								borderWidth: 2,
+								fill: true,
+								tension: 0.3
+							},
+							{
+								label: 'Não Pago (Dívida)',
+								data: debtData,
+								backgroundColor: 'rgba(239, 68, 68, 0.1)',
+								borderColor: '#ef4444', // Vermelho
+								borderWidth: 2,
+								borderDash: [5, 5], // Linha tracejada
+								fill: false,
+								tension: 0.3
+							}
+						]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						scales: {
+							y: { beginAtZero: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
+							x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+						},
+						plugins: {
+							legend: { labels: { color: '#d1d5db' } },
+							tooltip: { mode: 'index', intersect: false }
+						}
+					}
+				});
 				
 				// 2. Gráfico de Pizza (Faturação por Advogado)
 				const byAdvCtx = document.getElementById('advReportByAdvogadoChart').getContext('2d');
@@ -4384,7 +4445,8 @@
 				});
 				const contractData = sortedContractMonths.map(key => data.newContractsByMonth[key]);
 				this.analyticsHandler.renderNewContractsChart(newContractsCtx, contractLabels, contractData);
-				// [NOVO] Tabela de Inadimplentes Avançada
+
+				// 4. Tabela de Inadimplentes (Com as aspas corrigidas!)
 				let defContainer = document.getElementById('advReportDefaulters');
 				if (!defContainer) {
 					defContainer = document.createElement('div');
@@ -4393,11 +4455,10 @@
 					document.getElementById('advancedReportContainer').appendChild(defContainer);
 				}
 				
-				// Calcula inadimplentes no período selecionado
 				const startD = new Date(document.getElementById('reportStartDate').value + 'T00:00:00');
 				const endD = new Date(document.getElementById('reportEndDate').value + 'T23:59:59');
 				
-				let htmlDef = `<h3 class="text-lg font-semibold text-red-400 mb-4">Inadimplência no Período</h3>`;
+				let htmlDef = `<h3 class="text-lg font-semibold text-red-400 mb-4">Inadimplência Detalhada no Período</h3>`;
 				const allC = this.getFilteredContracts(true);
 				const periodDefaulters = [];
 				
@@ -4421,9 +4482,6 @@
 				}
 				defContainer.innerHTML = htmlDef;
 			}
-			
-
-			// [MUDANÇA v5] Nova função de PDF
 			exportReportPDF() {
 				if (!this.currentAdvancedReportData) {
 					Utils.showToast('Gere um relatório primeiro.', 'error');
