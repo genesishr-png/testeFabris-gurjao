@@ -1772,11 +1772,11 @@
 			// Removida a verificação 'isUserAdmin', pois os 'contractsToRender'
 			// já vêm pré-filtrados pela classe App.
 			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
-				let totalParcelas = 0, totalExito = 0, totalVencido = 0; // [NOVO] Variável para somar dívida
+				let totalParcelas = 0, totalExito = 0, totalVencido = 0;
 				const detailedPayments = [];
 				const byAdvogado = {};
 				const byMonth = {};
-				const vencidoByMonth = {}; // [NOVO] Para o gráfico comparativo
+				const vencidoByMonth = {}; 
 				const newContractsByMonth = {};
 				const allContracts = contractsToRender.filter(c => !c.isDeleted);
 				
@@ -1788,17 +1788,15 @@
 				allContracts.forEach(contract => {
 					const advogado = contract.advogadoResponsavel || 'Não Informado';
 					
-					// 1. Processa novos contratos
+					// 1. Novos Contratos
 					if (contract.createdAt) {
 						const d = new Date(contract.createdAt);
-						if (d >= startDate && d <= endDate) {
-							addData(newContractsByMonth, d, 1);
-						}
+						if (d >= startDate && d <= endDate) addData(newContractsByMonth, d, 1);
 					}
 					
-					// 2. Processa parcelas (Pagas e Pendentes/Vencidas)
+					// 2. Parcelas
 					(contract.parcels || []).forEach(parcel => {
-						// PAGAS (Receita)
+						// RECEBIDO (Conta Valor Pago)
 						if (parcel.status === 'Paga' && parcel.paymentDate) {
 							const d = new Date(parcel.paymentDate);
 							if (d >= startDate && d <= endDate) {
@@ -1809,18 +1807,19 @@
 								addData(byMonth, d, value);
 							}
 						}
-						// [NOVO] VENCIDAS (Dívida) - Só conta se venceu DENTRO do período selecionado
+						// DÍVIDA (Conta Valor Corrigido com Juros)
 						else if (parcel.status === 'Pendente') {
 							const d = new Date(parcel.dueDate);
-							// Verifica se a data de vencimento está no intervalo E se já passou de hoje
 							if (d >= startDate && d <= endDate && d < new Date()) {
-								totalVencido += parcel.value;
-								addData(vencidoByMonth, d, parcel.value);
+								// [CORREÇÃO] Aqui está a mágica: aplica a calculadora de juros
+								const valorAtualizado = this.app.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
+								totalVencido += valorAtualizado;
+								addData(vencidoByMonth, d, valorAtualizado);
 							}
 						}
 					});
 					
-					// 3. Processa pagamentos de êxito
+					// 3. Êxito
 					if (contract.successFeePaymentDate) {
 						const d = new Date(contract.successFeePaymentDate);
 						if (d >= startDate && d <= endDate) {
@@ -1837,7 +1836,6 @@
 				const totalGeral = totalParcelas + totalExito;
 				const totalContratos = Object.values(newContractsByMonth).reduce((a, b) => a + b, 0);
 				
-				// Retorna os novos dados (totalVencido, vencidoByMonth)
 				return { totalParcelas, totalExito, totalGeral, totalContratos, totalVencido, detailedPayments, byAdvogado, byMonth, vencidoByMonth, newContractsByMonth };
 			}
 			getDefaultersInMonth(month, year, contracts) {
