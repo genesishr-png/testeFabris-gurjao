@@ -2801,8 +2801,9 @@
 			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
 			// Lógica de renderização do Kanban e Dashboard atualizada
 			renderKanban() {
-				// 'contractsToRender' agora são apenas os contratos do usuário logado (não-deletados)
-				const contractsToRender = this.getFilteredContracts(false); 
+				// Pega os contratos filtrados (respeitando o botão Novos/Legados)
+				const contractsToRender = this.getFilteredContracts(false);
+				
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
 				const kanbanAVencer = document.getElementById('kanban-a-vencer');
 				const kanbanPagas = document.getElementById('kanban-pagas');
@@ -2816,6 +2817,9 @@
 				const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 				const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 				const trintaDiasFrente = new Date(); trintaDiasFrente.setDate(hoje.getDate() + 30);
+				
+				// [NOVO] Data de corte para impedir que o filtro "Novos" mostre dívidas antigas
+				const DATA_CORTE_NOVOS = new Date('2025-11-01T00:00:00');
 		
 				let totalAVencer30dias = 0;
 				let totalVencido = 0;
@@ -2823,7 +2827,6 @@
 		
 				for (const contract of contractsToRender) {
 					if (!contract.parcels) contract.parcels = [];
-					// O 'remainingValue' agora é calculado para todos
 					let remainingValue = contract.parcels.reduce((sum, p) => p.status === 'Pendente' ? sum + p.value : sum, 0);
 		
 					for (let i = 0; i < contract.parcels.length; i++) {
@@ -2837,12 +2840,19 @@
 							}
 						} else {
 							if (vencimento < hoje) {
+								// [CORREÇÃO CRÍTICA]
+								// Se o botão "NOVOS" estiver ativo, IGNORA qualquer parcela vencida antes de 01/11/2025
+								// Isso remove as dívidas de 2023/2024 da conta dos "Novos"
+								if (this.contractDateFilter === 'novos' && vencimento < DATA_CORTE_NOVOS) {
+									continue; 
+								}
+
 								const valorCorrigido = this.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
-								totalVencido += valorCorrigido; // Agora calculado para todos
+								totalVencido += valorCorrigido;
 								fragVencidas.append(this.domBuilder.createParcelCard(contract, parcel, i, 'vencida', remainingValue, valorCorrigido));
 							} else if (vencimento >= hoje && vencimento <= trintaDiasFrente) {
 								fragAVencer.append(this.domBuilder.createParcelCard(contract, parcel, i, 'a-vencer', remainingValue));
-								totalAVencer30dias += parcel.value; // Agora calculado para todos
+								totalAVencer30dias += parcel.value; 
 							}
 						}
 					}
@@ -2869,13 +2879,11 @@
 					document.getElementById('exito-section').style.display = 'none';
 				}
 		
-				// 'allContracts' agora inclui deletados para o cálculo do 'totalPagoMes'
 				const allContracts = this.getFilteredContracts(true); 
 				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral;
 				
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
 			}
-		
 			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
 				document.getElementById('dash-vencido').textContent = Utils.formatCurrency(vencido);
