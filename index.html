@@ -570,52 +570,15 @@
 								<div id="notification-list" class="max-h-80 overflow-y-auto space-y-2 p-2">
 									<div id="notification-list-empty" class="hidden">
 										<i class="fas fa-check-circle text-gray-500 text-3xl mb-2"></i>
-										<p>Nenhuma notificação nova.</p>
+									<p>Nenhuma notificação nova.</p>
 									</div>
 								</div>
 							</div>
-						</div>
-						
-						<!-- CHANGE: Adicionando dropdown de filtro de período ao lado do sino de notificações -->
-						<div class="relative">
-							<button id="period-filter-button" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-								<i class="fas fa-filter"></i>
-								<span id="period-filter-label">Todos os Contratos</span>
-								<i class="fas fa-chevron-down text-xs"></i>
-							</button>
-							<div id="period-filter-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
-								<div class="p-2 space-y-1">
-									<button data-filter="todos" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
-										<i class="fas fa-list text-indigo-400"></i>
-										<div>
-											<div class="font-semibold text-white">Todos os Contratos</div>
-											<div class="text-xs text-gray-400">Visualizar todos os períodos</div>
-										</div>
-									</button>
-									<button data-filter="novos" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
-										<i class="fas fa-star text-green-400"></i>
-										<div>
-											<div class="font-semibold text-white">Contratos Novos</div>
-											<div class="text-xs text-gray-400">A partir de 01/11/2025</div>
-										</div>
-									</button>
-									<button data-filter="legados" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
-										<i class="fas fa-history text-amber-400"></i>
-										<div>
-											<div class="font-semibold text-white">Contratos Legados</div>
-											<div class="text-xs text-gray-400">Antes de 01/11/2025</div>
-										</div>
-									</button>
-									<button data-filter="comparacao" class="period-filter-option w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-3">
-										<i class="fas fa-exchange-alt text-purple-400"></i>
-										<div>
-											<div class="font-semibold text-white">Modo Comparação</div>
-											<div class="text-xs text-gray-400">Ver novos e legados lado a lado</div>
-										</div>
-									</button>
-								</div>
-							</div>
-						</div>
+
+						<button id="date-filter-toggle" class="p-2 text-gray-300 hover:text-white transition-colors ml-2" title="Alternar: Todos / Legado / Novos">
+							<i class="fas fa-layer-group text-xl"></i>
+							<span id="date-filter-label" class="text-xs font-bold ml-1 bg-indigo-600 px-1 rounded">TODOS</span>
+						</button>
 						
 						<button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-300 hover:text-white">
 							<i class="fas fa-bars text-xl"></i>
@@ -887,17 +850,7 @@
 								</div>
 						</div>
 
-						<div class="dark-card shadow-lg p-6 rounded-lg">
-							<h3 class="text-lg font-semibold text-gray-300 mb-4 flex items-center gap-2">
-								<i class="fas fa-cog text-amber-400"></i>
-								Outras Configurações (Em Breve)
-							</h3>
-							<p class="text-sm text-gray-400 mb-4">
-								Esta secção será expandida para incluir outras configurações importantes do sistema.
-							</p>
-							<button class="form-button disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-								<i class="fas fa-plus"></i> Adicionar Nova Config
-							</button>
+						<div class...
 						</div>
 					</div>
 				</div>
@@ -968,7 +921,7 @@
 				<input type="hidden" id="contractId">
 				<input type="hidden" id="financialDataChanged" value="false">
 				
-				<div class="grid grid-cols-1 md:grid-grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="clienteNome" class="block text-sm font-medium text-gray-400 mb-1">Nome do Cliente</label>
 						<input type="text" id="clienteNome" class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-white transition-all duration-200" required>
@@ -1042,12 +995,12 @@
 						</div>
 					</div>
 					
-					<div id="financial-fields-special" class="space-y-4">
+					<div id="financial-fields-special" class="hidden space-y-4">
 						<p class="text-sm text-gray-400">Insira as parcelas uma a uma.</p>
 						<div class="flex flex-col md:flex-row gap-2">
 							<div class="flex-1">
 								<label for="parcelaValorManual" class="block text-xs font-medium text-gray-400 mb-1">Valor da Parcela (R$)</label>
-								<input type="number" step="0.01" id="parcelaValorManual" class="form-input">
+								<input type="number" step="0.01" id="parcelaValorManual" placeholder="1500.00" class="form-input">
 							</div>
 							<div class="flex-1">
 								<label for="parcelaVencimentoManual" class="block text-xs font-medium text-gray-400 mb-1">Vencimento</label>
@@ -1190,7 +1143,7 @@
 		import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setLogLevel, writeBatch, serverTimestamp, query, where, orderBy, limit, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 		
 		// Constantes Globais
-		// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
+		// [CORREÇÃO LIXEIRA] Nomes em minúsculo para verificação
 		const ADMIN_USERS = ["dra. renata fabris","Darc", "dr. felipe gurjão", "lilian"];
 		const CONTRACTS_PER_PAGE = 12; // Itens por página
 		// Objeto de Utilitários
@@ -1877,45 +1830,59 @@
 				
 				return { totalParcelas, totalExito, totalGeral, totalContratos, detailedPayments, byAdvogado, byMonth, newContractsByMonth };
 			}
+			// [NOVO] Função para achar quem não pagou no mês
+			getDefaultersInMonth(month, year, contracts) {
+				const defaulters = [];
+				const startMonth = new Date(year, month, 1);
+				const endMonth = new Date(year, month + 1, 0, 23, 59, 59);
+
+				contracts.forEach(c => {
+					if (!c.parcels) return;
+					c.parcels.forEach(p => {
+						const dueDate = new Date(p.dueDate);
+						const hoje = new Date();
+						// Lógica: Venceu neste mês + Status é Pendente + Data já passou
+						if (dueDate >= startMonth && dueDate <= endMonth && p.status === 'Pendente' && dueDate < hoje) {
+							defaulters.push({
+								client: c.clientName,
+								advogado: c.advogadoResponsavel,
+								dueDate: dueDate,
+								value: p.value,
+								parcelNum: `${p.number}/${c.parcels.length}`
+							});
+						}
+					});
+				});
+				return defaulters;
+			}
 			// [FIM DA ALTERAÇÃO]
 			
+			// [NOVO v5.5] Agrega dados para o Painel de Admin
+			calculateAdminPerformanceData(contractsToRender) {
+				const hoje = new Date();
+				const inicioAno = new Date(hoje.getFullYear(), 0, 1);
+				const fimAno = new Date(hoje.getFullYear(), 11, 31, 23, 59, 59);
+
+				const contratosAtivos = contractsToRender.filter(c => !c.isDeleted && this.app.getContractStatus(c).statusText !== 'Concluído');
+				const faturamentoAno = this.calculateIncomeByDateRange(inicioAno, fimAno, contractsToRender);
+
+				const contratosPorAdvogado = {};
+				contratosAtivos.forEach(contract => {
+					const advogado = contract.advogadoResponsavel || 'Não Informado';
+					contratosPorAdvogado[advogado] = (contratosPorAdvogado[advogado] || 0) + 1;
+				});
+
+				const faturamentoPorAdvogado = faturamentoAno.byAdvogado;
+				
+				return { contratosPorAdvogado, faturamentoPorAdvogado };
+			}
+
 			// Função legada (ainda usada pelo modal antigo)
 			calculateMonthlyIncome(year, month, contractsToRender) {
 				const startDate = new Date(year, month, 1);
 				const endDate = new Date(year, month + 1, 0, 23, 59, 59); // Fim do mês
 				const data = this.calculateIncomeByDateRange(startDate, endDate, contractsToRender);
-				
-				const unpaidContracts = [];
-				const contractsWithPayment = new Set();
-				
-				// Marca contratos que receberam pagamentos
-				data.detailedPayments.forEach(p => {
-					// Encontra o contrato original para pegar o ID
-					const contract = contractsToRender.find(c => c.clientName === p.clientName && c.advogadoResponsavel === p.advogado); // Adiciona advogado para busca mais precisa
-					if (contract) contractsWithPayment.add(contract.id);
-				});
-				
-				// Encontra contratos ativos sem pagamento no período
-				contractsToRender.forEach(contract => {
-					if (!contract.isDeleted && !contractsWithPayment.has(contract.id)) {
-						const status = this.app.getContractStatus(contract);
-						if (status.statusText !== 'Concluído') {
-							unpaidContracts.push({
-								clientName: contract.clientName,
-								advogado: contract.advogadoResponsavel || 'Não Informado',
-								totalValue: contract.totalValue
-							});
-						}
-					}
-				});
-				
-				return { 
-					totalParcelas: data.totalParcelas, 
-					totalExito: data.totalExito, 
-					totalGeral: data.totalGeral, 
-					detailedPayments: data.detailedPayments,
-					unpaidContracts: unpaidContracts 
-				};
+				return { totalParcelas: data.totalParcelas, totalExito: data.totalExito, totalGeral: data.totalGeral, detailedPayments: data.detailedPayments };
 			}
 		
 			getActualIncomeData(contractsToRender) {
@@ -1956,42 +1923,6 @@
 					}
 				}
 				return { labels, data };
-			}
-		
-			// [MUDANÇA v5] Nova função para obter dados para o relatório avançado (agora usa os dados salvos em this.currentAdvancedReportData)
-			getAdvancedReportData() {
-				return this.app.currentAdvancedReportData;
-			}
-		
-			// [NOVO v5.5] Helper para calcular dados de performance do admin
-			calculateAdminPerformanceData(allContracts) {
-				const contratosPorAdvogado = {};
-				const faturamentoPorAdvogado = {};
-				const today = new Date();
-				const currentYear = today.getFullYear();
-		
-				allContracts.forEach(contract => {
-					if (contract.isDeleted) return; // Ignora contratos deletados para métricas
-		
-					const advogado = contract.advogadoResponsavel || 'Não Informado';
-					
-					// Contratos Ativos
-					const statusInfo = this.app.getContractStatus(contract);
-					if (statusInfo.statusText !== 'Concluído') {
-						contratosPorAdvogado[advogado] = (contratosPorAdvogado[advogado] || 0) + 1;
-					}
-		
-					// Faturação do Ano Atual
-					const paidInCurrentYear = (contract.parcels || []).filter(p => p.status === 'Paga' && new Date(p.paymentDate).getFullYear() === currentYear).reduce((sum, p) => sum + (p.valuePaid || 0), 0);
-					const successFeePaidInCurrentYear = (new Date(contract.successFeePaymentDate).getFullYear() === currentYear) ? (contract.successFeeValueReceived || 0) : 0;
-					const totalYearlyIncome = paidInCurrentYear + successFeePaidInCurrentYear;
-					
-					if (totalYearlyIncome > 0) {
-						faturamentoPorAdvogado[advogado] = (faturamentoPorAdvogado[advogado] || 0) + totalYearlyIncome;
-					}
-				});
-				
-				return { contratosPorAdvogado, faturamentoPorAdvogado };
 			}
 		}
 		
@@ -2081,7 +2012,7 @@
 			}
 			
 			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
-			// Removida a verificação 'isUserAdmin' para exibir valores
+			// Removida a verificação 'isUserAdmin' para exibir valor
 			createExitoCard(contract) {
 				const taxaExitoDisplay = contract.successFee || '[Não definido]';
 				
@@ -2119,6 +2050,11 @@
 				header.append(this.buildElement('span', { className: `px-2 py-1 rounded-full text-xs font-semibold ${statusColor}`, text: statusText }));
 				cardBody.append(header);
 		
+				const adv = this.buildElement('p', { className: 'text-xs text-indigo-300 mb-3' });
+				adv.append(this.buildIcon('fas fa-user-tie mr-1'));
+				adv.append(document.createTextNode(` ${contract.advogadoResponsavel}`));
+				cardBody.append(adv);
+		
 				const servicesContainer = this.buildElement('div', { className: 'mb-4' });
 				(contract.serviceTypes || []).forEach(s => {
 					servicesContainer.append(this.buildElement('span', { className: 'service-tag-small', text: s.name }));
@@ -2143,7 +2079,7 @@
 					financialInfo.append(exitoDiv);
 				}
 				cardBody.append(financialInfo);
-		
+				
 				const footer = this.buildElement('div', { className: 'bg-gray-900/50 px-4 py-2 flex justify-end gap-2' });
 				
 				const historyBtn = this.buildElement('button', { className: 'text-sm flex items-center gap-2 text-gray-400 hover:text-indigo-400 hover:bg-indigo-900/20 py-1 px-3 rounded-md transition-colors', html: '<i class="fas fa-eye"></i> Histórico' });
@@ -2169,6 +2105,88 @@
 			
 			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
 			// Removida a verificação 'isUserAdmin' para exibir valores
+			createParcelaCard({ contract, parcel, index, diffDays, valorCorrigido, isVencida }) {
+				const valorOriginalDisplay = Utils.formatCurrency(parcel.value);
+				const valorCorrigidoDisplay = Utils.formatCurrency(valorCorrigido);
+		
+				// [NOVO v5.6] Adiciona classes dinâmicas para Vencida / A Vencer
+				const cardClasses = isVencida ? 'parcel-card-vencida' : 'parcel-card-avencer';
+				const card = this.buildElement('div', { className: `dark-card shadow-lg p-5 rounded-lg border-l-4 ${cardClasses} transition-all duration-200 hover:-translate-y-1 hover:shadow-xl` });
+				
+				card.append(this.buildElement('p', { className: 'font-bold text-lg text-white', text: contract.clientName }));
+				
+				const services = (contract.serviceTypes || []).map(s => s.name).join(', ');
+				card.append(this.buildElement('p', { className: 'text-sm text-gray-400 mb-3', text: `${services} - Parcela ${parcel.number}/${contract.parcels.length || 1}` }));
+				
+				const details = this.buildElement('div', { className: 'border-t border-gray-700 pt-3 mt-3 space-y-2' });
+				
+				if (isVencida) {
+					// Card de VENCIDA (mostra original e corrigido)
+					details.innerHTML = `
+					<div class="flex justify-between items-center text-sm">
+						<span class="text-gray-400">Valor Original:</span>
+						<span class="font-medium text-gray-400 line-through">${valorOriginalDisplay}</span>
+					</div>
+					<div class="flex justify-between items-center">
+						<span class="text-sm text-white">Valor Corrigido:</span>
+						<span class="font-semibold text-lg parcel-value">${valorCorrigidoDisplay}</span>
+					</div>`;
+				} else {
+					// Card de A VENCER (mostra só o valor normal)
+					details.innerHTML = `
+					<div class="flex justify-between items-center">
+						<span class="text-sm text-white">Valor:</span>
+						<span class="font-semibold text-lg parcel-value">${valorOriginalDisplay}</span>
+					</div>`;
+				}
+				
+				details.innerHTML += `
+				<div class="flex justify-between items-center text-sm">
+					<span class="text-gray-400">Vence em:</span>
+					<span class="font-medium text-gray-300">${Utils.formatDate(parcel.dueDate)}</span>
+				</div>`;
+
+				// [NOVO v5.6] Mostra "Atrasado há" ou "Faltam X dias"
+				if (isVencida) {
+					details.innerHTML += `
+					<div class="flex justify-between items-center text-red-400 font-bold text-sm bg-red-900/30 px-2 py-1 rounded">
+						<span>Atrasado há:</span>
+						<span>${diffDays} dia(s)</span>
+					</div>`;
+				} else {
+					details.innerHTML += `
+					<div class="flex justify-between items-center text-yellow-400 font-bold text-sm bg-yellow-900/30 px-2 py-1 rounded">
+						<span>Faltam:</span>
+						<span>${diffDays * -1} dia(s)</span>
+					</div>`;
+				}
+				
+				card.append(details);
+		
+				// [NOVO v5.6] Adiciona botões de Ação (Pagar e Editar Contrato)
+				const footer = this.buildElement('div', { className: 'mt-4 flex gap-2' });
+
+				const payBtn = this.buildElement('button', {
+					className: 'flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
+					html: '<i class="fas fa-check"></i> Pagar'
+				});
+				payBtn.onclick = () => window.App.openPaymentModal(contract.id, index);
+				
+				const editBtn = this.buildElement('button', {
+					className: 'flex-shrink-0 bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2',
+					html: '<i class="fas fa-pencil-alt"></i>'
+				});
+				editBtn.title = "Editar Contrato";
+				editBtn.onclick = () => window.App.openContractModal(contract.id);
+
+				footer.append(payBtn, editBtn);
+				card.append(footer);
+				
+				return card;
+			}
+			
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir progresso financeiro
 			createServicoCard(contract, serviceProgress, financialProgress) {
 				const card = this.buildElement('div', { className: 'dark-card shadow-lg p-5 rounded-lg transition-all duration-200 hover:-translate-y-1' });
 				
@@ -2326,7 +2344,7 @@
 				container.append(createPageButton(currentPage + 1, 'Próx »', currentPage === totalPages - 1));
 			}
 
-			// [MUDANÇA v5] Cria item do dropdown de notificação
+			// [MUDANÇA v5] Novo: Cria item do dropdown de notificação
 			createNotificationItem(notification) {
 				const item = this.buildElement('div', { className: 'notification-item' });
 				if (notification.isRead) item.classList.add('is-read');
@@ -2398,7 +2416,6 @@
 			}
 			// [FIM DA ALTERAÇÃO]
 		}
-		
 		/**
 		 * @class App
 		 * @description Classe principal que gere o estado e a lógica do dashboard
@@ -2436,8 +2453,7 @@
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
 				this.contractStatusFilter = 'ativos';
-				this.periodFilter = 'todos'; // Filtro de período (todos/novos/legados)
-				
+                this.contractDateFilter = 'todos'; // [NOVO] Filtro de data
 				// [MUDANÇA v5] Referências DOM movidas para _initDOMReferences
 				this.backdrop = null;
 				this.appContainer = null;
@@ -2524,7 +2540,7 @@
 				document.getElementById('contratoEspecial').addEventListener('change', this.toggleSpecialContractFields.bind(this));
 				// Listener para o botão de adicionar parcela manual
 				document.getElementById('addManualParcelButton').addEventListener('click', this.handleAddManualParcel.bind(this));
-				// [FIM DA ALTERAÇÃO - CONTRATO ESPECIAL]
+				// [FIM DA ALTERAÇÃO]
 
 				// Inputs de Busca
 				const debouncedContracts = Utils.debounce(() => this.resetAndRenderContractList(), 300);
@@ -2591,40 +2607,41 @@
 				// [MUDANÇA v5] Listener do PDF
 				const pdfBtn = document.getElementById('exportPdfButton');
 				if (pdfBtn) {
+					// [NOVO] Listener do Filtro de Data
+				const filterBtn = document.getElementById('date-filter-toggle');
+				if (filterBtn) {
+					filterBtn.addEventListener('click', () => {
+						const label = document.getElementById('date-filter-label');
+						// Ciclo: Todos -> Novos -> Legados -> Todos
+						if (this.contractDateFilter === 'todos') {
+							this.contractDateFilter = 'novos';
+							label.textContent = 'NOVOS';
+							label.className = 'text-xs font-bold ml-1 bg-green-600 px-1 rounded';
+							Utils.showToast('A mostrar: NOVOS (pós 01/11/25)', 'success');
+						} else if (this.contractDateFilter === 'novos') {
+							this.contractDateFilter = 'legados';
+							label.textContent = 'LEGADOS';
+							label.className = 'text-xs font-bold ml-1 bg-yellow-600 px-1 rounded';
+							Utils.showToast('A mostrar: LEGADOS (pré 01/11/25)', 'info');
+						} else {
+							this.contractDateFilter = 'todos';
+							label.textContent = 'TODOS';
+							label.className = 'text-xs font-bold ml-1 bg-indigo-600 px-1 rounded';
+							Utils.showToast('A mostrar: TODOS', 'info');
+						}
+						this.render(); // Atualiza a tela
+					});
+				}
 					pdfBtn.addEventListener('click', () => this.exportReportPDF());
 				}
 
-				// [NOVO v5.6] Listeners do modal de contrato
+				// [NOVO v5.6] Listeners para o modal de contrato
 				const financialInputs = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'contratoJaQuitado'];
 				financialInputs.forEach(id => {
 					document.getElementById(id)?.addEventListener('change', () => {
 						document.getElementById('financialDataChanged').value = 'true';
 					});
 				});
-
-				// [CHANGE] Adiciona listeners para o dropdown de período
-				const periodFilterButton = document.getElementById('period-filter-button');
-				const periodFilterDropdown = document.getElementById('period-filter-dropdown');
-				if (periodFilterButton && periodFilterDropdown) {
-					periodFilterButton.addEventListener('click', (e) => {
-						e.stopPropagation();
-						periodFilterDropdown.classList.toggle('hidden');
-					});
-					document.querySelectorAll('.period-filter-option').forEach(button => {
-						button.addEventListener('click', (e) => {
-							const filter = e.currentTarget.dataset.filter;
-							this.setPeriodFilter(filter);
-							periodFilterDropdown.classList.add('hidden');
-						});
-					});
-					document.addEventListener('click', (e) => {
-						if (periodFilterDropdown && !periodFilterDropdown.classList.contains('hidden')) {
-							if (!periodFilterButton.contains(e.target) && !periodFilterDropdown.contains(e.target)) {
-								periodFilterDropdown.classList.add('hidden');
-							}
-						}
-					});
-				}
 			}
 		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
@@ -2866,17 +2883,6 @@
 					if (this.contractStatusFilter === 'ativos' && isConcluido) return false;
 					if (this.contractStatusFilter === 'concluidos' && !isConcluido) return false;
 
-					if (this.periodFilter === 'novos') {
-						const createdDate = new Date(c.createdAt || '2000-01-01');
-						const cutoffDate = new Date('2025-11-01');
-						if (createdDate < cutoffDate) return false;
-					} else if (this.periodFilter === 'legados') {
-						const createdDate = new Date(c.createdAt || '2000-01-01');
-						const cutoffDate = new Date('2025-11-01');
-						if (createdDate >= cutoffDate) return false;
-					}
-					// </CHANGE>
-
 					const matchesAdvogado = (this.isUserAdmin && advogadoFilter === 'Todos') || c.advogadoResponsavel === advogadoFilter;
 					const matchesSearch = c.clientName.toLowerCase().includes(searchTerm) || (c.serviceTypes || []).some(s => s.name.toLowerCase().includes(searchTerm));
 					return matchesAdvogado && matchesSearch;
@@ -2885,9 +2891,9 @@
 				// 2. Ordena os contratos
 				if (this.currentContractSort === 'name-asc') {
 					filteredContracts.sort((a, b) => a.clientName.localeCompare(b.clientName));
-				} else if (this.currentContractSort === 'value-desc') {
+				} else if (this.currentContractSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin' da condição de ordenação
 					filteredContracts.sort((a, b) => (b.totalValue || 0) - (a.totalValue || 0));
-				}
+				} // [FIM DA ALTERAÇÃO]
 		
 				// 3. Calcula paginação
 				const totalItems = filteredContracts.length;
@@ -2939,7 +2945,7 @@
 					
 					for (let i = 0; i < contract.parcels.length; i++) {
 						const parcel = contract.parcels[i];
-						// [MUDANÇA v5.6] Mostra TODAS as parcelas pendentes
+						// [NOVO v5.6] Mostra TODAS as parcelas pendentes
 						if (parcel.status === 'Pendente') { 
 							const vencimento = new Date(parcel.dueDate);
 							const diffDays = Math.ceil((vencimento - hoje) / 86400000);
@@ -2954,7 +2960,7 @@
 				// [MUDANÇA v5.6] Nova ordenação
 				if (this.currentParcelasSort === 'days-asc') {
 					parcelasList.sort((a, b) => a.diffDays - b.diffDays); // Mais próximas primeiro
-				} else if (this.currentParcelasSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin' da condição de ordenação
+				} else if (this.currentParcelasSort === 'value-desc') { // [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
 					parcelasList.sort((a, b) => b.valorCorrigido - a.valorCorrigido); // Mais caras primeiro
 				} else if (this.currentParcelasSort === 'name-asc') {
 					parcelasList.sort((a, b) => a.contract.clientName.localeCompare(b.contract.clientName));
@@ -3070,7 +3076,6 @@
 				});
 				container.append(fragment);
 			}
-			
 			// [MUDANÇA v5] Nova Página de Relatórios
 			renderAdvancedReportPage() {
 				// Define datas padrão (início do mês até hoje)
@@ -3234,7 +3239,7 @@
 					}
 				});
 		
-				// [MUDANÇA v5] IDs dos campos financeiros
+				// [MUDANÇA v5.6] IDs dos campos financeiros
 				const financialFields = ['valorTotal', 'numParcelas', 'vencimentoPrimeiraParcela', 'taxaExito', 'contratoJaQuitado'];
 				financialFields.forEach(id => {
 					const field = document.getElementById(id);
@@ -3248,14 +3253,31 @@
 			
 			getFilteredContracts(includeDeleted = false) {
 				const allContracts = this.database.contracts;
+				// Data de corte: 01 de Novembro de 2025 (mês 10 no JS pois começa em 0)
+				const DIVISOR_DATE = new Date(2025, 10, 1); 
+
+				let filtered = [];
+				// 1. Filtro de Usuário vs Admin
 				if (this.isUserAdmin) {
-					// Admin: Se includeDeleted for true, retorna TODOS. Se for false, retorna só os NÃO deletados.
-					return includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
+					filtered = includeDeleted ? allContracts : allContracts.filter(c => !c.isDeleted);
+				} else {
+					filtered = allContracts.filter(c => c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted));
 				}
-				// Não-Admin: Retorna só os do usuário, respeitando a flag includeDeleted
-				return allContracts.filter(c => 
-					c.advogadoResponsavel === this.currentUserDisplayName && (includeDeleted ? true : !c.isDeleted)
-				);
+
+				// 2. [NOVO] Filtro de Data (Novos vs Legados)
+				if (this.contractDateFilter !== 'todos') {
+					filtered = filtered.filter(c => {
+						// Se não tiver data de criação, assume que é antigo (2020)
+						const dataCriacao = c.createdAt ? new Date(c.createdAt) : new Date('2020-01-01');
+						if (this.contractDateFilter === 'novos') {
+							return dataCriacao >= DIVISOR_DATE;
+						} else if (this.contractDateFilter === 'legados') {
+							return dataCriacao < DIVISOR_DATE;
+						}
+						return true;
+					});
+				}
+				return filtered;
 			}
 		
 			// [MUDANÇA v3] Lógica de "Concluído" atualizada
@@ -3307,24 +3329,23 @@
 				// Botões de Status (Ativos/Concluídos)
 				createButton(contractStatusFilterContainer, 'ativos', 'Ativos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
 				createButton(contractStatusFilterContainer, 'concluidos', 'Concluídos', this.contractStatusFilter, (key) => { this.contractStatusFilter = key; this.resetAndRenderContractList(); });
-				
-				// Botões de Período (Todos/Novos/Legados/Comparação)
-				createButton(contractStatusFilterContainer, 'todos', 'Todos', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
-				createButton(contractStatusFilterContainer, 'novos', 'Novos (≥01/11/2025)', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
-				createButton(contractStatusFilterContainer, 'legados', 'Legados (<01/11/2025)', this.periodFilter, (key) => { this.periodFilter = key; this.resetAndRenderContractList(); });
-				// O filtro de comparação é tratado separadamente no JS
 		
 				// Botões da lista de Contratos
 				createButton(contractSortContainer, 'name-asc', 'Nome (A-Z)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
+				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
 				createButton(contractSortContainer, 'value-desc', 'Valor (Maior)', this.currentContractSort, (key) => { this.currentContractSort = key; this.resetAndRenderContractList(); });
+				// [FIM DA ALTERAÇÃO]
 		
-				// Botões de Parcelas
+				// [MUDANÇA v5.6] Botões de Parcelas (substitui Inadimplentes)
 				createButton(parcelasSortContainer, 'days-asc', 'Venc. Próximo', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
 				createButton(parcelasSortContainer, 'name-asc', 'Nome (A-Z)', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
+				// [INÍCIO DA ALTERAÇÃO] Removido 'isUserAdmin'
 				createButton(parcelasSortContainer, 'value-desc', 'Maior Valor', this.currentParcelasSort, (key) => { this.currentParcelasSort = key; });
+				// [FIM DA ALTERAÇÃO]
 		
 				// Botões de Serviços
 				createButton(servicosSortContainer, 'name-asc', 'Cliente (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
+				createButton(servicosSortContainer, 'adv-asc', 'Advogado (A-Z)', this.currentServicosSort, (key) => { this.currentServicosSort = key; });
 			}
 			
 			// [INÍCIO DA ALTERAÇÃO - OFICINA]
@@ -3346,7 +3367,7 @@
 						select.add(new Option(adv, adv));
 					});
 		
-					select.value = currentValue && currentValue !== 'Não Informado' ? currentValue : (this.isUserAdmin ? 'Todos' : this.currentUserDisplayName);
+					select.value = this.isUserAdmin ? (currentValue || 'Todos') : this.currentUserDisplayName;
 					select.disabled = !this.isUserAdmin;
 				});
 			}
@@ -3382,83 +3403,7 @@
 				this.contractListPage = 0;
 				this.renderContractList();
 			}
-
-			// [CHANGE] Atualiza o label e renderiza a lista quando o filtro de período muda
-		setPeriodFilter(filter) {
-			
-showComparisonView() {
-    const listContainer = document.getElementById('contractListContainer');
-    
-    // Pega todos os contratos não deletados
-    const allContracts = this.getFilteredContracts(false);
-    const cutoffDate = new Date('2025-11-01');
-    
-    // Separa em novos e legados
-    const novosContracts = allContracts.filter(c => new Date(c.createdAt || '2000-01-01') >= cutoffDate);
-    const legadosContracts = allContracts.filter(c => new Date(c.createdAt || '2000-01-01') < cutoffDate);
-    
-    // Calcula métricas para cada grupo
-    const novosTotal = novosContracts.reduce((sum, c) => sum + (c.totalValue || 0), 0);
-    const legadosTotal = legadosContracts.reduce((sum, c) => sum + (c.totalValue || 0), 0);
-    
-    listContainer.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-gradient-to-br from-green-900/30 to-green-800/20 border border-green-700/50 rounded-lg p-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="fas fa-star text-green-400 text-2xl"></i>
-                    <h3 class="text-xl font-bold text-white">Contratos Novos</h3>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300">Total de contratos:</span>
-                        <span class="text-2xl font-bold text-green-400">${novosContracts.length}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300">Valor total:</span>
-                        <span class="text-2xl font-bold text-green-400">${Utils.formatCurrency(novosTotal)}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="fas fa-history text-amber-400 text-2xl"></i>
-                    <h3 class="text-xl font-bold text-white">Contratos Legados</h3>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300">Total de contratos:</span>
-                        <span class="text-2xl font-bold text-amber-400">${legadosContracts.length}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300">Valor total:</span>
-                        <span class="text-2xl font-bold text-amber-400">${Utils.formatCurrency(legadosTotal)}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center text-gray-400 text-sm mb-4">
-            <i class="fas fa-info-circle"></i> Data de corte: 01/11/2025
-        </div>
-    `;
-}
-    this.periodFilter = filter;
-    const labelMap = {
-        'todos': 'Todos os Contratos',
-        'novos': 'Contratos Novos',
-        'legados': 'Contratos Legados',
-        'comparacao': 'Modo Comparação'
-    };
-    document.getElementById('period-filter-label').textContent = labelMap[filter];
-    
-    if (filter === 'comparacao') {
-        this.showComparisonView();
-    } else {
-        this.resetAndRenderContractList();
-    }
-}
-			
+		
 			// --- 5. LÓGICA DE AÇÕES (CRUD) ---
 			
 			async handleDisplayNameSubmit(e) {
@@ -3634,7 +3579,7 @@ showComparisonView() {
 					}
 				}
 			}
-			// [FIM DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// [FIM DA ALTERAÇÃO]
 			
 			async handlePaymentSubmit(e) {
 				e.preventDefault();
@@ -3662,10 +3607,10 @@ showComparisonView() {
 					if (success) {
 						this.closeModal('modalPagamento');
 						Utils.showToast('Pagamento registado.', 'success');
-						// [NOVO v5.4] Notifica admins sobre pagamento
-						this.sendNotificationToAllAdmins({
+						// [NOVO v5.4] Notifica advogado sobre pagamento
+						this.sendNotification(contract.advogadoResponsavel, {
 							message: `Pagamento de ${Utils.formatCurrency(valuePaid)} (Parcela ${parcel.number}) registado para ${contract.clientName}.`,
-							contractId: contract.id,
+							contractId: contractId,
 							sender: this.currentUserDisplayName
 						});
 					}
@@ -3692,10 +3637,10 @@ showComparisonView() {
 					if (success) {
 						this.closeModal('modalExito');
 						Utils.showToast('Êxito registado.', 'success');
-						// [NOVO v5.4] Notifica admins sobre pagamento de êxito
-						this.sendNotificationToAllAdmins({
+						// [NOVO v5.4] Notifica advogado sobre pagamento de êxito
+						this.sendNotification(contract.advogadoResponsavel, {
 							message: `Pagamento de Êxito (${Utils.formatCurrency(valueReceived)}) registado para ${contract.clientName}.`,
-							contractId: contract.id,
+							contractId: contractId,
 							sender: this.currentUserDisplayName
 						});
 					}
@@ -3732,7 +3677,7 @@ showComparisonView() {
 					if (success && newStatus === 'Concluído') {
 						this.sendNotification(contract.advogadoResponsavel, {
 							message: `${this.currentUserDisplayName} concluiu o serviço "${serviceName}" no contrato ${contract.clientName}.`,
-							contractId: contract.id,
+							contractId: contractId,
 							sender: this.currentUserDisplayName
 						});
 					}
@@ -3792,13 +3737,13 @@ showComparisonView() {
 				this.lastOverdueCheck = hojeStr; // Marca como checado hoje
 			}
 		
-			moveToLixeira(contractId) {
+			async moveToLixeira(contractId) {
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract) return;
-				const ok = Utils.confirm(`Tem a certeza que deseja mover o contrato de "${contract.clientName}" para a lixeira?`);
+				const ok = await Utils.confirm(`Tem a certeza que deseja mover o contrato de "${contract.clientName}" para a lixeira?`);
 				if (!ok) return;
 				
-				const success = this.firebaseService.updateContractField(contractId, { isDeleted: true });
+				const success = await this.firebaseService.updateContractField(contractId, { isDeleted: true });
 				if (success) Utils.showToast('Contrato movido para a lixeira.', 'success');
 			}
 		
@@ -3872,7 +3817,6 @@ showComparisonView() {
 			// [FIM DA ALTERAÇÃO - OFICINA]
 
 			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
-			// Nova: Lida com a adição de parcela manual
 			handleAddManualParcel() {
 				const valorInput = document.getElementById('parcelaValorManual');
 				const vencimentoInput = document.getElementById('parcelaVencimentoManual');
@@ -3898,14 +3842,12 @@ showComparisonView() {
 				document.getElementById('financialDataChanged').value = 'true';
 			}
 
-			// Nova: Lida com a remoção de parcela manual
 			handleRemoveManualParcel(index) {
 				this.manualParcels.splice(index, 1);
 				this.renderManualParcelList();
 				document.getElementById('financialDataChanged').value = 'true';
 			}
 
-			// Nova: Renderiza a lista de parcelas manuais
 			renderManualParcelList() {
 				const listContainer = document.getElementById('manualParcelList');
 				listContainer.innerHTML = '';
@@ -3913,6 +3855,7 @@ showComparisonView() {
 					listContainer.innerHTML = `<p class="text-xs text-gray-500 text-center p-2">Nenhuma parcela adicionada.</p>`;
 					return;
 				}
+				
 				const fragment = document.createDocumentFragment();
 				this.manualParcels.forEach((parcel, index) => {
 					fragment.append(this.domBuilder.createManualParcelListItem(parcel.value, parcel.dueDate, index));
@@ -3920,14 +3863,13 @@ showComparisonView() {
 				listContainer.append(fragment);
 			}
 
-			// Nova: Alterna a visibilidade dos campos padrão/especial
 			toggleSpecialContractFields(event) {
 				const isChecked = event.target.checked;
 				document.getElementById('financial-fields-standard').style.display = isChecked ? 'none' : 'block';
 				document.getElementById('financial-fields-special').style.display = isChecked ? 'block' : 'none';
 				document.getElementById('financialDataChanged').value = 'true';
 			}
-			// [FIM DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// [FIM DA ALTERAÇÃO]
 		
 			// --- 6. LÓGICA DE MODAIS (com Acessibilidade) ---
 		
@@ -4082,8 +4024,10 @@ showComparisonView() {
 					Utils.showToast('Falha ao abrir o modal de contrato.', 'error');
 				}
 			}
-			// [FIM DA ALTERAÇÃO - CONTRATO ESPECIAL]
+			// [FIM DA ALTERAÇÃO]
 			
+			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
+			// Removida a verificação 'isUserAdmin' para exibir valores
 			openPaymentModal(contractId, parcelIndex) {
 				const contract = this.database.contracts.find(c => c.id === contractId);
 				if (!contract || !contract.parcels || !contract.parcels[parcelIndex]) return;
@@ -4179,6 +4123,7 @@ showComparisonView() {
 				this.openModal('modalCliente');
 			}
 			
+			// Modal de Relatório Antigo
 			openReportModal() {
 				if (!this.isUserAdmin) { Utils.showToast('Apenas admins podem abrir o relatório.', 'error'); return; }
 				this.openModal('modalRelatorio');
@@ -4224,25 +4169,30 @@ showComparisonView() {
 				} else {
 					detailsHtml += '<p class="text-sm text-gray-400 mt-2">Nenhum recebimento neste período.</p>';
 				}
-		
-				let unpaidHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-white">Contratos Não Pagos no Mês</h4>';
-				if (income.unpaidContracts && income.unpaidContracts.length > 0) {
-					unpaidHtml += '<ul class="space-y-2 mt-2 text-sm">';
-					income.unpaidContracts.forEach(c => {
-						unpaidHtml += `<li class="flex justify-between items-center bg-red-900/30 border border-red-500/50 p-3 rounded-md"><div><p class="font-semibold text-white">${c.clientName}</p><p class="text-xs text-gray-400">Advogado: ${c.advogado}</p></div><span class="font-semibold text-red-400 text-lg">${Utils.formatCurrency(c.totalValue)}</span></li>`;
+				// [NOVO] HTML dos Inadimplentes
+				const defaulters = this.reportHandler.getDefaultersInMonth(month, year, this.getFilteredContracts(true));
+				let defaultersHtml = '<h4 class="text-lg font-semibold mt-6 border-t border-gray-700 pt-4 text-red-400">Inadimplentes (Vencidos no Mês)</h4>';
+				
+				if (defaulters.length > 0) {
+					defaultersHtml += '<ul class="space-y-2 mt-2 text-sm">';
+					defaulters.forEach(d => {
+						defaultersHtml += `<li class="flex justify-between items-center bg-red-900/20 p-2 rounded border border-red-900/50">
+							<div><span class="font-bold text-gray-200">${d.client}</span> <span class="text-xs text-gray-400">(${d.advogado})</span><br><span class="text-xs text-red-300">Venceu: ${Utils.formatDate(d.dueDate)}</span></div>
+							<span class="font-bold text-red-400">${Utils.formatCurrency(d.value)}</span>
+						</li>`;
 					});
-					unpaidHtml += '</ul>';
+					defaultersHtml += '</ul>';
 				} else {
-					unpaidHtml += '<p class="text-sm text-green-400 mt-2">Todos os contratos tiveram pagamentos neste período!</p>';
+					defaultersHtml += '<p class="text-sm text-gray-500 mt-2">Nenhum atraso registado.</p>';
 				}
 		
-				resultDiv.innerHTML = `
+				resultDiv.innerHTML = ` ` + detailsHtml + defaultersHtml;
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div class="dark-card shadow-lg p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Parcelas)</p><p class="text-2xl font-bold text-white">${Utils.formatCurrency(income.totalParcelas)}</p></div>
 						<div class="dark-card shadow-lg p-4 rounded-lg text-center"><p class="text-sm text-gray-400">Total (Êxito)</p><p class="text-2xl font-bold text-indigo-400">${Utils.formatCurrency(income.totalExito)}</p></div>
 					</div>
 					<div class="bg-gray-900 p-4 rounded-lg border border-gray-700 text-center"><p class="text-white font-bold">TOTAL GERAL RECEBIDO</p><p class="text-3xl font-extrabold text-green-400">${Utils.formatCurrency(income.totalGeral)}</p></div>
-				` + detailsHtml + unpaidHtml; // Adicionando seção de contratos não pagos
+				` + detailsHtml;
 			}
 		
 			showAnalyticsInModal() {
@@ -4425,7 +4375,44 @@ showComparisonView() {
 				});
 				const contractData = sortedContractMonths.map(key => data.newContractsByMonth[key]);
 				this.analyticsHandler.renderNewContractsChart(newContractsCtx, contractLabels, contractData);
+				// [NOVO] Tabela de Inadimplentes Avançada
+				let defContainer = document.getElementById('advReportDefaulters');
+				if (!defContainer) {
+					defContainer = document.createElement('div');
+					defContainer.id = 'advReportDefaulters';
+					defContainer.className = 'dark-card shadow-lg p-6 rounded-lg mt-8 col-span-1 md:col-span-2';
+					document.getElementById('advancedReportContainer').appendChild(defContainer);
+				}
+				
+				// Calcula inadimplentes no período selecionado
+				const startD = new Date(document.getElementById('reportStartDate').value + 'T00:00:00');
+				const endD = new Date(document.getElementById('reportEndDate').value + 'T23:59:59');
+				
+				let htmlDef = `<h3 class="text-lg font-semibold text-red-400 mb-4">Inadimplência no Período</h3>`;
+				const allC = this.getFilteredContracts(true);
+				const periodDefaulters = [];
+				
+				allC.forEach(c => {
+					(c.parcels || []).forEach(p => {
+						const d = new Date(p.dueDate);
+						if (d >= startD && d <= endD && p.status === 'Pendente' && d < new Date()) {
+							periodDefaulters.push({ client: c.clientName, date: d, value: p.value, adv: c.advogadoResponsavel });
+						}
+					});
+				});
+
+				if (periodDefaulters.length === 0) {
+					htmlDef += `<p class="text-gray-400">Nenhum pagamento em atraso neste período.</p>`;
+				} else {
+					htmlDef += `<div class="overflow-x-auto"><table class="ranking-table"><thead><tr><th>Cliente</th><th>Advogado</th><th>Vencimento</th><th>Valor</th></tr></thead><tbody>`;
+					periodDefaulters.forEach(d => {
+						htmlDef += `<tr><td class="text-white">${d.client}</td><td class="text-gray-400">${d.adv}</td><td>${Utils.formatDate(d.date)}</td><td class="text-red-400 font-bold">${Utils.formatCurrency(d.value)}</td></tr>`;
+					});
+					htmlDef += `</tbody></table></div>`;
+				}
+				defContainer.innerHTML = htmlDef;
 			}
+			
 
 			// [MUDANÇA v5] Nova função de PDF
 			exportReportPDF() {
@@ -4607,21 +4594,35 @@ showComparisonView() {
 		
 			_trapFocus(event) {
 				const modal = document.getElementById(this.openModalId);
-				const focusableEls = modal.querySelectorAll('button, [href], input, select, textarea');
-				const firstFocusableEl = focusableEls[0];
-				const lastFocusableEl = focusableEls[focusableEls.length - 1];
+				if (!modal) return;
+				
+				const focusableElements = modal.querySelectorAll(
+					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+				);
+				if (focusableElements.length === 0) return;
+				
+				const firstElement = focusableElements[0];
+				const lastElement = focusableElements[focusableElements.length - 1];
 		
-				if (!event.shiftKey && document.activeElement === lastFocusableEl) {
-					firstFocusableEl.focus();
-					event.preventDefault();
-				} else if (event.shiftKey && document.activeElement === firstFocusableEl) {
-					lastFocusableEl.focus();
-					event.preventDefault();
+				if (event.shiftKey) {
+					if (document.activeElement === firstElement) {
+						lastElement.focus();
+						event.preventDefault();
+					}
+				} else {
+					if (document.activeElement === lastElement) {
+						firstElement.focus();
+						event.preventDefault();
+					}
+				}
+				
+				if (!modal.contains(document.activeElement)) {
+					firstElement.focus();
 				}
 			}
 		}
 		
-		// Inicialização Global da Aplicação
+		// --- INICIALIZAÇÃO DA APLICAÇÃO ---
 		document.addEventListener('DOMContentLoaded', () => {
 			// [MUDANÇA v5] Garante que o jspdf-autotable está carregado
 			// (Numa app real, isto seria feito com um bundler, mas aqui garantimos a ordem)
@@ -4636,64 +4637,7 @@ showComparisonView() {
 			};
 			document.head.appendChild(autoTableScript);
 		});
-				
-		// Permite chamar as funções App diretamente no HTML
-		window.App.showPage = (pageId) => window.App.showPage(pageId);
-		window.App.openContractModal = (contractId) => window.App.openContractModal(contractId);
-		window.App.openPaymentModal = (contractId, parcelIndex) => window.App.openPaymentModal(contractId, parcelIndex);
-		window.App.openExitoModal = (contractId) => window.App.openExitoModal(contractId);
-		window.App.openClientHistoryModal = (clientName) => window.App.openClientHistoryModal(clientName);
-		window.App.openReportModal = () => window.App.openReportModal();
-		window.App.generateAndShowReport = () => window.App.generateAndShowReport();
-		window.App.showAnalyticsInModal = () => window.App.showAnalyticsInModal();
-		window.App.exportReportCSV = () => window.App.exportReportCSV();
-		window.App.exportContractsCSV = () => window.App.exportContractsCSV();
-		window.App.moveToLixeira = (contractId) => window.App.moveToLixeira(contractId);
-		window.App.restoreContract = (contractId) => window.App.restoreContract(contractId);
-		window.App.deleteContractPermanently = (contractId) => window.App.deleteContractPermanently(contractId);
-		window.App.updateServiceStatus = (contract, serviceIndex, newStatus) => window.App.updateServiceStatus(contract, serviceIndex, newStatus);
-		window.App.closeModal = (modalId) => window.App.closeModal(modalId);
-		window.App.resetAndRenderContractList = () => window.App.resetAndRenderContractList();
-		window.App.renderServicosPage = () => window.App.renderServicosPage();
-		window.App.renderParcelasPage = () => window.App.renderParcelasPage(); // [MUDANÇA v5.6]
-		window.App.changeContractPage = (pageIndex) => window.App.changeContractPage(pageIndex);
-		window.App.markNotificationsAsRead = (ids) => window.App.markNotificationsAsRead(ids);
-		window.App.generateAdvancedReport = () =>window.App.generateAdvancedReport();
-		window.App.exportReportPDF = () => window.App.exportReportPDF();
-		window.App.handleRemoveAdvogado = (name) => window.App.handleRemoveAdvogado(name);
 		
-		// Trap focus no modal aberto
-		document.addEventListener('keydown', (event) => {
-			if (event.key !== 'Tab') return;
-			
-			const modal = document.querySelector('.modal.show');
-			if (!modal) return;
-			
-			const focusableElements = modal.querySelectorAll(
-				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-			);
-			if (focusableElements.length === 0) return;
-			
-			const firstElement = focusableElements[0];
-			const lastElement = focusableElements[focusableElements.length - 1];
-	
-			if (event.shiftKey) {
-				if (document.activeElement === firstElement) {
-					lastElement.focus();
-					event.preventDefault();
-				}
-			} else {
-				if (document.activeElement === lastElement) {
-					firstElement.focus();
-					event.preventDefault();
-				}
-			}
-			
-			if (!modal.contains(document.activeElement)) {
-				firstElement.focus();
-			}
-		});
-	
-</script>
+	</script>
 </body>
 </html>
