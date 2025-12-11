@@ -1771,16 +1771,19 @@
 			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
 			// Removida a verificação 'isUserAdmin', pois os 'contractsToRender'
 			// já vêm pré-filtrados pela classe App.
-			calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
+		calculateIncomeByDateRange(startDate, endDate, contractsToRender) {
 				let totalParcelas = 0, totalExito = 0, totalVencido = 0;
 				const detailedPayments = [];
 				const byAdvogado = {};
 				const byMonth = {};
 				const vencidoByMonth = {}; 
 				const newContractsByMonth = {};
+				
+				// Filtra contratos excluídos
 				const allContracts = contractsToRender.filter(c => !c.isDeleted);
 				
 				const addData = (map, date, value) => {
+					// Cria chave de mês (Ex: "2025-11")
 					const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 					map[monthKey] = (map[monthKey] || 0) + value;
 				};
@@ -1788,7 +1791,7 @@
 				allContracts.forEach(contract => {
 					const advogado = contract.advogadoResponsavel || 'Não Informado';
 					
-					// 1. Novos Contratos
+					// 1. Novos Contratos (Baseado na Data de Criação)
 					if (contract.createdAt) {
 						const d = new Date(contract.createdAt);
 						if (d >= startDate && d <= endDate) addData(newContractsByMonth, d, 1);
@@ -1796,9 +1799,10 @@
 					
 					// 2. Parcelas
 					(contract.parcels || []).forEach(parcel => {
-						// RECEBIDO (Conta Valor Pago)
+						// === RECEBIDO (O que entrou no caixa) ===
 						if (parcel.status === 'Paga' && parcel.paymentDate) {
 							const d = new Date(parcel.paymentDate);
+							// Verifica se o PAGAMENTO foi dentro do mês
 							if (d >= startDate && d <= endDate) {
 								const value = parcel.valuePaid;
 								totalParcelas += value;
@@ -1807,19 +1811,25 @@
 								addData(byMonth, d, value);
 							}
 						}
-						// DÍVIDA (Conta Valor Corrigido com Juros)
+						// === DÍVIDA / INADIMPLÊNCIA (O que devia ter entrado) ===
 						else if (parcel.status === 'Pendente') {
 							const d = new Date(parcel.dueDate);
+							
+							// AQUI ESTÁ O SEGREDO:
+							// 1. A data de vencimento (d) tem que ser MAIOR ou IGUAL ao inicio do relatorio
+							// 2. A data de vencimento (d) tem que ser MENOR ou IGUAL ao fim do relatorio
+							// 3. A data de vencimento (d) tem que ser MENOR que hoje (para ser atraso e não futuro)
 							if (d >= startDate && d <= endDate && d < new Date()) {
-								// [CORREÇÃO] Aqui está a mágica: aplica a calculadora de juros
+								// Calcula o valor corrigido para ser justo
 								const valorAtualizado = this.app.correctionCalculator.calcularValorCorrigido(parcel.value, parcel.dueDate);
+								
 								totalVencido += valorAtualizado;
 								addData(vencidoByMonth, d, valorAtualizado);
 							}
 						}
 					});
 					
-					// 3. Êxito
+					// 3. Êxito (Recebido)
 					if (contract.successFeePaymentDate) {
 						const d = new Date(contract.successFeePaymentDate);
 						if (d >= startDate && d <= endDate) {
