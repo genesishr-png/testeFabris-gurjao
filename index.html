@@ -604,8 +604,13 @@
 							<h3 class="text-lg font-semibold text-gray-400">A Receber (Próx. 30 dias)</h3>
 							<p id="dash-a-receber" class="text-3xl font-bold text-green-400"></p>
 						</div>
-						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-							<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+						<div class="relative dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+							<div class="flex justify-between items-start">
+								<h3 class="text-lg font-semibold text-gray-400">Vencido (Corrigido)</h3>
+								<button id="toggle-debt-view" class="hidden text-gray-500 hover:text-white transition-colors" title="Ver Histórico Completo">
+									<i id="toggle-debt-icon" class="fas fa-filter"></i>
+								</button>
+							</div>
 							<p id="dash-vencido" class="text-3xl font-bold text-red-400"></p>
 						</div>
 						<div class="dark-card p-6 rounded-lg shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
@@ -2470,7 +2475,8 @@
 				this.currentServicosSort = 'name-asc';
 				this.contractListPage = 0;
 				this.contractStatusFilter = 'ativos';
-                this.contractDateFilter = 'todos'; // [NOVO] Filtro de data
+                this.contractDateFilter = 'todos';
+				this.showLegacyDebt = false; // Controla o botão do KPI// [NOVO] Filtro de data
 				// [MUDANÇA v5] Referências DOM movidas para _initDOMReferences
 				this.backdrop = null;
 				this.appContainer = null;
@@ -2659,6 +2665,18 @@
 						document.getElementById('financialDataChanged').value = 'true';
 					});
 				});
+				// [NOVO] Clique do botão do KPI de Vencidos
+				const toggleDebtBtn = document.getElementById('toggle-debt-view');
+				if (toggleDebtBtn) {
+					toggleDebtBtn.addEventListener('click', (e) => {
+						e.stopPropagation(); // Evita cliques indesejados
+						this.showLegacyDebt = !this.showLegacyDebt; // Liga/Desliga
+						this.render(); // Atualiza a tela
+						
+						const msg = this.showLegacyDebt ? "A mostrar DÍVIDA TOTAL (Histórico)." : "A mostrar DÍVIDA DO PERÍODO (Novos).";
+						Utils.showToast(msg, 'info');
+					});
+				}
 			}
 		
 			// --- 2. HANDLERS DE AUTENTICAÇÃO E DADOS ---
@@ -2801,7 +2819,6 @@
 			// [INÍCIO DA ALTERAÇÃO - ADVOGADO VÊ FINANCEIRO]
 			// Lógica de renderização do Kanban e Dashboard atualizada
 			renderKanban() {
-				// Pega os contratos filtrados (respeitando o botão Novos/Legados)
 				const contractsToRender = this.getFilteredContracts(false);
 				
 				const kanbanVencidas = document.getElementById('kanban-vencidas');
@@ -2818,7 +2835,7 @@
 				const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 				const trintaDiasFrente = new Date(); trintaDiasFrente.setDate(hoje.getDate() + 30);
 				
-				// [NOVO] Data de corte para impedir que o filtro "Novos" mostre dívidas antigas
+				// DATA DE CORTE: Define o que é "Dívida Velha" (antes de Nov/25)
 				const DATA_CORTE_NOVOS = new Date('2025-11-01T00:00:00');
 		
 				let totalAVencer30dias = 0;
@@ -2840,10 +2857,12 @@
 							}
 						} else {
 							if (vencimento < hoje) {
-								// [CORREÇÃO CRÍTICA]
-								// Se o botão "NOVOS" estiver ativo, IGNORA qualquer parcela vencida antes de 01/11/2025
-								// Isso remove as dívidas de 2023/2024 da conta dos "Novos"
-								if (this.contractDateFilter === 'novos' && vencimento < DATA_CORTE_NOVOS) {
+								// [AQUI ESTÁ O SEGREDO DO BOTÃO]
+								// Se estamos na aba 'NOVOS' 
+								// E o botão de ver histórico está DESLIGADO (!this.showLegacyDebt)
+								// E a parcela venceu antes de Novembro/25
+								// ENTÃO: Pula essa parcela (não mostra, não soma).
+								if (this.contractDateFilter === 'novos' && !this.showLegacyDebt && vencimento < DATA_CORTE_NOVOS) {
 									continue; 
 								}
 
@@ -2856,7 +2875,7 @@
 							}
 						}
 					}
-					// Lógica de Êxito
+					
 					if (contract.successFee && !contract.successFeePaymentDate && (contract.parcels || []).every(p => p.status === 'Paga')) {
 						fragExito.append(this.domBuilder.createExitoCard(contract));
 						exitoPendente++;
@@ -2883,6 +2902,30 @@
 				const totalPagoMes = this.reportHandler.calculateMonthlyIncome(hoje.getFullYear(), hoje.getMonth(), allContracts).totalGeral;
 				
 				this.renderDashboard(totalAVencer30dias, totalVencido, totalPagoMes, contractsToRender.length);
+
+				// [CONTROLE VISUAL DO BOTÃO]
+				const toggleBtn = document.getElementById('toggle-debt-view');
+				const toggleIcon = document.getElementById('toggle-debt-icon');
+				
+				if (toggleBtn) {
+					// Só mostra o botão se estivermos na aba "NOVOS"
+					if (this.contractDateFilter === 'novos') {
+						toggleBtn.classList.remove('hidden');
+						
+						// Muda o ícone: Olho (Aberto = Tudo) / Filtro (Fechado = Só Novos)
+						if (this.showLegacyDebt) {
+							toggleIcon.className = 'fas fa-eye text-red-400'; // Modo Histórico
+							toggleBtn.title = "A mostrar TUDO (Clique para filtrar)";
+						} else {
+							toggleIcon.className = 'fas fa-filter text-gray-500'; // Modo Filtrado
+							toggleBtn.title = "A mostrar Período (Clique para ver histórico)";
+						}
+					} else {
+						// Esconde o botão se estiver em "Todos" ou "Legados"
+						toggleBtn.classList.add('hidden');
+						this.showLegacyDebt = false; 
+					}
+				}
 			}
 			renderDashboard(aVencer, vencido, pago, totalContratos) {
 				document.getElementById('dash-a-receber').textContent = Utils.formatCurrency(aVencer);
