@@ -422,90 +422,7 @@
 		.parcel-list-remove-btn:hover {
 			background-color: #dc2626; /* red-600 */
 		}
-/* [NOVO CSS - CAIXA DE LOGIN] */
-		.login-container-custom {
-			position: relative;
-			background-color: hsla(0, 0%, 10%, 0.1);
-			border: 2px solid white;
-			margin-inline: 1.5rem;
-			padding: 2.5rem 1.5rem;
-			border-radius: 1rem;
-			backdrop-filter: blur(10px);
-			width: 100%;
-			max-width: 400px;
-		}
 
-		.login__title {
-			text-align: center;
-			font-size: 1.75rem;
-			font-weight: 500;
-			margin-bottom: 2rem;
-			color: white;
-		}
-
-		.login__content {
-			display: grid;
-			row-gap: 1.75rem;
-			margin-bottom: 1.5rem;
-		}
-
-		.login__box {
-			display: grid;
-			grid-template-columns: max-content 1fr;
-			align-items: center;
-			column-gap: 0.75rem;
-			border-bottom: 2px solid white;
-		}
-
-		.login__icon, .login__eye {
-			font-size: 1.25rem;
-			color: white;
-		}
-
-		.login__input {
-			width: 100%;
-			padding-block: 0.8rem;
-			background: none;
-			color: white;
-			position: relative;
-			z-index: 1;
-			border: none;
-			outline: none;
-		}
-
-		.login__box-input {
-			position: relative;
-		}
-
-		.login__label {
-			position: absolute;
-			left: 0;
-			top: 13px;
-			font-weight: 500;
-			transition: top 0.3s, font-size 0.3s;
-			color: white;
-		}
-
-		/* Input focus animations */
-		.login__input:focus + .login__label { top: -12px; font-size: 0.813rem; }
-		.login__input:not(:placeholder-shown):not(:focus) + .login__label { top: -12px; font-size: 0.813rem; }
-
-		.login__button {
-			width: 100%;
-			padding: 1rem;
-			border-radius: 0.5rem;
-			background-color: white;
-			color: #000;
-			font-weight: 500;
-			cursor: pointer;
-			margin-bottom: 2rem;
-			transition: 0.3s;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 10px;
-		}
-		.login__button:hover { background-color: #d1d5db; }
 	</style>
 </head>
 <body class="text-gray-300">
@@ -531,40 +448,47 @@
 					Gestão profissional para advocacia
 				</p>
 			</div>
-			<form id="login-form" class="login-container-custom">
-				<h1 class="login__title">Login</h1>
-
-				<div class="login__content">
-					<div class="login__box">
-						<i class="fas fa-user login__icon"></i> 
-
-						<div class="login__box-input">
-							<input type="email" required class="login__input" id="login-email" placeholder=" ">
-							<label for="login-email" class="login__label">Email</label>
+			<div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+				<form id="login-form" class="space-y-5">
+					<div>
+						<label for="login-email" class="block text-sm font-medium text-gray-100 mb-2">
+							Email
+						</label>
+						<div class="relative">
+							<i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="email"
+								   id="login-email"
+								   placeholder="seu@email.com"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
-
-					<div class="login__box">
-						<i class="fas fa-lock login__icon"></i> 
-
-						<div class="login__box-input">
-							<input type="password" required class="login__input" id="login-password" placeholder=" ">
-							<label for="login-password" class="login__label">Senha</label>
+					<div>
+						<label for="login-password" class="block text-sm font-medium text-gray-100 mb-2">
+							Senha
+						</label>
+						<div class="relative">
+							<i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+							<input type="password"
+								   id="login-password"
+								   placeholder="••••••••"
+								   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+								   required />
 						</div>
 					</div>
+					<div id="auth-error" class="hidden p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
+						</div>
+					<button type="submit"
+							id="login-submit-button"
+							class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 mt-6">
+						<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
+						<span id="login-button-text">Entrar no Sistema</span>
+					</button>
+				</form>
+				<div class="mt-6 text-center text-gray-400 text-xs">
+					<p>Acesso restrito a utilizadores autorizados</p>
 				</div>
-
-				<div id="auth-error" class="hidden mb-4 p-3 bg-red-500/40 border border-red-500 rounded text-white text-sm text-center"></div>
-
-				<button type="submit" id="login-submit-button" class="login__button">
-					<i id="login-button-icon" class="fas fa-sign-in-alt"></i>
-					<span id="login-button-text">Entrar</span>
-				</button>
-
-				<div class="text-center">
-					<span class="text-white text-sm">Acesso restrito a utilizadores autorizados</span>
-				</div>
-			</form>
+			</div>
 		</div>
 	</div>
 	
