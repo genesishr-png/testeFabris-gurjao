@@ -1410,6 +1410,14 @@
 						class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200"
 						required style="color-scheme: dark;">
 				</div>
+				<div>
+					<label for="pagamentoAnexo" class="block text-sm font-medium text-gray-400 mb-1">Comprovativo
+						(Opcional)</label>
+					<input type="file" id="pagamentoAnexo" accept="image/*,application/pdf"
+						class="mt-1 block w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white transition-all duration-200"
+						style="color-scheme: dark;">
+					<p class="text-xs text-gray-500 mt-1">Máx: 300KB (PDF ou Imagem)</p>
+				</div>
 				<input type="hidden" id="pagamentoContractId">
 				<input type="hidden" id="pagamentoParcelIndex">
 			</div>
@@ -4076,6 +4084,24 @@
 					parcel.valuePaid = valuePaid;
 					parcel.paymentDate = new Date(paymentDate + 'T12:00:00Z').toISOString();
 
+					// [NOVO] Processar anexo se existir
+					const anexoFile = document.getElementById('pagamentoAnexo').files[0];
+					if (anexoFile) {
+						if (Utils.validateFileSize(anexoFile, 0.3)) {
+							const base64Data = await Utils.fileToBase64(anexoFile);
+							if (!parcel.attachments) parcel.attachments = [];
+							parcel.attachments.push({
+								name: anexoFile.name,
+								type: anexoFile.type,
+								data: base64Data,
+								uploadedAt: new Date().toISOString(),
+								uploadedBy: this.currentUserDisplayName
+							});
+						} else {
+							Utils.showToast('Anexo ignorado: muito grande (>300KB).', 'error');
+						}
+					}
+
 					const success = await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels });
 					if (success) {
 						this.closeModal('modalPagamento');
@@ -4586,6 +4612,10 @@
 				// Define o valor, mas só permite edição se for admin
 				valorInput.value = valorCorrigido.toFixed(2);
 				valorInput.disabled = !this.isUserAdmin;
+
+				// [NOVO] Limpa o campo de anexo
+				const anexoInput = document.getElementById('pagamentoAnexo');
+				if (anexoInput) anexoInput.value = '';
 
 				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
 				this.openModal('modalPagamento');
