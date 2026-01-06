@@ -1586,6 +1586,19 @@
 				div.textContent = str;
 				return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;').trim();
 			},
+			// [NOVO v5.7] Helpers para anexos (Base64)
+			fileToBase64(file) {
+				return new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.readAsDataURL(file);
+					reader.onload = () => resolve(reader.result);
+					reader.onerror = error => reject(error);
+				});
+			},
+			validateFileSize(file, maxSizeMB = 0.3) {
+				const sizeInMB = file.size / (1024 * 1024);
+				return sizeInMB <= maxSizeMB;
+			},
 			// [MUDANÇA v5] Helper para "sanitizar" nomes para IDs do Firestore
 			sanitizeForFirestoreId(name) {
 				if (!name) return 'unknown_user';
@@ -1741,12 +1754,12 @@
 				// [CHAVES REMOVIDAS] - Cole as suas chaves originais aqui
 				this.firebaseConfig = {
 					apiKey: "AIzaSyCQ865fjOiTRGbogtvI6leNSBF-n2uCwx0",
-    authDomain: "pagamento-5b5c1.firebaseapp.com",
-    projectId: "pagamento-5b5c1",
-    storageBucket: "pagamento-5b5c1.firebasestorage.app",
-    messagingSenderId: "748472701350",
-    appId: "1:748472701350:web:2b8d65bb261bbd94f17f67"
-  };
+					authDomain: "pagamento-5b5c1.firebaseapp.com",
+					projectId: "pagamento-5b5c1",
+					storageBucket: "pagamento-5b5c1.firebasestorage.app",
+					messagingSenderId: "748472701350",
+					appId: "1:748472701350:web:2b8d65bb261bbd94f17f67"
+				};
 			}
 
 			initialize() {
@@ -4369,6 +4382,64 @@
 				// [CORREÇÃO v5.2] Chama o destrutor específico do MODAL
 				if (modalId === 'modalRelatorio') {
 					this.analyticsHandler.destroyModalCharts();
+				}
+			}
+
+			// [NOVO v5.7] Lógica de Upload de Anexo
+			async handleFileUpload(contractId, parcelIndex, file) {
+				if (!contractId || parcelIndex === undefined || !file) return;
+
+				// 1. Validação de Tamanho (300KB)
+				if (!Utils.validateFileSize(file, 0.3)) {
+					Utils.showToast('O arquivo é muito grande. Máximo: 300KB (Use PDF ou Imagem comprimida).', 'error');
+					return;
+				}
+
+				try {
+					Utils.showToast('A enviar anexo...', 'info');
+					// 2. Converter para Base64
+					const base64Data = await Utils.fileToBase64(file);
+
+					// 3. Atualizar Contrato no Firebase
+					const contract = this.database.contracts.find(c => c.id === contractId);
+					if (!contract) return;
+
+					const updatedParcels = [...contract.parcels];
+					if (!updatedParcels[parcelIndex].attachments) {
+						updatedParcels[parcelIndex].attachments = [];
+					}
+
+					updatedParcels[parcelIndex].attachments.push({
+						name: file.name,
+						type: file.type,
+						data: base64Data,
+						uploadedAt: new Date().toISOString(),
+						uploadedBy: this.currentUserDisplayName // Opcional: Rastreabilidade
+					});
+
+					const success = await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels });
+					if (success) {
+						Utils.showToast('Anexo adicionado com sucesso!', 'success');
+					}
+				} catch (error) {
+					console.error("Erro no upload:", error);
+					Utils.showToast('Erro ao processar arquivo.', 'error');
+				}
+			}
+
+			// [NOVO v5.7] Lógica de Remoção de Anexo
+			async handleRemoveAttachment(contractId, parcelIndex, attachmentIndex) {
+				const contract = this.database.contracts.find(c => c.id === contractId);
+				if (!contract) return;
+
+				const updatedParcels = [...contract.parcels];
+				if (updatedParcels[parcelIndex] && updatedParcels[parcelIndex].attachments) {
+					updatedParcels[parcelIndex].attachments.splice(attachmentIndex, 1);
+
+					const success = await this.firebaseService.updateContractField(contractId, { parcels: updatedParcels });
+					if (success) {
+						Utils.showToast('Anexo removido.', 'success');
+					}
 				}
 			}
 
