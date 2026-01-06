@@ -1281,6 +1281,16 @@
 					</select>
 				</div>
 				<div>
+					<label class="block text-sm font-medium text-gray-400 mb-1">Arquivos do Contrato</label>
+					<div id="contractFilesDropZone"
+						class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-indigo-500 hover:bg-gray-800 transition-colors">
+						<i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+						<p class="text-sm text-gray-400">Arraste arquivos aqui ou clique para selecionar</p>
+						<input type="file" id="contractFileInput" class="hidden" accept="image/*,application/pdf">
+					</div>
+					<div id="contractFilesList" class="mt-2 space-y-2"></div>
+				</div>
+				<div>
 					<label for="contratoObservacoes"
 						class="block text-sm font-medium text-gray-400 mb-1">Observações</label>
 					<textarea id="contratoObservacoes" rows="3"
@@ -1293,6 +1303,11 @@
 						class="hidden p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-300 text-sm">
 						<i class="fas fa-exclamation-triangle mr-2"></i> Os campos financeiros estão bloqueados pois
 						este contrato já possui parcelas pagas. Para alterá-los, é necessário um novo contrato.
+					</div>
+
+					<div id="paid-parcels-container" class="hidden mt-4 pt-4 border-t border-gray-700">
+						<h3 class="text-lg font-semibold text-white mb-3">Parcelas Pagas (Gerir Anexos)</h3>
+						<div id="paid-parcels-list" class="space-y-3"></div>
 					</div>
 
 					<h3 class="text-lg font-semibold mb-2 border-t border-gray-700 pt-4 text-white">Detalhes Financeiros
@@ -1606,6 +1621,34 @@
 			validateFileSize(file, maxSizeMB = 0.3) {
 				const sizeInMB = file.size / (1024 * 1024);
 				return sizeInMB <= maxSizeMB;
+			},
+			setupDragAndDrop(element, onDrop) {
+				if (!element) return;
+
+				['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+					element.addEventListener(eventName, preventDefaults, false);
+				});
+
+				function preventDefaults(e) {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+
+				['dragenter', 'dragover'].forEach(eventName => {
+					element.addEventListener(eventName, () => element.classList.add('border-indigo-500', 'bg-gray-700'), false);
+				});
+
+				['dragleave', 'drop'].forEach(eventName => {
+					element.addEventListener(eventName, () => element.classList.remove('border-indigo-500', 'bg-gray-700'), false);
+				});
+
+				element.addEventListener('drop', (e) => {
+					const dt = e.dataTransfer;
+					const files = dt.files;
+					if (files && files.length > 0) {
+						onDrop(files[0]);
+					}
+				}, false);
 			},
 			// [MUDANÇA v5] Helper para "sanitizar" nomes para IDs do Firestore
 			sanitizeForFirestoreId(name) {
@@ -3994,6 +4037,11 @@
 					});
 				}
 
+				// [NOVO v5.8] Anexa arquivos da fila se houver (Criação)
+				if (this.contractAttachmentsQueue && this.contractAttachmentsQueue.length > 0) {
+					contractData.contractAttachments = this.contractAttachmentsQueue;
+				}
+
 				if (!contractId) {
 					// --- CRIAÇÃO DE NOVO CONTRATO ---
 					if (!this.isUserAdmin) {
@@ -4469,6 +4517,105 @@
 				}
 			}
 
+			// [NOVO v5.8] Upload de Arquivos do Contrato (Geral)
+			async handleContractFileUpload(contractId, file) {
+				if (!file) return;
+				if (!Utils.validateFileSize(file, 0.3)) {
+					Utils.showToast('Arquivo muito grande (>300KB).', 'error');
+					return;
+				}
+
+				try {
+					const base64Data = await Utils.fileToBase64(file);
+					const attachment = {
+						name: file.name,
+						type: file.type,
+						data: base64Data,
+						uploadedAt: new Date().toISOString(),
+						uploadedBy: this.currentUserDisplayName
+					};
+
+					if (contractId) {
+						// Modo Edição: Salva direto no Firebase
+						Utils.showToast('Enviando arquivo...', 'info');
+						const contract = this.database.contracts.find(c => c.id === contractId);
+						if (!contract) return;
+						const currentAtts = [...(contract.contractAttachments || []), attachment];
+						const success = await this.firebaseService.updateContractField(contractId, { contractAttachments: currentAtts });
+						if (success) {
+							Utils.showToast('Arquivo do contrato adicionado.', 'success');
+							this.renderContractAttachmentsList(currentAtts, contractId);
+						}
+					} else {
+						// Modo Criação: Adiciona à fila
+						this.contractAttachmentsQueue = this.contractAttachmentsQueue || [];
+						this.contractAttachmentsQueue.push(attachment);
+						this.renderContractAttachmentsList(this.contractAttachmentsQueue, null);
+					}
+				} catch (e) {
+					console.error(e);
+					Utils.showToast('Erro ao processar arquivo.', 'error');
+				}
+			}
+
+			// [NOVO v5.8] Remover Arquivo do Contrato
+			async handleRemoveContractAttachment(contractId, index) {
+				if (contractId) {
+					// Modo Edição
+					const contract = this.database.contracts.find(c => c.id === contractId);
+					if (!contract) return;
+					const currentAtts = [...(contract.contractAttachments || [])];
+					currentAtts.splice(index, 1);
+					const success = await this.firebaseService.updateContractField(contractId, { contractAttachments: currentAtts });
+					if (success) {
+						Utils.showToast('Arquivo removido.', 'success');
+						this.renderContractAttachmentsList(currentAtts, contractId);
+					}
+				} else {
+					// Modo Criação
+					this.contractAttachmentsQueue.splice(index, 1);
+					this.renderContractAttachmentsList(this.contractAttachmentsQueue, null);
+				}
+			}
+
+			// [NOVO v5.8] Renderiza a lista de arquivos do contrato no modal
+			renderContractAttachmentsList(files, contractId) {
+				const container = document.getElementById('contractFilesList');
+				if (!container) return;
+				container.innerHTML = '';
+
+				if (!files || files.length === 0) return;
+
+				files.forEach((file, index) => {
+					const chip = this.domBuilder.buildElement('div', { className: 'flex justify-between items-center bg-gray-800 border border-gray-600 rounded px-3 py-2' });
+
+					const left = this.domBuilder.buildElement('div', { className: 'flex items-center gap-2 overflow-hidden' });
+					let iconClass = file.type.startsWith('image/') ? 'fa-image text-purple-400' : 'fa-file-pdf text-red-400';
+					left.innerHTML = `<i class="fas ${iconClass}"></i> <span class="text-sm text-gray-300 truncate">${file.name}</span>`;
+
+					// Click para visualizar
+					const viewBtn = this.domBuilder.buildElement('button', { className: 'text-xs text-indigo-400 hover:text-indigo-300 mr-2', text: 'Ver' });
+					viewBtn.onclick = (e) => {
+						e.preventDefault();
+						const w = window.open("");
+						if (file.type.startsWith('image/')) w.document.write(`<img src="${file.data}" style="max-width:100%">`);
+						else w.document.write(`<iframe src="${file.data}" style="width:100%;height:100%;border:0"></iframe>`);
+					};
+
+					const delBtn = this.domBuilder.buildElement('button', { className: 'text-gray-500 hover:text-red-400', html: '<i class="fas fa-times"></i>' });
+					delBtn.onclick = (e) => {
+						e.preventDefault();
+						if (confirm('Remover este arquivo?')) this.handleRemoveContractAttachment(contractId, index);
+					};
+
+					const actions = this.domBuilder.buildElement('div');
+					actions.append(viewBtn, delBtn);
+
+					chip.append(left, actions);
+					container.append(chip);
+				});
+			}
+
 			// [INÍCIO DA ALTERAÇÃO - CONTRATO ESPECIAL]
 			// Lógica de Edição de Contrato ATUALIZADA
 			openContractModal(contractId = null) {
@@ -4477,6 +4624,26 @@
 					document.getElementById('financialDataChanged').value = 'false';
 					const title = document.getElementById('modalContratoTitle');
 					const servicosContainer = document.getElementById('servicosContainer'); servicosContainer.innerHTML = '';
+
+					// [NOVO v5.8] Inicializa Lógica de Arquivos do Contrato
+					this.contractAttachmentsQueue = [];
+					this.renderContractAttachmentsList([], null);
+
+					const dropZone = document.getElementById('contractFilesDropZone');
+					const fileInput = document.getElementById('contractFileInput');
+
+					// Setup Click no DropZone para abrir Input
+					dropZone.onclick = (e) => {
+						if (e.target !== fileInput) fileInput.click();
+					};
+					// Setup Input Change
+					fileInput.onchange = (e) => {
+						if (e.target.files[0]) this.handleContractFileUpload(document.getElementById('contractId').value, e.target.files[0]);
+					};
+					// Setup Drag and Drop
+					Utils.setupDragAndDrop(dropZone, (file) => {
+						this.handleContractFileUpload(document.getElementById('contractId').value, file);
+					});
 
 					// [INÍCIO DA ALTERAÇÃO - OFICINA]
 					// Esta função agora popula o modal com a lista do Firebase
@@ -4511,6 +4678,9 @@
 						document.getElementById('contratoTipoPagamento').value = contract.paymentType || 'Parcelado';
 						document.getElementById('contratoObservacoes').value = contract.observations || '';
 
+						// [NOVO v5.8] Renderiza Arquivos do Contrato
+						this.renderContractAttachmentsList(contract.contractAttachments || [], contract.id);
+
 						// Verifica se alguma parcela foi paga
 						const hasPaidParcels = (contract.parcels || []).some(p => p.status === 'Paga');
 
@@ -4521,9 +4691,72 @@
 							specialFields.classList.add('hidden'); // Esconde os campos especiais
 							specialCheckbox.disabled = true; // Desativa a checkbox
 							financialInputs.forEach(input => input.disabled = true);
+
+							// [NOVO] Renderiza lista de Parcelas Pagas para Anexos
+							const paidContainer = document.getElementById('paid-parcels-container');
+							const paidList = document.getElementById('paid-parcels-list');
+							paidContainer.classList.remove('hidden');
+							paidList.innerHTML = '';
+
+							(contract.parcels || []).forEach((p, pIndex) => {
+								if (p.status === 'Paga') {
+									const row = this.domBuilder.buildElement('div', { className: 'bg-gray-700/50 p-3 rounded border border-gray-600' });
+
+									// Info da Parcela
+									const info = this.domBuilder.buildElement('div', { className: 'flex justify-between text-sm text-gray-300 mb-2' });
+									info.innerHTML = `<span><strong>Parcela ${p.number}</strong> (Pago: ${Utils.formatCurrency(p.valuePaid)})</span> <span class="text-xs text-gray-400">${Utils.formatDate(p.paymentDate)}</span>`;
+									row.appendChild(info);
+
+									// Seção de Anexos (Cópia simplificada da lógica do Card)
+									const attDiv = this.domBuilder.buildElement('div', { className: 'border-t border-gray-600 pt-2' });
+
+									// Botão Add
+									const attHeader = this.domBuilder.buildElement('div', { className: 'flex justify-between items-center mb-1' });
+									const uploadLabel = this.domBuilder.buildElement('label', {
+										className: 'cursor-pointer text-xs text-indigo-300 hover:text-indigo-200 flex items-center gap-1',
+										html: '<i class="fas fa-plus-circle"></i> Anexar documento'
+									});
+									const fInput = this.domBuilder.buildElement('input', { className: 'hidden', type: 'file', accept: 'image/*,application/pdf' });
+									fInput.onchange = (e) => {
+										if (e.target.files[0]) this.handleFileUpload(contract.id, pIndex, e.target.files[0]);
+									};
+									uploadLabel.appendChild(fInput);
+									attHeader.appendChild(uploadLabel);
+									attDiv.appendChild(attHeader);
+
+									// Lista
+									const chips = this.domBuilder.buildElement('div', { className: 'flex flex-wrap gap-2' });
+									if (p.attachments && p.attachments.length > 0) {
+										p.attachments.forEach((att, attIdx) => {
+											const chip = this.domBuilder.buildElement('div', { className: 'bg-gray-800 text-xs px-2 py-1 rounded flex items-center gap-2 border border-gray-600' });
+
+											const nameSpan = this.domBuilder.buildElement('span', { className: 'cursor-pointer hover:text-indigo-400', text: att.name });
+											nameSpan.onclick = () => {
+												const w = window.open("");
+												if (att.type.startsWith('image/')) w.document.write(`<img src="${att.data}" style="max-width:100%">`);
+												else w.document.write(`<iframe src="${att.data}" style="width:100%;height:100%;border:0"></iframe>`);
+											};
+
+											const delIcon = this.domBuilder.buildElement('i', { className: 'fas fa-times text-red-400 cursor-pointer pl-1' });
+											delIcon.onclick = () => {
+												if (confirm('Remover anexo?')) this.handleRemoveAttachment(contract.id, pIndex, attIdx);
+											};
+
+											chip.appendChild(nameSpan);
+											chip.appendChild(delIcon);
+											chips.appendChild(chip);
+										});
+									}
+									attDiv.appendChild(chips);
+									row.appendChild(attDiv);
+									paidList.appendChild(row);
+								}
+							});
+
 						} else {
 							// Se não pagou, permite a edição (e reseta os campos)
 							financialWarning.classList.add('hidden');
+							document.getElementById('paid-parcels-container').classList.add('hidden'); // Escondecontainer
 							specialCheckbox.disabled = !this.isUserAdmin;
 							financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
 						}
@@ -4566,6 +4799,7 @@
 
 						// Garante que os campos estão visíveis e habilitados
 						financialWarning.classList.add('hidden');
+						document.getElementById('paid-parcels-container').classList.add('hidden'); // [NOVO] Garante escondido
 						financialInputs.forEach(input => input.disabled = !this.isUserAdmin);
 						document.getElementById('contratoJaQuitado').checked = false;
 
@@ -4613,9 +4847,23 @@
 				valorInput.value = valorCorrigido.toFixed(2);
 				valorInput.disabled = !this.isUserAdmin;
 
-				// [NOVO] Limpa o campo de anexo
+				// [NOVO] Limpa o campo de anexo e Configura Drag&Drop
 				const anexoInput = document.getElementById('pagamentoAnexo');
-				if (anexoInput) anexoInput.value = '';
+				if (anexoInput) {
+					anexoInput.value = '';
+
+					// Adiciona classes para efeito visual de "Drop Zone"
+					const dropContainer = anexoInput.parentElement;
+					dropContainer.classList.add('border', 'border-transparent', 'rounded-md', 'transition-colors', 'duration-200');
+
+					Utils.setupDragAndDrop(dropContainer, (file) => {
+						// Cria um FileList simulado para atribuir ao input
+						const dt = new DataTransfer();
+						dt.items.add(file);
+						anexoInput.files = dt.files;
+						Utils.showToast(`Arquivo "${file.name}" selecionado!`, 'info');
+					});
+				}
 
 				document.getElementById('pagamentoData').value = new Date().toISOString().split('T')[0];
 				this.openModal('modalPagamento');
